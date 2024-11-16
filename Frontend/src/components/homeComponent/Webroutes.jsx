@@ -16,6 +16,8 @@ import AttendanceSheet from '../dashboardComponents/teacherDashboardComponent/At
 import Settings from '../dashboardComponents/teacherDashboardComponent/Settings';
 import CourseList from '../dashboardComponents/teacherDashboardComponent/CourseList';
 import AttendanceReport from '../dashboardComponents/teacherDashboardComponent/AttendanceReport.jsx';
+import StudentHomePage from '../dashboardComponents/studentDashboardComponent/StudentHomePage.jsx';
+import StudentCalendar from '../dashboardComponents/studentDashboardComponent/StudentCalendar.jsx';
 
 const Webroutes = () => {
 
@@ -33,8 +35,8 @@ const attendanceData = [
         <Route path='/signup' element={<SignUp />} />
         <Route path='/aboutus' element={<AboutUs />} />
         <Route path='/studentdashboard' element={<StudentDashboard/>}>
-           <Route index element={<HomePage />} />
-           <Route path='attendance' element={<AttendanceSheet />} />
+           <Route index element={<StudentHomePage/>} />
+           <Route path='calendar' element={<StudentCalendar />} />
            <Route path='courses' element={<CourseList />} />
            <Route path='reports' element={<AttendanceReport attendanceData={attendanceData} />}/>
            <Route path='settings' element={<Settings/>} />
