@@ -33,6 +33,8 @@ const StudentHomePage = () => {
         { month: 'May', Present: 88, Late: 7, Absent: 5 },
         { month: 'Jun', Present: 92, Late: 5, Absent: 3 },
       ];
+      const XAxis = ({ ...rest }) => <RechartsXAxis {...rest} />;
+
      
   return (
     <div className="flex flex-col bg-gray-100">

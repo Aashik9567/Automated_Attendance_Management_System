@@ -3,8 +3,6 @@ import { FaChalkboardTeacher, FaUserGraduate, FaBook, FaChartBar, FaCog, FaBars,
 import store from '../../../zustand/loginStore';
 import { Outlet,useNavigate,useLocation } from 'react-router-dom';
 
-
-
 const TeacherDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
