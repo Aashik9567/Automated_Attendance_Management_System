@@ -1,29 +1,33 @@
 import React, { useState } from 'react';
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Button,
-  Input,
-  useDisclosure,
-  FormControl,
-  FormLabel,
-} from '@chakra-ui/react';
+import { 
+  Modal, 
+  Form, 
+  Input, 
+  Button, 
+  Table, 
+  Tag, 
+  DatePicker, 
+  Space, 
+  Popconfirm,
+  message 
+} from 'antd';
+import { 
+  PlusOutlined, 
+  EditOutlined, 
+  DeleteOutlined 
+} from '@ant-design/icons';
+import moment from 'moment';
 
 const AttendanceSheet = () => {
-  const [attendanceDate, setAttendanceDate] = useState(new Date().toISOString().split('T')[0]);
+  const [attendanceDate, setAttendanceDate] = useState(moment());
   const [attendanceData, setAttendanceData] = useState([
     { id: 1, name: 'Aashik Kumar Mahato', present: true },
     { id: 2, name: 'Bhawana Adhikari', present: false },
     { id: 3, name: 'Mandeep Kumar Mishra', present: true },
     { id: 4, name: 'Rensa Neupane', present: true },
   ]);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [newStudentName, setNewStudentName] = useState('');
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [form] = Form.useForm();
 
   const handleAttendanceChange = (id) => {
     setAttendanceData(attendanceData.map(student => 
@@ -31,87 +35,118 @@ const AttendanceSheet = () => {
     ));
   };
 
-  const handleDateChange = (e) => {
-    setAttendanceDate(e.target.value);
+  const handleAddStudent = () => {
+    form.validateFields()
+      .then(values => {
+        const newStudent = {
+          id: attendanceData.length + 1,
+          name: values.studentName,
+          present: false
+        };
+        setAttendanceData([...attendanceData, newStudent]);
+        setIsModalVisible(false);
+        form.resetFields();
+        message.success('Student added successfully');
+      })
+      .catch(errorInfo => {
+        console.log('Validation Failed:', errorInfo);
+      });
   };
 
-  const handleAddStudent = () => {
-    if (newStudentName.trim()) {
-      setAttendanceData([...attendanceData, {
-        id: attendanceData.length + 1,
-        name: newStudentName.trim(),
-        present: false
-      }]);
-      setNewStudentName('');
-      onClose();
-    }
+  const handleDeleteStudent = (id) => {
+    setAttendanceData(attendanceData.filter(student => student.id !== id));
+    message.success('Student removed successfully');
   };
+
+  const columns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'present',
+      key: 'status',
+      render: (present) => (
+        <Tag color={present ? 'green' : 'red'}>
+          {present ? 'Present' : 'Absent'}
+        </Tag>
+      )
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (_, record) => (
+        <Space size="middle">
+          <Button 
+            type="link" 
+            onClick={() => handleAttendanceChange(record.id)}
+          >
+            Change Status
+          </Button>
+          <Popconfirm
+            title="Sure to delete?"
+            onConfirm={() => handleDeleteStudent(record.id)}
+          >
+            <Button type="link" danger>Delete</Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
 
   return (
-    <div className="bg-white shadow-md rounded-lg overflow-hidden p-6">
-      <div className="mb-4 flex justify-between items-center">
-        <input
-          type="date"
+    <div className="p-6 bg-white rounded-lg shadow-lg">
+      <div className="flex items-center justify-between mb-4">
+        <DatePicker 
           value={attendanceDate}
-          onChange={handleDateChange}
-          className="border rounded px-2 py-1"
+          onChange={(date) => setAttendanceDate(date)}
+          className="mr-4"
         />
-        <Button colorScheme="blue" onClick={onOpen}>Add Student</Button>
+        <Button 
+          type="primary" 
+          icon={<PlusOutlined />} 
+          onClick={() => setIsModalVisible(true)}
+        >
+          Add Student
+        </Button>
       </div>
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {attendanceData.map(student => (
-            <tr key={student.id} className="hover:bg-gray-50 transition duration-150 ease-in-out">
-              <td className="px-6 py-4 whitespace-nowrap">{student.name}</td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  student.present ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                }`}>
-                  {student.present ? 'Present' : 'Absent'}
-                </span>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <button 
-                  onClick={() => handleAttendanceChange(student.id)}
-                  className="text-indigo-600 hover:text-indigo-900 transition duration-150 ease-in-out"
-                >
-                  Change
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Add New Student</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <FormLabel>Student Name</FormLabel>
-              <Input 
-                value={newStudentName}
-                onChange={(e) => setNewStudentName(e.target.value)}
-                placeholder="Enter student name"
-              />
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleAddStudent}>
-              Add
-            </Button>
-            <Button variant="ghost" onClick={onClose}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
+      <Table 
+        columns={columns} 
+        dataSource={attendanceData} 
+        rowKey="id"
+      />
+
+      <Modal
+        title="Add New Student"
+        open={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        footer={[
+          <Button key="back" onClick={() => setIsModalVisible(false)}>
+            Cancel
+          </Button>,
+          <Button 
+            key="submit" 
+            type="primary" 
+            onClick={handleAddStudent}
+          >
+            Add Student
+          </Button>
+        ]}
+      >
+        <Form form={form}>
+          <Form.Item
+            name="studentName"
+            rules={[{ 
+              required: true, 
+              message: 'Please input student name' 
+            }]}
+          >
+            <Input placeholder="Enter student name" />
+          </Form.Item>
+        </Form>
       </Modal>
     </div>
   );

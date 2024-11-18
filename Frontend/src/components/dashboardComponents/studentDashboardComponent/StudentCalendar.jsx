@@ -101,11 +101,11 @@ const StudentCalendar = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8 bg-gradient-to-r from-indigo-400 to-purple-400">
+    <div className="flex flex-col items-center justify-center p-16 rounded-xl min-h-max bg-gradient-to-r from-indigo-400 to-purple-400">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-3xl"
+        className="w-full max-w-2xl"
       >
         <Card 
           className="backdrop-blur-lg"
@@ -156,7 +156,7 @@ const StudentCalendar = () => {
                 type="text"
                 style={{ color: 'white' }}
               />
-              <h4 className="text-2xl font-bold text-white">
+              <h4 className="text-2xl font-bold text-neutral-100">
                 {nepaliMonths[currentDate.getMonth()]} {currentDate.getYear()}
               </h4>
               <Button
@@ -169,7 +169,7 @@ const StudentCalendar = () => {
 
             <div className="grid grid-cols-7 gap-2 mb-2">
               {nepaliDays.map(day => (
-                <div key={day} className="text-sm font-medium text-center text-white">
+                <div key={day} className="text-sm font-medium text-center text-neutral-100">
                   {day}
                 </div>
               ))}
@@ -190,7 +190,7 @@ const StudentCalendar = () => {
                   disabled={!date}
                 >
                   {date && (
-                    <span className="text-xl font-medium text-white">
+                    <span className="text-xl font-medium text-neutral-100">
                       {date.getDate()}
                     </span>
                   )}
@@ -219,7 +219,7 @@ const StudentCalendar = () => {
             className="p-4 mt-6 rounded-lg"
             style={{ background: 'rgba(255, 255, 255, 0.1)' }}
           >
-            <h4 className="mb-4 text-xl font-bold text-white">Upcoming Events</h4>
+            <h4 className="mb-4 text-xl font-bold text-neutral-100">Upcoming Events</h4>
             <div className="space-y-3">
               {getUpcomingEvents().map((event, index) => (
                 <motion.div 
@@ -230,8 +230,8 @@ const StudentCalendar = () => {
                   className="flex items-center justify-between p-3 rounded-lg"
                   style={{ background: 'rgba(255, 255, 255, 0.1)' }}
                 >
-                  <span className="font-medium text-white">{event.title}</span>
-                  <span className="text-white opacity-75">{event.date}</span>
+                  <span className="font-medium text-neutral-100">{event.title}</span>
+                  <span className="opacity-75 text-neutral-100">{event.date}</span>
                 </motion.div>
               ))}
             </div>
@@ -246,7 +246,7 @@ const StudentCalendar = () => {
                 className="p-4 mt-4 rounded-lg"
                 style={{ background: 'rgba(255, 255, 255, 0.2)' }}
               >
-                <h4 className="text-lg font-semibold text-white">
+                <h4 className="text-lg font-semibold text-neutral-100">
                   {events[`${selectedDate.getYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`].title}
                 </h4>
               </motion.div>

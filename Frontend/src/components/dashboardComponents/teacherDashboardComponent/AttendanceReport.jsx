@@ -27,13 +27,13 @@ const AttendanceReport = ({ attendanceData }) => {
   const COLORS = ['#00C49F', '#FF8042'];
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6">
-      <h2 className="text-2xl font-bold mb-4">Attendance Report</h2>
+    <div className="p-6 rounded-lg shadow-md bg-neutral-100">
+      <h2 className="mb-4 text-2xl font-bold">Attendance Report</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Bar Chart: Daily Attendance */}
         <div>
-          <h3 className="text-lg font-semibold mb-2">Daily Attendance</h3>
+          <h3 className="mb-2 text-lg font-semibold">Daily Attendance</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={attendanceData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -48,7 +48,7 @@ const AttendanceReport = ({ attendanceData }) => {
 
         {/* Pie Chart: Overall Attendance */}
         <div>
-          <h3 className="text-lg font-semibold mb-2">Overall Attendance</h3>
+          <h3 className="mb-2 text-lg font-semibold">Overall Attendance</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -72,7 +72,7 @@ const AttendanceReport = ({ attendanceData }) => {
 
         {/* Line Chart: Attendance Trend */}
         <div>
-          <h3 className="text-lg font-semibold mb-2">Attendance Trend</h3>
+          <h3 className="mb-2 text-lg font-semibold">Attendance Trend</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={attendanceData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -87,8 +87,8 @@ const AttendanceReport = ({ attendanceData }) => {
 
         {/* Summary Statistics */}
         <div>
-          <h3 className="text-lg font-semibold mb-2">Summary Statistics</h3>
-          <div className="bg-gray-100 p-4 rounded-lg">
+          <h3 className="mb-2 text-lg font-semibold">Summary Statistics</h3>
+          <div className="p-4 bg-gray-100 rounded-lg">
             <p className="mb-2">Total Days: {attendanceData.length}</p>
             <p className="mb-2">Average Attendance: {averageAttendance.toFixed(2)} students</p>
             <p className="mb-2">Highest Attendance: {Math.max(...attendanceData.map(day => day.presentCount))} students</p>

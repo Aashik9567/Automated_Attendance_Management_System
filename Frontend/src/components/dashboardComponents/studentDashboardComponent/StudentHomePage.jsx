@@ -37,7 +37,7 @@ const StudentHomePage = () => {
 
      
   return (
-    <div className="flex flex-col bg-gray-100">
+    <div className="flex flex-col bg-stone-300">
               {/* Metric Cards */}
               <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2 lg:grid-cols-4">
                 {['bg-indigo-400', 'bg-blue-400', 'bg-orange-400', 'bg-green-400'].map((color, index) => (
@@ -51,7 +51,7 @@ const StudentHomePage = () => {
               </div>
 
               {/* Main Chart */}
-              <div className="p-6 mb-8 rounded-lg shadow-md bg-slate-200">
+              <div className="p-6 mb-8 rounded-lg shadow-md bg-stone-300">
                 <h4 className="mb-4 text-xl font-semibold">Monthly Attendance Trends</h4>
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
@@ -72,7 +72,7 @@ const StudentHomePage = () => {
               {/* Bottom Section */}
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
                 {/* Department Attendance Chart */}
-                <div className="p-6 rounded-lg shadow-md bg-slate-200">
+                <div className="p-6 rounded-lg shadow-md bg-stone-300">
                   <h4 className="mb-4 text-xl font-bold">Monthly Attendance Record</h4>
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
@@ -88,7 +88,7 @@ const StudentHomePage = () => {
                 </div>
 
                 {/* Attendance Stats and Leave Types */}
-                <div className="p-4 rounded-lg shadow-md bg-slate-200 max-h-96">
+                <div className="p-4 rounded-lg shadow-md bg-stone-300 max-h-96">
                   <h4 className="text-xl font-bold ">Attendance Statistics</h4>
                   <PieChart
                     data={data}

@@ -1,124 +1,192 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  VStack,
-  Heading,
-  SimpleGrid,
-  FormControl,
-  FormLabel,
-  Input,
-  Select,
-  Button,
-  useToast,
-  Divider,
-  Avatar,
-  Flex,
-  IconButton,
-} from '@chakra-ui/react';
-import { FaCamera } from 'react-icons/fa';
+import { 
+  Layout, 
+  Form, 
+  Input, 
+  Select, 
+  Button, 
+  Avatar, 
+  Typography, 
+  Row, 
+  Col, 
+  Divider, 
+  message 
+} from 'antd';
+import { CameraOutlined } from '@ant-design/icons';
 import store from '../../../zustand/loginStore';
 
+const { Title } = Typography;
+
 const Settings = () => {
-    const { isLogin, loginUserData } = store(state => state)
-  const toast = useToast();
+  const { isLogin, loginUserData } = store(state => state);
+  const [form] = Form.useForm();
 
   const handleSaveChanges = () => {
-    // Logic to save changes would go here
-    toast({
-      title: "Settings saved.",
-      description: "Your changes have been successfully saved.",
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
+    form.validateFields()
+      .then(values => {
+        // Logic to save changes would go here
+        message.success('Settings saved successfully');
+      })
+      .catch(errorInfo => {
+        message.error('Validation failed');
+      });
   };
 
   return (
-    <Box bg="white" shadow="xl" rounded="lg" p={6}>
-      <Heading size="lg" mb={6}>Account Settings</Heading>
+    <Layout.Content style={{ padding: '24px', backgroundColor: 'white' }}>
+      <Title level={3} style={{ marginBottom: 24 }}>Account Settings</Title>
       
-      <VStack spacing={8} align="stretch">
+      <Form form={form} layout="vertical">
         {/* Profile Information */}
-        <Box>
-          <Heading size="md" mb={4}>Profile Information</Heading>
-          <Flex alignItems="center" mb={4}>
-            <Avatar size="xl" src={loginUserData.avatar} mr={4} />
-            <IconButton
-              aria-label="Change profile picture"
-              icon={<FaCamera />}
-              isRound
-              onClick={() => {/* Logic to change profile picture */}}
-            />
-          </Flex>
-          <SimpleGrid columns={2} spacing={4}>
-            <FormControl>
-              <FormLabel>Full Name</FormLabel>
-              <Input placeholder="John" />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Email Address</FormLabel>
-              <Input placeholder="aashik.077@example.com" type="email" />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Phone Number</FormLabel>
-              <Input placeholder="+977980000000" type="tel" />
-            </FormControl>
-          </SimpleGrid>
-        </Box>
+        <div>
+          <Title level={4} style={{ marginBottom: 16 }}>Profile Information</Title>
+          <Row align="middle" gutter={16} style={{ marginBottom: 16 }}>
+            <Col>
+              <Avatar size={128} src={loginUserData.avatar} />
+            </Col>
+            <Col>
+              <Button 
+                type="text" 
+                icon={<CameraOutlined />}
+                onClick={() => {/* Logic to change profile picture */}}
+              >
+                Change Profile Picture
+              </Button>
+            </Col>
+          </Row>
+          
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item 
+                name="fullName" 
+                label="Full Name"
+                rules={[{ required: true, message: 'Please input your full name' }]}
+              >
+                <Input placeholder="John" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item 
+                name="email" 
+                label="Email Address"
+                rules={[{ 
+                  required: true, 
+                  type: 'email', 
+                  message: 'Please input a valid email' 
+                }]}
+              >
+                <Input placeholder="aashik.077@example.com" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item 
+                name="phoneNumber" 
+                label="Phone Number"
+              >
+                <Input placeholder="+977980000000" />
+              </Form.Item>
+            </Col>
+          </Row>
+        </div>
 
         <Divider />
 
         {/* Account Security */}
-        <Box>
-          <Heading size="md" mb={4}>Account Security</Heading>
-          <VStack align="stretch" spacing={4}>
-            <FormControl>
-              <FormLabel>Change Password</FormLabel>
-              <Input placeholder="New password" type="password" mb={2} />
-              <Input placeholder="Confirm new password" type="password" />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Two-Factor Authentication</FormLabel>
-              <Select placeholder="Select option">
-                <option value="disabled">Disabled</option>
-                <option value="sms">SMS</option>
-                <option value="app">Authenticator App</option>
-              </Select>
-            </FormControl>
-          </VStack>
-        </Box>
+        <div>
+          <Title level={4} style={{ marginBottom: 16 }}>Account Security</Title>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item 
+                name="newPassword" 
+                label="Change Password"
+                rules={[{ 
+                  min: 6, 
+                  message: 'Password must be at least 6 characters' 
+                }]}
+              >
+                <Input.Password placeholder="New password" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item 
+                name="confirmPassword" 
+                label="Confirm New Password"
+                dependencies={['newPassword']}
+                rules={[
+                  { 
+                    validator: async (_, value) => {
+                      const newPassword = form.getFieldValue('newPassword');
+                      if (newPassword && value !== newPassword) {
+                        throw new Error('Passwords do not match');
+                      }
+                    } 
+                  }
+                ]}
+              >
+                <Input.Password placeholder="Confirm new password" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item 
+                name="twoFactor" 
+                label="Two-Factor Authentication"
+              >
+                <Select placeholder="Select option">
+                  <Select.Option value="disabled">Disabled</Select.Option>
+                  <Select.Option value="sms">SMS</Select.Option>
+                  <Select.Option value="app">Authenticator App</Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+        </div>
 
         <Divider />
 
         {/* Teaching Preferences */}
-        <Box>
-          <Heading size="md" mb={4}>Teaching Preferences</Heading>
-          <SimpleGrid columns={2} spacing={4}>
-            <FormControl>
-              <FormLabel>Preferred Teaching Mode</FormLabel>
-              <Select placeholder="Select mode">
-                <option value="in-person">In-person</option>
-                <option value="online">Online</option>
-                <option value="hybrid">Hybrid</option>
-              </Select>
-            </FormControl>
-            <FormControl>
-              <FormLabel>Class Size Preference</FormLabel>
-              <Select placeholder="Select size">
-                <option value="small">Small (1-15 students)</option>
-                <option value="medium">Medium (16-30 students)</option>
-                <option value="large">Large (31+ students)</option>
-              </Select>
-            </FormControl>
-          </SimpleGrid>
-        </Box>
+        <div>
+          <Title level={4} style={{ marginBottom: 16 }}>Teaching Preferences</Title>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item 
+                name="teachingMode" 
+                label="Preferred Teaching Mode"
+              >
+                <Select placeholder="Select mode">
+                  <Select.Option value="in-person">In-person</Select.Option>
+                  <Select.Option value="online">Online</Select.Option>
+                  <Select.Option value="hybrid">Hybrid</Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item 
+                name="classSizePreference" 
+                label="Class Size Preference"
+              >
+                <Select placeholder="Select size">
+                  <Select.Option value="small">Small (1-15 students)</Select.Option>
+                  <Select.Option value="medium">Medium (16-30 students)</Select.Option>
+                  <Select.Option value="large">Large (31+ students)</Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+        </div>
 
         {/* Save Changes Button */}
-        <Button colorScheme="blue" size="lg" onClick={handleSaveChanges}>
-          Save Changes
-        </Button>
-      </VStack>
-    </Box>
+        <Form.Item>
+          <Button 
+            type="primary" 
+            size="large" 
+            onClick={handleSaveChanges}
+            block
+          >
+            Save Changes
+          </Button>
+        </Form.Item>
+      </Form>
+    </Layout.Content>
   );
 };
 

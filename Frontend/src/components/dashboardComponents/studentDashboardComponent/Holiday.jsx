@@ -6,7 +6,7 @@ const Holiday = () => {
     <h3 className="mb-4 text-xl font-semibold">Upcoming Holidays</h3>
     <table className="min-w-full">
       <thead>
-        <tr className="bg-gray-100">
+        <tr className="bg-stone-300">
           <th className="p-2 text-left">Date</th>
           <th className="p-2 text-left">Holiday</th>
           <th className="p-2 text-left">Type</th>
