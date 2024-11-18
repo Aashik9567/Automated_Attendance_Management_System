@@ -1,7 +1,9 @@
 import React,{useState} from "react";
 import CourseList from './CourseList';
 import StudentStats from './StudentStats';
+import { useOutletContext } from "react-router-dom";
 const HomePage = () => {
+    const { changeTab } = useOutletContext();
     const [image, setImage] = useState(null);
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -79,12 +81,12 @@ const HomePage = () => {
         </div>
       </div>
       <div className="grid grid-cols-1 gap-6 shadow-lg md:grid-cols-2">
-        <CourseList />
+        
         <div className="flex flex-col items-center justify-center mb-2 text-xl font-semibold bg-white rounded-lg shadow-md">
           <h3 className="mb-4 font-extrabold">Quick Actions</h3>
           <div className="grid grid-cols-1 gap-6">
             <button
-              onClick={() => changeTab("attendance")}
+              onClick={() => changeTab('Attendance', '/teacherdashboard/attendance')}
               className="p-2 text-white transition transform bg-blue-500 rounded hover:bg-blue-600 hover:scale-105"
             >
               Take Attendance
@@ -94,6 +96,7 @@ const HomePage = () => {
             </button>
           </div>
         </div>
+        <CourseList />
       </div>
     </>
   );

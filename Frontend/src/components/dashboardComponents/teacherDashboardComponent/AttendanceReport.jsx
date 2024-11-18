@@ -2,7 +2,6 @@ import React from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   PieChart, Pie, Cell,
-  LineChart, Line,
   ResponsiveContainer
 } from 'recharts';
 
@@ -24,13 +23,13 @@ const AttendanceReport = ({ attendanceData }) => {
     { name: 'Absent', value: overallAttendance.absent },
   ];
 
-  const COLORS = ['#00C49F', '#FF8042'];
+  const COLORS = ['green', 'orange'];
 
   return (
-    <div className="p-6 rounded-lg shadow-md bg-neutral-100">
+    <div className="p-6 rounded-lg shadow-md bg-neutral-400">
       <h2 className="mb-4 text-2xl font-bold">Attendance Report</h2>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6">
         {/* Bar Chart: Daily Attendance */}
         <div>
           <h3 className="mb-2 text-lg font-semibold">Daily Attendance</h3>
@@ -69,26 +68,10 @@ const AttendanceReport = ({ attendanceData }) => {
             </PieChart>
           </ResponsiveContainer>
         </div>
-
-        {/* Line Chart: Attendance Trend */}
-        <div>
-          <h3 className="mb-2 text-lg font-semibold">Attendance Trend</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={attendanceData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="presentCount" stroke="#8884d8" name="Present" />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
         {/* Summary Statistics */}
         <div>
           <h3 className="mb-2 text-lg font-semibold">Summary Statistics</h3>
-          <div className="p-4 bg-gray-100 rounded-lg">
+          <div className="p-4 rounded-lg bg-neutral-400">
             <p className="mb-2">Total Days: {attendanceData.length}</p>
             <p className="mb-2">Average Attendance: {averageAttendance.toFixed(2)} students</p>
             <p className="mb-2">Highest Attendance: {Math.max(...attendanceData.map(day => day.presentCount))} students</p>

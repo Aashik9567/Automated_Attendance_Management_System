@@ -116,7 +116,7 @@ const CourseList = () => {
       </div>
 
       <List
-        grid={{ gutter: 16, column: 3 }}
+        grid={{ gutter: 16, column: 1 }}
         dataSource={courses}
         renderItem={(course) => (
           <List.Item>

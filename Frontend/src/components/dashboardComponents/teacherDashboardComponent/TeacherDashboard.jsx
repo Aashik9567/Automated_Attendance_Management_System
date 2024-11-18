@@ -77,14 +77,14 @@ const TeacherDashboard = () => {
               <FaBars size={24} />
             </button>
           </header>
-          <div className="p-6">
-            <div className="p-6 mb-6 text-white rounded-lg shadow-lg bg-gradient-to-r from-blue-500 to-purple-600">
+          <div className="p-2">
+            <div className="p-6 mb-2 text-white rounded-lg shadow-lg bg-gradient-to-r from-blue-500 to-purple-600">
               <h2 className="mb-2 text-4xl font-bold">
                 {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
               </h2>
               <p className={`text-blue-100 ${activeTab==='Home'?'':'hidden'}`}>Manage your classroom with ease</p>
             </div>
-            <Outlet />
+            <Outlet context={{ changeTab }}/>
           </div>
         </main>
 
