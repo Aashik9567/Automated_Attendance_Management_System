@@ -11,7 +11,7 @@ const initialLoginState = {
 };
 
 const store = create(
-    persist(
+    
         (set) => ({
             loginUserData: initialLoginState,
             isLogin: false,
@@ -45,6 +45,5 @@ const store = create(
             }),
         }
     )
-);
 
 export default store;

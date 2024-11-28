@@ -1,4 +1,4 @@
-import React from 'react'
+import React,{useState} from 'react'
 import login from '../assets/login.png'
 import ImageDisplayer from './ImageDisplayer'
 import {useNavigate} from 'react-router-dom'
@@ -14,8 +14,12 @@ const schema=z.object({
   role: z.string().min(1, {message: "role is required"}),
   firstName:z.string().min(1,{message:"first name is required"}),
   lastName:z.string().min(1,{message:"last name is required "})
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"]
 })
 const SignUp = () => {
+  const [loading, setLoading] = useState(false);
   const nav=useNavigate();
   const {
     register,
@@ -25,12 +29,13 @@ const SignUp = () => {
     resolver: zodResolver(schema)
   })
   const submitHandle=async (data)=>{
+    console.log(data);  
     try {
+      setLoading(true);
       console.log(data)
       const response = await axios.post("http://localhost:8080/api/v1/users/signup", {
         email: data.email,
         password: data.password,
-        confirmPassword: data.confirmPassword,
         role: data.role,
         firstName:data.firstName,
         lastName:data.lastName
@@ -39,20 +44,11 @@ const SignUp = () => {
       nav("/login");
       toast.success(response?.data.message);
     } catch (error) {
-    if(axios.isAxiosError(error)) {
-      if(error.response){
-         const errors =  error.response.data.message;
-        errors?.map((item)=>{
-            toast.error(item);
-        })
-        
-      }
+        toast.error(error.response.data.message);
   }
+  finally{
+    setLoading(false)
   }
-  }
- 
-  const goToLogin=()=>{
-    nav("/login");
   }
 
   return (
@@ -69,8 +65,7 @@ const SignUp = () => {
               </h1>
               <div className='mb-5 text-sm font-light'>Enter details to create your account</div>
               <form onSubmit={handleSubmit(submitHandle)} className="space-y-4 md:space-y-4" action="#">
-                <select id="role" className="block w-full p-2 text-sm border rounded-lg bg-gray-50 border-blur-e00" {...register("Role")}>
-                       <option value="">Select a role</option>
+                <select id="role" className="block w-full p-2 text-sm border rounded-lg bg-gray-50 border-blur-e00" {...register("role")}>
                        <option value="Teacher" >Teacher</option>
                        <option value="Student">Student</option>
                 </select>
@@ -99,12 +94,12 @@ const SignUp = () => {
                 </div>
                 <div>
                   <label htmlFor="confirm-password" className="block mb-2 text-sm font-medium">Confirm Password</label>
-                  <input type="confirm-password" {...register("confirm-password")} id="confirm-password" placeholder="Confirm password" className="block w-full p-2 border border-blue-500 rounded-lg focus:ring-primary-600 focus:border-primary-600"/>
+                  <input type="confirm-password" {...register("confirmPassword")} id="confirm-password" placeholder="Confirm password" className="block w-full p-2 border border-blue-500 rounded-lg focus:ring-primary-600 focus:border-primary-600"/>
                   {errors.confirmPassword && <p className='text-red-400'>{errors.confirmPassword.message}</p>}
                 </div>
-                <button type="submit" className="w-full bg-cyan-300 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mt-4">Create an account</button>
+                <button type="submit" disabled={loading} className="w-full bg-cyan-300 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mt-4">{loading ? "Loading...." : "Create an account"}</button>
                 <p className="text-sm font-light ">
-                  Already have an account? <button onClick={()=>{goToLogin()}} type="button" className="px-4 py-2 mx-3 mb-2 text-sm font-medium text-center text-white rounded-lg shadow-lg bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 shadow-teal-500/50 dark:shadow-teal-800/80 me-2">Login here</button>
+                  Already have an account? <button onClick={()=> nav("/login")} type="button" className="px-4 py-2 mx-3 mb-2 text-sm font-medium text-center text-white rounded-lg shadow-lg bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 shadow-teal-500/50 dark:shadow-teal-800/80 me-2">Login here</button>
                 </p>
               </form>
             </div>

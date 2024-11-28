@@ -51,9 +51,12 @@ const signupUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async(req,res)=>{
-    const { email, password, role} = req.body;
-    if (!(email || password || role)) {
-        throw new apiError(400, "please provide all the details ");
+    const { email, password } = req.body;
+    if (!email) {
+        throw new apiError(400, "please provide email ");
+    }
+    if (!password) {
+        throw new apiError(400, "please provide password ");
     }
     const user = await User.findOne({ email });
     if (!(user ||(await user.isPasswordCorrect(password)))) {
@@ -71,7 +74,7 @@ const loginUser = asyncHandler(async(req,res)=>{
     .json(new apiResponse(200,"user logged in successfully",{loginUser,accessToken,refreshToken}))
     
 })
-const logoutUser = await asyncHandler(async (req, res) => {
+const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user?._id,
         { $unset:

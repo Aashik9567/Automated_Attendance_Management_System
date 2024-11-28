@@ -9,6 +9,7 @@ import axios from 'axios';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
 import store from '../zustand/loginStore'
+import { toast } from 'react-toastify';
 const schema = z.object({
     email: z.string().min(1, { message: "Email is required" }).email("please enter valid format of email"),
     password: z.string().min(1, { message: "Password is required" }),
@@ -28,16 +29,20 @@ const Login = () => {
 
     const  submitHandle = async (formData) => {
         try{
-            const response = await axios.get('http://localhost:8080/api/v1/users/login', {
+            console.log(formData.email,formData.password)
+            const response = await axios.post('http://localhost:8080/api/v1/users/login', {
                 email: formData.email,
                 password: formData.password
             });
             console.log(response.data)
             setLoginStatus(true);
+            setLoggedInUser(response.data)
+            toast.success(response.data?.message);
 
         }
         catch(error){
             console.log(error)
+            toast.error(error.response.data.message);
         }
     }
    
