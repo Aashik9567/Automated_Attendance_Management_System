@@ -1,9 +1,19 @@
 import connectDb from "./database/db.js";
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+const app = express();
+app.use(cors({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true
+}))
 import dotenv from "dotenv";
-import {app} from "./app.js";
 dotenv.config({
     path:'./.env'
 })
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(express.json())
 
 connectDb().
 then(() =>{
@@ -12,3 +22,6 @@ then(() =>{
     })
 })
 .catch((error) => console.error("mongodb connection failed!!",error));
+// Routes import 
+import userRoutes from "./routes/user.routes.js";
+app.use("/api/v1/users", userRoutes);
