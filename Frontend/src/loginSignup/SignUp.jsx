@@ -5,28 +5,52 @@ import {useNavigate} from 'react-router-dom'
 import { z } from "zod"
 import { useForm } from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod"
+import axios from 'axios'
+import { toast } from 'react-toastify'
 const schema=z.object({
   email: z.string().min(1, { message: "Email is required" }).email("please enter valid format of email"),
   password: z.string().min(1, { message: "Password is required" }),
   confirmPassword:z.string().min(1,{message:'confirm the password'}),
-  Role: z.string().min(1, {message: "Role is required"}),
+  role: z.string().min(1, {message: "role is required"}),
   firstName:z.string().min(1,{message:"first name is required"}),
   lastName:z.string().min(1,{message:"last name is required "})
 })
-
 const SignUp = () => {
+  const nav=useNavigate();
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema)
   })
-  const submitHandle=(data)=>{
-    console.log(data)
+  const submitHandle=async (data)=>{
+    try {
+      console.log(data)
+      const response = await axios.post("http://localhost:8080/api/v1/users/signup", {
+        email: data.email,
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+        role: data.role,
+        firstName:data.firstName,
+        lastName:data.lastName
+      });
+      console.log(response.data)
+      nav("/login");
+      toast.success(response?.data.message);
+    } catch (error) {
+    if(axios.isAxiosError(error)) {
+      if(error.response){
+         const errors =  error.response.data.message;
+        errors?.map((item)=>{
+            toast.error(item);
+        })
+        
+      }
   }
-  const nav=useNavigate();
+  }
+  }
+ 
   const goToLogin=()=>{
     nav("/login");
   }
@@ -37,20 +61,20 @@ const SignUp = () => {
         {/* Image Part */}
         <ImageDisplayer login={login} />
         {/* signup part */}
-        <div className="md:w-1/2 h-screen bg-gradient-to-b from-purple-400 to-indigo-400 flex flex-col justify-center px-6 py-8">
-          <div className="w-full rounded-lg shadow sm:max-w-md xl:p-0 mx-auto">
+        <div className="flex flex-col justify-center h-screen px-6 py-8 md:w-1/2 bg-gradient-to-b from-purple-400 to-indigo-400">
+          <div className="w-full mx-auto rounded-lg shadow sm:max-w-md xl:p-0">
             <div className="p-6 md:space-y-4 sm:p-8">
-              <h1 className="text-xl font-bold md:text-2xl text-center mb-4">
+              <h1 className="mb-4 text-xl font-bold text-center md:text-2xl">
                 Sign Up
               </h1>
-              <div className='mb-5 font-light text-sm'>Enter details to create your account</div>
+              <div className='mb-5 text-sm font-light'>Enter details to create your account</div>
               <form onSubmit={handleSubmit(submitHandle)} className="space-y-4 md:space-y-4" action="#">
-                <select id="Role" className="bg-gray-50 border border-blur-e00  text-sm rounded-lg  block w-full p-2" {...register("Role")}>
+                <select id="role" className="block w-full p-2 text-sm border rounded-lg bg-gray-50 border-blur-e00" {...register("Role")}>
                        <option value="">Select a role</option>
-                       <option value="teacher" >Teacher</option>
-                       <option value="student">Student</option>
+                       <option value="Teacher" >Teacher</option>
+                       <option value="Student">Student</option>
                 </select>
-                 {errors.Role && (<p className="text-red-400">{errors.Role.message}</p>)}
+                 {errors.role && (<p className="text-red-400">{errors.role.message}</p>)}
                 <div className="grid md:grid-cols-2 md:gap-6">
                   <div className="relative z-0 w-full mb-5 group">
                     <input type="text" {...register("firstName")} id="firstName" className="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" "/>
@@ -65,22 +89,22 @@ const SignUp = () => {
                 </div>
                 <div>
                   <label htmlFor="email" className="block mb-2 text-sm font-medium">Your email</label>
-                  <input type="email" {...register("email")} id="email" className="border border-blue-500 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2" placeholder="name@acem.edu.np"/>
+                  <input type="email" {...register("email")} id="email" className="block w-full p-2 border border-blue-500 rounded-lg focus:ring-primary-600 focus:border-primary-600" placeholder="name@acem.edu.np"/>
                   {errors.email && (<p className="text-red-400">{errors.email.message}</p>)}
                 </div>
                 <div>
                   <label htmlFor="password" className="block mb-2 text-sm font-medium">Password</label>
-                  <input type="password" {...register("password")} id="password" placeholder="Enter password" className="border border-blue-500 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2" />
+                  <input type="password" {...register("password")} id="password" placeholder="Enter password" className="block w-full p-2 border border-blue-500 rounded-lg focus:ring-primary-600 focus:border-primary-600" />
                   {errors.password && <p className='text-red-400'>{errors.password.message}</p>}
                 </div>
                 <div>
                   <label htmlFor="confirm-password" className="block mb-2 text-sm font-medium">Confirm Password</label>
-                  <input type="confirm-password" {...register("confirm-password")} id="confirm-password" placeholder="Confirm password" className="border border-blue-500 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2"/>
+                  <input type="confirm-password" {...register("confirm-password")} id="confirm-password" placeholder="Confirm password" className="block w-full p-2 border border-blue-500 rounded-lg focus:ring-primary-600 focus:border-primary-600"/>
                   {errors.confirmPassword && <p className='text-red-400'>{errors.confirmPassword.message}</p>}
                 </div>
                 <button type="submit" className="w-full bg-cyan-300 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mt-4">Create an account</button>
                 <p className="text-sm font-light ">
-                  Already have an account? <button onClick={()=>{goToLogin()}} type="button" className="text-white bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 shadow-lg shadow-teal-500/50 dark:shadow-teal-800/80 font-medium rounded-lg text-sm mx-3 px-4 py-2 text-center me-2 mb-2">Login here</button>
+                  Already have an account? <button onClick={()=>{goToLogin()}} type="button" className="px-4 py-2 mx-3 mb-2 text-sm font-medium text-center text-white rounded-lg shadow-lg bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 shadow-teal-500/50 dark:shadow-teal-800/80 me-2">Login here</button>
                 </p>
               </form>
             </div>

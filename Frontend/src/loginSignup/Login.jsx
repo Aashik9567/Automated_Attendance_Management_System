@@ -28,21 +28,11 @@ const Login = () => {
 
     const  submitHandle = async (formData) => {
         try{
-            const response = await axios.post('https://api.escuelajs.co/api/v1/auth/login', {
+            const response = await axios.get('http://localhost:8080/api/v1/users/login', {
                 email: formData.email,
                 password: formData.password
             });
-            
-            localStorage.setItem("AccessToken", response.data.access_token);
-            localStorage.setItem("RefreshToken", response.data.refresh_token);
-            
-            // Fetch user data after successful login
-            const userResponse = await axios.get('https://api.escuelajs.co/api/v1/auth/profile', {
-                headers: {
-                    Authorization: `Bearer ${response.data.access_token}`
-                }
-            });
-            setLoggedInUser(userResponse.data);
+            console.log(response.data)
             setLoginStatus(true);
 
         }
