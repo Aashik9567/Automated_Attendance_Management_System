@@ -2,20 +2,30 @@ import React, { useState } from 'react';
 import { FaChalkboardTeacher, FaUserGraduate, FaBook, FaChartBar, FaCog, FaBars, FaTimes, FaSignOutAlt, FaChevronRight } from 'react-icons/fa';
 import store from '../../../zustand/loginStore';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { message } from 'antd';
+import axios from 'axios';
 
 const TeacherDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { loginUserData } = store(state => state);
+  const { loginUserData, setLoginStatus } = store(state => state);
   // Determine active tab from current path
   const getActiveTab = (path) => {
     if (path === '/teacherdashboard') return 'Home';
     const segment = path.split('/').pop();
     return segment.charAt(0).toUpperCase() + segment.slice(1);
   };
-  const handleLogout = () => {
-    console.log('Logout');
+  const handleLogout = async () => {
+    try {
+      const response= await axios.post('http://localhost:8080/api/v1/users/logout');
+      setLoginStatus(false);
+      message.success(response.data.message);
+      navigate('/');
+      
+    } catch (error) {
+      message.error(error.message);
+    }
   }
 
   const [activeTab, setActiveTab] = useState(getActiveTab(location.pathname));

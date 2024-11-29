@@ -10,8 +10,6 @@ import { message } from 'antd';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
 import store from '../zustand/loginStore'
-import { toast } from 'react-toastify';
-import { AntDesignOutlined } from '@ant-design/icons';
 const schema = z.object({
     email: z.string()
         .min(1, { message: "Email is required" })
@@ -20,7 +18,7 @@ const schema = z.object({
         .min(3, { message: "Password must be at least 3 characters" })
 })
 const Login = () => {
-    const {setLoginStatus,isLogin,setLoggedInUser}=store(state=>state)
+    const {setLoginStatus,setLoggedInUser}=store(state=>state)
     
     const navigate = useNavigate();
     const {

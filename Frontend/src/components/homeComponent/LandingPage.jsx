@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { ReactTyped } from "react-typed";
 const LandingPage = () => {
   return (
-    <div className="min-h-screen text-white bg-gradient-to-b from-purple-600 to-indigo-400">
+    <div className="min-h-screen text-white bg-gradient-to-r from-blue-500 to-indigo-400">
       {/* Header */}
       <header className="container px-4 py-4 mx-auto sm:py-4">
         <nav className="flex items-center justify-between">
