@@ -52,14 +52,11 @@ const signupUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async(req,res)=>{
     const { email, password } = req.body;
-    if (!email) {
-        throw new apiError(400, "please provide email ");
-    }
-    if (!password) {
-        throw new apiError(400, "please provide password ");
+    if (!(email || password )) {
+        throw new apiError(400, "please provide all the details ");
     }
     const user = await User.findOne({ email });
-    if (!(user ||(await user.isPasswordCorrect(password)))) {
+    if (!user || !(await user.isPasswordCorrect(password))) {
         throw new apiError(401, "Invalid email or password");
     }
 

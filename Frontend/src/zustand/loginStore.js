@@ -2,28 +2,30 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 const initialLoginState = {
-    id: null,
+    _id: null,
     email: null,
-    password: null,
-    name: 'a',
+    firstName: null,
     role: null,
-    avatar: null,
+    lastName: null,
 };
-
+const Token={
+    accessToken: null,
+    refreshToken: null,
+}
 const store = create(
-    
         (set) => ({
             loginUserData: initialLoginState,
             isLogin: false,
-            
+            tokens:Token,
             // Fixed to properly set login status and user data together
-            setLoggedInUser: (data) => {
+            setLoggedInUser: (data,token) => {
                 set({ 
                     loginUserData: data,
-                    isLogin: true  // This was set to false in your original code
+                    isLogin: true ,
+                    Token: token
+                    
                 });
             },
-            
             // Separate method if you only need to update login status
             setLoginStatus: (status) => {
                 set({ isLogin: status });

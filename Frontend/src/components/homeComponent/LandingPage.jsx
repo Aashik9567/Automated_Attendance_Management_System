@@ -3,32 +3,7 @@ import { FaUserCheck, FaChartBar, FaClock, FaMobileAlt } from 'react-icons/fa';
 import logo from '../../assets/Logo.png';
 import { Link } from 'react-router-dom';
 import { ReactTyped } from "react-typed";
-import axios from 'axios';
-import store from '../../zustand/loginStore';
 const LandingPage = () => {
-const {setLoggedInUser} = store(state=>state)
-  useEffect(()=>{
-      const getUser = async(token)=>{
-      try {
-        const response = await axios.get('https://api.escuelajs.co/api/v1/auth/profile', {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        })
-        setLoggedInUser(response.data)
-        console.log(response.data)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
-    const token = localStorage.getItem("AccessToken")
-    if(token){
-      getUser(token)
-    }
-  },[])
-
-
   return (
     <div className="min-h-screen text-white bg-gradient-to-b from-purple-600 to-indigo-400">
       {/* Header */}

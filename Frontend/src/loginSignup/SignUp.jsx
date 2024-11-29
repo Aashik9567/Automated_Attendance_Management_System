@@ -6,7 +6,7 @@ import { z } from "zod"
 import { useForm } from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod"
 import axios from 'axios'
-import { toast } from 'react-toastify'
+import { message } from 'antd';
 const schema=z.object({
   email: z.string().min(1, { message: "Email is required" }).email("please enter valid format of email"),
   password: z.string().min(1, { message: "Password is required" }),
@@ -29,10 +29,9 @@ const SignUp = () => {
     resolver: zodResolver(schema)
   })
   const submitHandle=async (data)=>{
-    console.log(data);  
+     
     try {
       setLoading(true);
-      console.log(data)
       const response = await axios.post("http://localhost:8080/api/v1/users/signup", {
         email: data.email,
         password: data.password,
@@ -40,11 +39,11 @@ const SignUp = () => {
         firstName:data.firstName,
         lastName:data.lastName
       });
-      console.log(response.data)
+  
       nav("/login");
-      toast.success(response?.data.message);
+      message.success(response?.data.message);
     } catch (error) {
-        toast.error(error.response.data.message);
+        message.error(error.response.data.message);
   }
   finally{
     setLoading(false)

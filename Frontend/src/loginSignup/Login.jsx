@@ -6,14 +6,18 @@ import ImageDisplayer from './ImageDisplayer';
 import { useNavigate } from 'react-router-dom';
 import { z } from "zod";
 import axios from 'axios';
+import { message } from 'antd';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
 import store from '../zustand/loginStore'
 import { toast } from 'react-toastify';
+import { AntDesignOutlined } from '@ant-design/icons';
 const schema = z.object({
-    email: z.string().min(1, { message: "Email is required" }).email("please enter valid format of email"),
-    password: z.string().min(1, { message: "Password is required" }),
-    // Role: z.string().min(1, {message: "Role is required"})
+    email: z.string()
+        .min(1, { message: "Email is required" })
+        .email("Please enter valid email format"),
+    password: z.string()
+        .min(3, { message: "Password must be at least 3 characters" })
 })
 const Login = () => {
     const {setLoginStatus,isLogin,setLoggedInUser}=store(state=>state)
@@ -29,31 +33,34 @@ const Login = () => {
 
     const  submitHandle = async (formData) => {
         try{
-            console.log(formData.email,formData.password)
             const response = await axios.post('http://localhost:8080/api/v1/users/login', {
                 email: formData.email,
                 password: formData.password
             });
-            console.log(response.data)
             setLoginStatus(true);
-            setLoggedInUser(response.data)
-            toast.success(response.data?.message);
+            const userData=response.data.data.loginUser;
+            const token = {
+                accessToken: response.data.data.accessToken,
+                refreshToken: response.data.data.refreshToken
+            }
+            setLoggedInUser(userData,token);
+            message.success(response.data?.message);
+            console.log(token)
+            if(userData.role==="Teacher"){
+                navigate("/teacherdashboard");
+            }else{
+                navigate("/studentdashboard");
+            }
 
         }
         catch(error){
             console.log(error)
-            toast.error(error.response.data.message);
+            message.error(error.response.data.message);
+        }
+        finally{
+            // setLoading(false)
         }
     }
-   
-    const goToSignup = () => {
-        navigate('/signup')
-    }
-   useEffect(()=>{
-      if(isLogin){
-        navigate("/teacherdashboard")
-      }
-    },[isLogin])
     return (
         <div className="flex flex-col-reverse md:flex-row ">
             {/* Image Part */}
@@ -105,9 +112,9 @@ const Login = () => {
                                 </div>
                                 <Link to="#" className="text-sm font-medium text-blue-500 hover:underline">Forgot password?</Link>
                             </div>
-                            <button type="submit" className="w-full bg-cyan-300 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mt-4">Sign in</button>
+                            <button type="submit" className="w-full bg-cyan-300 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mt-4">Login</button>
                             <p className="mt-4 text-sm font-light text-center">
-                                Don’t have an account yet?<button onClick={() => { goToSignup() }} type="button" className="px-5 py-2 mx-3 mb-2 text-sm font-medium text-center text-white rounded-lg shadow-lg bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 dark:focus:ring-teal-800 shadow-teal-500/50 dark:shadow-lg dark:shadow-teal-800/80 me-2">Signup</button>
+                                Don’t have an account yet?<button onClick={() => navigate('/signup')} type="button" className="px-5 py-2 mx-3 mb-2 text-sm font-medium text-center text-white rounded-lg shadow-lg bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 dark:focus:ring-teal-800 shadow-teal-500/50 dark:shadow-lg dark:shadow-teal-800/80 me-2">Signup</button>
                             </p>
 
                         </form>

@@ -33,9 +33,8 @@ const Settings = () => {
   };
 
   return (
-    <Layout.Content style={{ padding: '24px', backgroundColor: 'white' }}>
+    <Layout.Content style={{ padding: '24px', backgroundColor: 'rgb(214 211 209)', borderRadius: '10px' }}>
       <Title level={3} style={{ marginBottom: 24 }}>Account Settings</Title>
-      
       <Form form={form} layout="vertical">
         {/* Profile Information */}
         <div>

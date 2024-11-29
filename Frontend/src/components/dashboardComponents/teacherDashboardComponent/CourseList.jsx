@@ -102,7 +102,7 @@ const CourseList = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="p-4 bg-white rounded-lg shadow-xl"
+      className="p-4 rounded-lg shadow-xl bg-stone-300"
     >
       <div className="flex items-center justify-between mb-4">
         <Title level={3}>Your Courses</Title>

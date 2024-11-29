@@ -26,7 +26,7 @@ const AttendanceReport = ({ attendanceData }) => {
   const COLORS = ['green', 'orange'];
 
   return (
-    <div className="p-6 rounded-lg shadow-md bg-neutral-400">
+    <div className="p-6 rounded-lgshadow-md bg-stone-300">
       <h2 className="mb-4 text-2xl font-bold">Attendance Report</h2>
 
       <div className="grid grid-cols-1 gap-6">
@@ -71,7 +71,7 @@ const AttendanceReport = ({ attendanceData }) => {
         {/* Summary Statistics */}
         <div>
           <h3 className="mb-2 text-lg font-semibold">Summary Statistics</h3>
-          <div className="p-4 rounded-lg bg-neutral-400">
+          <div className="p-4 rounded-lg bg-stone-300">
             <p className="mb-2">Total Days: {attendanceData.length}</p>
             <p className="mb-2">Average Attendance: {averageAttendance.toFixed(2)} students</p>
             <p className="mb-2">Highest Attendance: {Math.max(...attendanceData.map(day => day.presentCount))} students</p>

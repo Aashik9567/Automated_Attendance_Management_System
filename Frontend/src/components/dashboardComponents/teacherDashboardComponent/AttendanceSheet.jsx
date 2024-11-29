@@ -97,7 +97,7 @@ const AttendanceSheet = () => {
   ];
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-lg">
+    <div className="p-6 rounded-lg shadow-lg bg-stone-300">
       <div className="flex items-center justify-between mb-4">
         <DatePicker 
           value={attendanceDate}

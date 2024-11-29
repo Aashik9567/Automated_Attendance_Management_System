@@ -13,6 +13,7 @@ import "react-calendar/dist/Calendar.css";
 import store from "../../../zustand/loginStore";
 
 const StudentDashboard = () => {
+  
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -21,6 +22,9 @@ const StudentDashboard = () => {
     setActiveTab(tabName);
     setIsSidebarOpen(false);
     navigate(path);
+  };
+  const handleLogout = () => {
+    console.log("Logout");
   };
   const getActiveTab = (path) => {
     if (path === "/studentdashboard") return "Home";
@@ -98,6 +102,15 @@ const StudentDashboard = () => {
             </button>
           ))}
         </nav>
+        <button onClick={handleLogout} >
+            <div className="flex items-center justify-between p-4 mb-4 transition hover:bg-blue-500 hover:border-l-4 hover:border-white hover:rounded-lg">
+              <div className="flex items-center">
+                <FaSignOutAlt className="mr-3" />
+                <span>Log Out</span>
+              </div>
+              <FaChevronRight />
+            </div>
+          </button>
       </aside>
 
       {/* Main Content */}
