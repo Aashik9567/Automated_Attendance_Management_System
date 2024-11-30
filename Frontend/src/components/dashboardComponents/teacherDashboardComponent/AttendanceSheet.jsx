@@ -14,10 +14,9 @@ import {
 import { 
   PlusOutlined,  
 } from '@ant-design/icons';
-import moment from 'moment';
 
 const AttendanceSheet = () => {
-  const [attendanceDate, setAttendanceDate] = useState(moment());
+  const [attendanceDate, setAttendanceDate] = useState();
   const [attendanceData, setAttendanceData] = useState([
     { id: 1, name: 'Aashik Kumar Mahato', present: true },
     { id: 2, name: 'Bhawana Adhikari', present: false },

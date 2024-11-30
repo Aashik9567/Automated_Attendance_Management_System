@@ -1,14 +1,11 @@
 import React from 'react';
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-  PieChart, Pie, Cell,
-  ResponsiveContainer
-} from 'recharts';
+import { Card, Typography, Row, Col } from 'antd';
+import { Column } from '@ant-design/plots';
+import { Pie } from '@ant-design/plots';
+
+const { Title, Text } = Typography;
 
 const AttendanceReport = ({ attendanceData }) => {
-  // Assuming attendanceData is an array of objects with date and presentCount properties
-  // Example: [{ date: '2023-07-01', presentCount: 15, totalStudents: 20 }, ...]
-
   // Calculate average attendance
   const averageAttendance = attendanceData.reduce((sum, day) => sum + day.presentCount, 0) / attendanceData.length;
 
@@ -19,67 +16,86 @@ const AttendanceReport = ({ attendanceData }) => {
   };
 
   const pieChartData = [
-    { name: 'Present', value: overallAttendance.present },
-    { name: 'Absent', value: overallAttendance.absent },
+    { type: 'Present', value: overallAttendance.present },
+    { type: 'Absent', value: overallAttendance.absent },
   ];
 
-  const COLORS = ['green', 'orange'];
+  // Bar Chart Configuration
+  const barChartConfig = {
+    data: attendanceData,
+    xField: 'date',
+    yField: 'presentCount',
+    color: '#1890ff',
+    label: {
+      position: 'middle',
+      style: {
+        fill: '#FFFFFF',
+        opacity: 0.6,
+      },
+    },
+  };
+
+  // Pie Chart Configuration
+  const pieChartConfig = {
+    data: pieChartData,
+    angleField: 'value',
+    colorField: 'type',
+    color: ['#52c41a', '#ff4d4f'],
+    label: {
+      text: ({ type, value, percent }) => 
+        `${type} ${value} (${(percent * 100).toFixed(2)}%)`,
+      position: 'outside',
+    },
+    legend: {
+      position: 'bottom',
+    },
+  };
 
   return (
-    <div className="p-6 rounded-lgshadow-md bg-stone-300">
-      <h2 className="mb-4 text-2xl font-bold">Attendance Report</h2>
+    <Card 
+      title="Attendance Report" 
+      className="w-full rounded-lg shadow-md"
+    >
+      <Row gutter={[16, 16]}>
+        {/* Daily Attendance Bar Chart */}
+        <Col xs={24} sm={24} md={12} lg={12}>
+          <Card type="inner" title="Daily Attendance">
+            <Column {...barChartConfig} height={300} />
+          </Card>
+        </Col>
 
-      <div className="grid grid-cols-1 gap-6">
-        {/* Bar Chart: Daily Attendance */}
-        <div>
-          <h3 className="mb-2 text-lg font-semibold">Daily Attendance</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={attendanceData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="presentCount" fill="#8884d8" name="Present" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        {/* Overall Attendance Pie Chart */}
+        <Col xs={24} sm={24} md={12} lg={12}>
+          <Card type="inner" title="Overall Attendance">
+            <Pie {...pieChartConfig} height={300} />
+          </Card>
+        </Col>
 
-        {/* Pie Chart: Overall Attendance */}
-        <div>
-          <h3 className="mb-2 text-lg font-semibold">Overall Attendance</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={pieChartData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-              >
-                {pieChartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
         {/* Summary Statistics */}
-        <div>
-          <h3 className="mb-2 text-lg font-semibold">Summary Statistics</h3>
-          <div className="p-4 rounded-lg bg-stone-300">
-            <p className="mb-2">Total Days: {attendanceData.length}</p>
-            <p className="mb-2">Average Attendance: {averageAttendance.toFixed(2)} students</p>
-            <p className="mb-2">Highest Attendance: {Math.max(...attendanceData.map(day => day.presentCount))} students</p>
-            <p>Lowest Attendance: {Math.min(...attendanceData.map(day => day.presentCount))} students</p>
-          </div>
-        </div>
-      </div>
-    </div>
+        <Col xs={24}>
+          <Card type="inner" title="Summary Statistics">
+            <Row gutter={[16, 16]}>
+              <Col xs={24} sm={12} md={6}>
+                <Text strong>Total Days: </Text>
+                <Text>{attendanceData.length}</Text>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Text strong>Avg. Attendance: </Text>
+                <Text>{averageAttendance.toFixed(2)} students</Text>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Text strong>Highest Attendance: </Text>
+                <Text>{Math.max(...attendanceData.map(day => day.presentCount))} students</Text>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Text strong>Lowest Attendance: </Text>
+                <Text>{Math.min(...attendanceData.map(day => day.presentCount))} students</Text>
+              </Col>
+            </Row>
+          </Card>
+        </Col>
+      </Row>
+    </Card>
   );
 };
 
