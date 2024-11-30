@@ -37,13 +37,13 @@ const Login = () => {
             });
             setLoginStatus(true);
             const userData=response.data.data.loginUser;
-            const token = {
-                accessToken: response.data.data.accessToken,
-                refreshToken: response.data.data.refreshToken
-            }
-            setLoggedInUser(userData,token);
+            const accessToken= response.data.data.accessToken
+            const refreshToken=response.data.data.refreshToken
+        
+            setLoggedInUser(userData);
             message.success(response.data?.message);
-            console.log(token)
+            localStorage.setItem('accessToken',accessToken);
+            localStorage.setItem('refreshToken',refreshToken);
             if(userData.role==="Teacher"){
                 navigate("/teacherdashboard");
             }else{

@@ -35,7 +35,11 @@ const Webroutes = () => {
         <Route path="/aboutus" element={<AboutUs />} />
         <Route
           path="/studentdashboard"
-          element={<StudentDashboard  />}
+          element={
+          <ProtectedRouter>
+            <StudentDashboard />
+            </ProtectedRouter>
+            }
         >
           <Route index element={<StudentHomePage />} />
           <Route path="calendar" element={<StudentCalendar />} />

@@ -29,14 +29,20 @@ const StudentDashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:8080/api/v1/users/logout');
+      const accessToken = localStorage.getItem('accessToken');
+      const response= await axios.post('http://localhost:8080/api/v1/users/logout',{},{
+        headers:{
+          Authorization:`Bearer ${accessToken}`
+        }});
       setLoginStatus(false);
-      message.success('Logout successful');
-      navigate('/');
+      message.success(response.data.message);
+      logoutUser();
+      
     } catch (error) {
       message.error(error.message);
     }
-  };
+  }
+
 
   const getActiveTab = (path) => {
     if (path === "/studentdashboard") return "Home";

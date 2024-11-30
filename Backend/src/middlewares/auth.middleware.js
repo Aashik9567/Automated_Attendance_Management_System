@@ -11,7 +11,6 @@ export const authenticateUser = asyncHandler(async (req, res, next) => {
         if (!token) {
             throw new apiError(401, "Please authenticate to access this route");
         }
-
         // Verify the token
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
         

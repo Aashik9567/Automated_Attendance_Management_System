@@ -12,9 +12,7 @@ import {
   message 
 } from 'antd';
 import { 
-  PlusOutlined, 
-  EditOutlined, 
-  DeleteOutlined 
+  PlusOutlined,  
 } from '@ant-design/icons';
 import moment from 'moment';
 

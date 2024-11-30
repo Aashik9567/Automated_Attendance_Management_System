@@ -8,21 +8,16 @@ const initialLoginState = {
     role: null,
     lastName: null,
 };
-const Token={
-    accessToken: null,
-    refreshToken: null,
-}
+
 const store = create(
         (set) => ({
             loginUserData: initialLoginState,
             isLogin: false,
-            tokens:Token,
             // Fixed to properly set login status and user data together
             setLoggedInUser: (data,token) => {
                 set({ 
                     loginUserData: data,
                     isLogin: true ,
-                    Token: token
                     
                 });
             },

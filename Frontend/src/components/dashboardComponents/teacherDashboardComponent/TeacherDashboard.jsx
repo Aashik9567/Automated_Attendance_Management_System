@@ -9,7 +9,7 @@ const TeacherDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { loginUserData, setLoginStatus } = store(state => state);
+  const { loginUserData, setLoginStatus,logoutUser } = store(state => state);
   // Determine active tab from current path
   const getActiveTab = (path) => {
     if (path === '/teacherdashboard') return 'Home';
@@ -18,10 +18,14 @@ const TeacherDashboard = () => {
   };
   const handleLogout = async () => {
     try {
-      const response= await axios.post('http://localhost:8080/api/v1/users/logout');
+      const accessToken = localStorage.getItem('accessToken');
+      const response= await axios.post('http://localhost:8080/api/v1/users/logout',{},{
+        headers:{
+          Authorization:`Bearer ${accessToken}`
+        }});
       setLoginStatus(false);
       message.success(response.data.message);
-      navigate('/');
+      logoutUser();
       
     } catch (error) {
       message.error(error.message);
