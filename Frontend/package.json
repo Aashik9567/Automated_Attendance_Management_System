@@ -11,11 +11,11 @@
   },
   "dependencies": {
     "@ant-design/charts": "^2.2.3",
-    "@ant-design/icons": "^5.5.1",
+    "@ant-design/icons": "^5.5.2",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@hookform/resolvers": "^3.9.0",
-    "antd": "^5.22.1",
+    "antd": "^5.22.2",
     "axios": "^1.7.2",
     "framer-motion": "^11.3.8",
     "lucide-react": "^0.460.0",
@@ -27,7 +27,6 @@
     "react-minimal-pie-chart": "^8.4.0",
     "react-router-dom": "^6.24.1",
     "react-typed": "^2.0.12",
-    "recharts": "^2.13.3",
     "zod": "^3.23.8",
     "zustand": "^4.5.4"
   },

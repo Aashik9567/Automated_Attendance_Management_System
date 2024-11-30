@@ -5,11 +5,16 @@ var IsCallable = require('es-abstract/2024/IsCallable');
 var Type = require('es-abstract/2024/Type');
 var whichBuiltinType = require('which-builtin-type');
 var $TypeError = require('es-errors/type');
+var callBind = require('call-bind');
+var gOPD = require('gopd');
 
 var $gPO = GetIntrinsic('%Object.getPrototypeOf%', true);
 var $ObjectPrototype = GetIntrinsic('%Object.prototype%');
 
 var hasProto = [].__proto__ === Array.prototype; // eslint-disable-line no-proto
+
+var dunderGetter = !$gPO && hasProto && gOPD && gOPD(Object.prototype, '__proto__');
+var getDunder = dunderGetter && dunderGetter.get && callBind(dunderGetter.get);
 
 module.exports = function getPrototypeOf(O) {
 	if (Type(O) !== 'Object') {
@@ -20,9 +25,8 @@ module.exports = function getPrototypeOf(O) {
 		return $gPO(O);
 	}
 
-	if (hasProto) {
-		// eslint-disable-next-line no-proto
-		var proto = O.__proto__;
+	if (getDunder) {
+		var proto = getDunder(O);
 		if (proto || proto === null) {
 			return proto;
 		}
