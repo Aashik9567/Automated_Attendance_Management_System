@@ -10,7 +10,7 @@ const LandingPage = () => {
       <header className="container px-4 py-4 mx-auto sm:py-4">
         <nav className="flex items-center justify-between">
         <div className="mb-4 text-center md:mb-8">
-                    <img className="w-[86px] h-[70px] inline-block mr-2" src={logo} alt="logo" />
+                    <img className="w-[86px] h-[70px] inline-block mr-2 rounded-full" src={logo} alt="logo" />
                     <span className="text-2xl font-semibold">AAMS</span>
          </div>
          <Link to={'/teacherdashboard'}><button className="px-3 py-1 text-sm font-semibold text-purple-600 transition duration-300 bg-white rounded-full sm:px-4 sm:py-2 sm:text-base hover:bg-purple-100">

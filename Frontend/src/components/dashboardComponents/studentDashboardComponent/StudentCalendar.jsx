@@ -101,7 +101,7 @@ const StudentCalendar = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-16 rounded-xl min-h-max bg-gradient-to-r from-indigo-400 to-purple-400">
+    <div className="flex flex-col items-center justify-center p-16 text-gray-900 bg-white rounded-xl min-h-max">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

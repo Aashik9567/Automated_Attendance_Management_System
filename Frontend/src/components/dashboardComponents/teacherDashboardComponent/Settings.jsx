@@ -31,7 +31,7 @@ const Settings = () => {
         message.error('Validation failed');
       });
   };
-
+ const response= 'https://ui-avatars.com/api/?name=Aashik+Mahato&background=0D8ABC&color=fff'
   return (
     <Layout.Content style={{ padding: '24px', backgroundColor: 'rgb(214 211 209)', borderRadius: '10px' }}>
       <Title level={3} style={{ marginBottom: 24 }}>Account Settings</Title>
@@ -41,7 +41,7 @@ const Settings = () => {
           <Title level={4} style={{ marginBottom: 16 }}>Profile Information</Title>
           <Row align="middle" gutter={16} style={{ marginBottom: 16 }}>
             <Col>
-              <Avatar size={128} src={loginUserData.avatar} />
+              <Avatar size={128} src={response} />
             </Col>
             <Col>
               <Button 

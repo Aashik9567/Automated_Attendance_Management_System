@@ -53,7 +53,7 @@ const TeacherDashboard = () => {
     <>
       <div className="flex h-screen">
         {/* Sidebar */}
-        <aside className={`bg-gradient-to-r from-green-500 to-emerald-400 text-white w-64 fixed h-full z-20 transition-all duration-300 ease-in-out flex flex-col ${isSidebarOpen ? 'left-0' : '-left-64'} md:left-0`}>
+        <aside className={`bg-purple-400 text-white w-64 fixed h-full z-20 transition-all duration-300 ease-in-out flex flex-col ${isSidebarOpen ? 'left-0' : '-left-64'} md:left-0`}>
           <div className="flex-grow">
             <div className="flex items-center justify-between p-4 md:hidden">
               <h1 className="text-2xl font-bold">Dashboard</h1>
@@ -62,8 +62,8 @@ const TeacherDashboard = () => {
               </button>
             </div>
             <div className="p-6">
-              <h1 className="mb-2 text-3xl font-bold">Teacher Dashboard</h1>
-              <p className="font-bold text-indigo-700 text-md">Welcome back! {loginUserData.firstName}</p>
+              <h1 className="mb-2 text-3xl font-bold text-slate-300">Teacher Dashboard</h1>
+              <p className="font-bold text-indigo-600 text-md">Welcome back! {loginUserData.firstName}</p>
             </div>
             <nav className="mt-8">
               {navItems.map((item) => (
