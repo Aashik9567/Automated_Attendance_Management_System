@@ -63,7 +63,7 @@ const StudentDashboard = () => {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (
-    <div className="flex h-screen bg-stone-300">
+    <div className="flex h-screen">
       {/* Sidebar */}
       <aside
         className={`bg-gradient-to-r from-indigo-400 to-purple-400 text-white w-64 fixed h-full z-20 transition-all duration-300 ease-in-out ${isSidebarOpen ? "left-0" : "-left-64"

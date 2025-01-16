@@ -12,8 +12,13 @@ const schema=z.object({
   password: z.string().min(1, { message: "Password is required" }),
   confirmPassword:z.string().min(1,{message:'confirm the password'}),
   role: z.string().min(1, {message: "role is required"}),
-  firstName:z.string().min(1,{message:"first name is required"}),
-  lastName:z.string().min(1,{message:"last name is required "})
+  fullName:z.string().min(1,{message:"full name is required"}),
+  semester: z.preprocess(
+    (value) => (typeof value === "string" ? parseInt(value, 10) : value),
+    z.number()
+      .min(1, { message: "Semester must be at least 1" })
+      .max(8, { message: "Semester must not exceed 8" })
+  )
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"]
@@ -36,8 +41,8 @@ const SignUp = () => {
         email: data.email,
         password: data.password,
         role: data.role,
-        firstName:data.firstName,
-        lastName:data.lastName
+        fullName:data.fullName,
+        semester:data.semester
       });
   
       nav("/login");
@@ -68,33 +73,33 @@ const SignUp = () => {
                        <option value="Teacher" >Teacher</option>
                        <option value="Student">Student</option>
                 </select>
-                 {errors.role && (<p className="text-red-400">{errors.role.message}</p>)}
+                 {errors.role && (<p className="text-red-600">{errors.role.message}</p>)}
                 <div className="grid md:grid-cols-2 md:gap-6">
                   <div className="relative z-0 w-full mb-5 group">
-                    <input type="text" {...register("firstName")} id="firstName" className="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" "/>
-                    <label htmlFor="firstName" className="peer-focus:font-medium absolute text-sm duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">first name</label>
-                    {errors.firstName && (<p className="text-red-400">{errors.firstName.message}</p>)}
+                    <input type="text" {...register("fullName")} id="fullName" className="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" "/>
+                    <label htmlFor="fullName" className="peer-focus:font-medium absolute text-sm duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Full Name</label>
+                    {errors.fullName && (<p className="text-red-600">{errors.fullName.message}</p>)}
                   </div>
                   <div className="relative z-0 w-full mb-5 group">
-                    <input type="text" {...register("lastName")} id="lastName" className="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" "/>
-                    <label htmlFor="lastName" className="peer-focus:font-medium absolute text-sm  duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">last name</label>
-                    {errors.lastName && (<p className="text-red-400">{errors.lastName.message}</p>)}
+                    <input type="text" {...register("semester")} id="semester" className="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" "/>
+                    <label htmlFor="semester" className="peer-focus:font-medium absolute text-sm  duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">semester (1-8)</label>
+                    {errors.semester && (<p className="text-red-600">{errors.semester.message}</p>)}
                   </div>
                 </div>
                 <div>
                   <label htmlFor="email" className="block mb-2 text-sm font-medium">Your email</label>
                   <input type="email" {...register("email")} id="email" className="block w-full p-2 border border-blue-500 rounded-lg focus:ring-primary-600 focus:border-primary-600" placeholder="name@acem.edu.np"/>
-                  {errors.email && (<p className="text-red-400">{errors.email.message}</p>)}
+                  {errors.email && (<p className="text-red-600">{errors.email.message}</p>)}
                 </div>
                 <div>
                   <label htmlFor="password" className="block mb-2 text-sm font-medium">Password</label>
                   <input type="password" {...register("password")} id="password" placeholder="Enter password" className="block w-full p-2 border border-blue-500 rounded-lg focus:ring-primary-600 focus:border-primary-600" />
-                  {errors.password && <p className='text-red-400'>{errors.password.message}</p>}
+                  {errors.password && <p className='text-red-600'>{errors.password.message}</p>}
                 </div>
                 <div>
                   <label htmlFor="confirm-password" className="block mb-2 text-sm font-medium">Confirm Password</label>
                   <input type="confirm-password" {...register("confirmPassword")} id="confirm-password" placeholder="Confirm password" className="block w-full p-2 border border-blue-500 rounded-lg focus:ring-primary-600 focus:border-primary-600"/>
-                  {errors.confirmPassword && <p className='text-red-400'>{errors.confirmPassword.message}</p>}
+                  {errors.confirmPassword && <p className='text-red-600'>{errors.confirmPassword.message}</p>}
                 </div>
                 <button type="submit" disabled={loading} className="w-full bg-cyan-300 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mt-4">{loading ? "Loading...." : "Create an account"}</button>
                 <p className="text-sm font-light ">

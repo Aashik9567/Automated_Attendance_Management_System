@@ -75,7 +75,7 @@ const StudentHomePage = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50">
+    <div className="p-6 bg-blue-300 rounded-xl">
       <div className="flex items-center justify-between mb-6">
         <Title level={2} className="m-0">Attendance Overview</Title>
         <Select

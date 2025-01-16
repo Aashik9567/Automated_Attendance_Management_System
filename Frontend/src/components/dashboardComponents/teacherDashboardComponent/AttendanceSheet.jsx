@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  Modal, 
-  Form, 
-  Input, 
+import {  
   Button, 
   Table, 
   Tag, 
@@ -11,9 +8,6 @@ import {
   Popconfirm,
   message 
 } from 'antd';
-import { 
-  PlusOutlined,  
-} from '@ant-design/icons';
 
 const AttendanceSheet = () => {
   const [attendanceDate, setAttendanceDate] = useState();
@@ -23,8 +17,7 @@ const AttendanceSheet = () => {
     { id: 3, name: 'Mandeep Kumar Mishra', present: true },
     { id: 4, name: 'Rensa Neupane', present: true },
   ]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [form] = Form.useForm();
+
 
   const handleAttendanceChange = (id) => {
     setAttendanceData(attendanceData.map(student => 
@@ -32,28 +25,6 @@ const AttendanceSheet = () => {
     ));
   };
 
-  const handleAddStudent = () => {
-    form.validateFields()
-      .then(values => {
-        const newStudent = {
-          id: attendanceData.length + 1,
-          name: values.studentName,
-          present: false
-        };
-        setAttendanceData([...attendanceData, newStudent]);
-        setIsModalVisible(false);
-        form.resetFields();
-        message.success('Student added successfully');
-      })
-      .catch(errorInfo => {
-        console.log('Validation Failed:', errorInfo);
-      });
-  };
-
-  const handleDeleteStudent = (id) => {
-    setAttendanceData(attendanceData.filter(student => student.id !== id));
-    message.success('Student removed successfully');
-  };
 
   const columns = [
     {
@@ -94,20 +65,13 @@ const AttendanceSheet = () => {
   ];
 
   return (
-    <div className="p-6 rounded-lg shadow-lg bg-stone-300">
+    <div className="p-6 bg-blue-200 rounded-lg shadow-lg">
       <div className="flex items-center justify-between mb-4">
         <DatePicker 
           value={attendanceDate}
           onChange={(date) => setAttendanceDate(date)}
           className="mr-4"
         />
-        <Button 
-          type="primary" 
-          icon={<PlusOutlined />} 
-          onClick={() => setIsModalVisible(true)}
-        >
-          Add Student
-        </Button>
       </div>
 
       <Table 
@@ -116,35 +80,7 @@ const AttendanceSheet = () => {
         rowKey="id"
       />
 
-      <Modal
-        title="Add New Student"
-        open={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        footer={[
-          <Button key="back" onClick={() => setIsModalVisible(false)}>
-            Cancel
-          </Button>,
-          <Button 
-            key="submit" 
-            type="primary" 
-            onClick={handleAddStudent}
-          >
-            Add Student
-          </Button>
-        ]}
-      >
-        <Form form={form}>
-          <Form.Item
-            name="studentName"
-            rules={[{ 
-              required: true, 
-              message: 'Please input student name' 
-            }]}
-          >
-            <Input placeholder="Enter student name" />
-          </Form.Item>
-        </Form>
-      </Modal>
+        
     </div>
   );
 };

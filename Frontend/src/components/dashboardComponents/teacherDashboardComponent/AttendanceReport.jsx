@@ -54,7 +54,7 @@ const AttendanceReport = ({ attendanceData }) => {
   return (
     <Card 
       title="Attendance Report" 
-      className="w-full rounded-lg shadow-md"
+      className="w-full bg-blue-200 rounded-lg shadow-md"
     >
       <Row gutter={[16, 16]}>
         {/* Daily Attendance Bar Chart */}

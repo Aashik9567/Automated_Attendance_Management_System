@@ -26,17 +26,17 @@ const generateAcessAndRefreshToken = async (userId) => {
     }
   };
 const signupUser = asyncHandler(async (req, res) => {
-    const { firstName, lastName, email, password,role } = req.body;
-    if (!firstName || !email || !password || !role) {
-        throw new apiError(400, "please provide all the details ");
+    const { fullName, semester, email, password,role } = req.body;
+    if (!fullName || !email || !password || !role || !semester) {
+        throw new apiError(401, "please provide all the details ");
     }
     const userExists = await User.findOne({ email });
     if (userExists) {
         throw new apiError(400, "User already exists, please proceed to login");
     }
     const user = await User.create({
-        firstName,
-        lastName,
+        fullName,
+        semester,
         email,
         password,
         role,

@@ -33,7 +33,7 @@ const Settings = () => {
   };
  const response= 'https://ui-avatars.com/api/?name=Aashik+Mahato&background=0D8ABC&color=fff'
   return (
-    <Layout.Content style={{ padding: '24px', backgroundColor: 'rgb(214 211 209)', borderRadius: '10px' }}>
+    <Layout.Content style={{ padding: '24px', backgroundColor: 'rgb(191, 219, 254)', borderRadius: '10px' }}>
       <Title level={3} style={{ marginBottom: 24 }}>Account Settings</Title>
       <Form form={form} layout="vertical">
         {/* Profile Information */}

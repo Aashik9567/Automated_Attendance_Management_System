@@ -2,12 +2,17 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 const userSchema = new mongoose.Schema({
-    firstName: {
+    fullName: {
         type: String,
         required: true
     },
-    lastName: {
-        type: String,
+    semester: {
+        type: Number,
+        required: true,
+        validate: {
+          validator: (value) => value >= 1 && value <= 8,
+          message: 'Semester must be between 1 and 8'
+      },
     },
     email: {
         type: String,

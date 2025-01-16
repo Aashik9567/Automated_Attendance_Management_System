@@ -75,24 +75,6 @@ const Login = () => {
                             Sign in to your account
                         </h1>
                         <form onSubmit={handleSubmit(submitHandle)} className="space-y-2 md:space-y-4">
-                            {/* <label htmlFor="Roles" className="block mb-2 text-sm font-medium ">Select Role</label> */}
-                            {/* <select id="Roles" className="block w-full p-2 text-sm border rounded-lg bg-gray-50 border-blur-e00" {...register("Role")}>
-                                <option value="">Select a role</option>
-                                <option value="teacher" >Teacher</option>
-                                <option value="student">Student</option>
-                            </select>
-                            {errors.Role && (<p className="text-red-400">{errors.Role.message}</p>)} */}
-
-                            {/* <div className="flex justify-evenly">
-                                <div className="flex items-center w-[8rem] ps-2 border-2 border-blue-500 rounded-lg hover:bg-fuchsia-100">
-                                    <input id="roleStudent" type="radio" {...register('student-role')} className="w-4 h-4 " {...register("Role")}/>
-                                    <label htmlFor="roleStudent" className="w-full py-2 text-sm font-medium ms-2">Student</label>
-                                </div>
-                                <div className="flex items-center w-[8rem] ps-4 border-2 border-blue-500 rounded-lg hover:bg-fuchsia-100">
-                                    <input id="roleTeacher" type="radio" {...register('teacher-role')} className="w-4 h-4" />
-                                    <label htmlFor="roleTeacher" className="w-full py-2 text-sm font-medium ms-2 ">Teacher</label>
-                                </div>
-                            </div> */}
                             <div>
                                 <label htmlFor="email" className="block mb-2 text-sm font-medium">Your email</label>
                                 <input type="email" {...register('email',)} id="email" className="block w-full p-2 border border-blue-500 rounded-lg focus:ring-primary-600 focus:border-primary-600" placeholder="name@acem.edu.np" />

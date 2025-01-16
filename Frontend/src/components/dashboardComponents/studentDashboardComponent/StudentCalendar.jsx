@@ -101,7 +101,7 @@ const StudentCalendar = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-16 text-gray-900 bg-white rounded-xl min-h-max">
+    <div className="flex flex-col items-center justify-center p-16 text-gray-900 bg-blue-300 rounded-xl min-h-max">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -119,7 +119,7 @@ const StudentCalendar = () => {
             <motion.h3 
               initial={{ x: -20 }}
               animate={{ x: 0 }}
-              className="text-4xl font-bold text-white"
+              className="text-4xl font-bold text-black"
             >
               <CalendarOutlined className="mr-2" />
               Nepali Calendar
@@ -156,7 +156,7 @@ const StudentCalendar = () => {
                 type="text"
                 style={{ color: 'white' }}
               />
-              <h4 className="text-2xl font-bold text-neutral-100">
+              <h4 className="text-2xl font-bold text-black">
                 {nepaliMonths[currentDate.getMonth()]} {currentDate.getYear()}
               </h4>
               <Button
@@ -169,7 +169,7 @@ const StudentCalendar = () => {
 
             <div className="grid grid-cols-7 gap-2 mb-2">
               {nepaliDays.map(day => (
-                <div key={day} className="text-sm font-medium text-center text-neutral-100">
+                <div key={day} className="text-sm font-medium text-center text-black">
                   {day}
                 </div>
               ))}
@@ -190,7 +190,7 @@ const StudentCalendar = () => {
                   disabled={!date}
                 >
                   {date && (
-                    <span className="text-xl font-medium text-neutral-100">
+                    <span className="text-xl font-medium text-black">
                       {date.getDate()}
                     </span>
                   )}
@@ -219,7 +219,7 @@ const StudentCalendar = () => {
             className="p-4 mt-6 rounded-lg"
             style={{ background: 'rgba(255, 255, 255, 0.1)' }}
           >
-            <h4 className="mb-4 text-xl font-bold text-neutral-100">Upcoming Events</h4>
+            <h4 className="mb-4 text-xl font-bold text-black">Upcoming Events</h4>
             <div className="space-y-3">
               {getUpcomingEvents().map((event, index) => (
                 <motion.div 
@@ -230,8 +230,8 @@ const StudentCalendar = () => {
                   className="flex items-center justify-between p-3 rounded-lg"
                   style={{ background: 'rgba(255, 255, 255, 0.1)' }}
                 >
-                  <span className="font-medium text-neutral-100">{event.title}</span>
-                  <span className="opacity-75 text-neutral-100">{event.date}</span>
+                  <span className="font-medium text-black">{event.title}</span>
+                  <span className="text-black opacity-75">{event.date}</span>
                 </motion.div>
               ))}
             </div>
@@ -246,7 +246,7 @@ const StudentCalendar = () => {
                 className="p-4 mt-4 rounded-lg"
                 style={{ background: 'rgba(255, 255, 255, 0.2)' }}
               >
-                <h4 className="text-lg font-semibold text-neutral-100">
+                <h4 className="text-lg font-semibold text-black">
                   {events[`${selectedDate.getYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`].title}
                 </h4>
               </motion.div>

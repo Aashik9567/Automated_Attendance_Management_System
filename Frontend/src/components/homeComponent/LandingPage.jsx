@@ -82,4 +82,4 @@ const FeatureCard = ({ icon, title, description }) => {
   );
 };
 
-export default LandingPage;
+export default LandingPage
