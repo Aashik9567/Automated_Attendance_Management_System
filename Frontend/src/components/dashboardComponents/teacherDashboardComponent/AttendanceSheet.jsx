@@ -220,12 +220,6 @@ const AttendanceSheet = () => {
             rowKey="id"
             loading={loading}
             scroll={{ x: 'max-content' }}
-            pagination={{
-              responsive: true,
-              showSizeChanger: true,
-              pageSizeOptions: [5, 10, 20],
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} students`
-            }}
             locale={{ 
               emptyText: 'Select a subject to view students' 
             }}
