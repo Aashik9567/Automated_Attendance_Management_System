@@ -82,6 +82,24 @@ const logoutUser = asyncHandler(async (req, res) => {
     res.clearCookie("refreshToken",option).clearCookie("accessToken",option).json(new apiResponse(200,"user logged out successfully",null))
 })
 
-
+export const getAllStudents = async (req, res) => {
+    try {
+      const students = await User.find({ 
+        role: 'Student' 
+      }).select('fullName email semester avatar');
+  
+      res.status(200).json({
+        success: true,
+        count: students.length,
+        data: students
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false,
+        message: 'Error fetching students', 
+        error: error.message 
+      });
+    }
+  };
 
 export {signupUser,loginUser,logoutUser }
