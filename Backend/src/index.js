@@ -22,4 +22,6 @@ then(() =>{
 .catch((error) => console.error("mongodb connection failed!!",error));
 // Routes import 
 import userRoutes from "./routes/user.routes.js";
+import subjectRoutes from "./routes/subject.routes.js";
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/subjects", subjectRoutes);

@@ -36,3 +36,16 @@ export const authenticateUser = asyncHandler(async (req, res, next) => {
         }
     }
 });
+export const authorizeRoles = (...allowedRoles) => {
+    return (req, res, next) => {
+        if (!req.user) {
+            throw new apiError(401, "Authentication required");
+        }
+
+        if (!allowedRoles.includes(req.user.role)) {
+            throw new apiError(403, "Access denied: Insufficient permissions");
+        }
+
+        next();
+    };
+};

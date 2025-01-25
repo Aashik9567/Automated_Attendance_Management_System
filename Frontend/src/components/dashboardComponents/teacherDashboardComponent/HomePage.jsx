@@ -1,20 +1,164 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { message } from "antd";
-import StudentStats from './StudentStats';
 import { useNavigate } from "react-router-dom";
-import { Upload, Camera, BookOpen, Users, AlertCircle } from "lucide-react";
+import { Upload, Camera, BookOpen, Users, AlertCircle, Plus } from "lucide-react";
+import StudentStats from './StudentStats';
 
+const SubjectSetup = ({ onSubjectCreated }) => {
+    const [subjectData, setSubjectData] = useState({
+        name: '',
+        code: '',
+        semester: '',
+        creditHours: ''
+    });
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setSubjectData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post(
+                'http://localhost:8080/api/v1/subjects/createsubject', 
+                subjectData,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            
+            message.success('Subject created successfully!');
+            onSubjectCreated(response.data);
+        } catch (error) {
+            message.error(error.response?.data?.message || 'Failed to create subject');
+        }
+    };
+
+    return (
+        <div className="max-w-md p-8 mx-auto bg-blue-200 shadow-xl rounded-2xl">
+            <h2 className="mb-6 text-2xl font-bold text-center text-gray-800">
+                Setup Your Subject
+            </h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                        Subject Name
+                    </label>
+                    <input
+                        type="text"
+                        name="name"
+                        value={subjectData.name}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g. Mathematics"
+                    />
+                </div>
+                <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                        Subject Code
+                    </label>
+                    <input
+                        type="text"
+                        name="code"
+                        value={subjectData.code}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g. MATH101"
+                    />
+                </div>
+                <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                        Semester
+                    </label>
+                    <input
+                        type="text"
+                        name="semester"
+                        value={subjectData.semester}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g. Fall 2024"
+                    />
+                </div>
+                <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                        Credit Hours
+                    </label>
+                    <input
+                        type="number"
+                        name="creditHours"
+                        value={subjectData.creditHours}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g. 3"
+                        min="1"
+                        max="6"
+                    />
+                </div>
+                <button
+                    type="submit"
+                    className="flex items-center justify-center w-full gap-2 px-6 py-3 text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700"
+                >
+                    <Plus className="w-5 h-5" />
+                    Create Subject
+                </button>
+            </form>
+        </div>
+    );
+};
 const HomePage = () => {
     const navigate = useNavigate();
+    const [subjects, setSubjects] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [image, setImage] = useState(null);
-    const [loading, setLoading] = useState(false);
     const [results, setResults] = useState(null);
     const [error, setError] = useState(null);
     const [cloudinaryUrl, setCloudinaryUrl] = useState(null);
     const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
     const [isDragging, setIsDragging] = useState(false);
 
+    useEffect(() => {
+        const fetchSubjects = async () => {
+            try {
+                const accessToken = localStorage.getItem('accessToken');
+                
+                const response = await axios.get('http://localhost:8080/api/v1/subjects/getsubject', {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+        
+                // Ensure we're setting an array
+                const fetchedSubjects = response.data.data || [];
+                setSubjects(fetchedSubjects);
+                setError(null);
+            } catch (error) {
+                setSubjects([]);
+                setError(error.response?.data?.message || 'Failed to fetch subjects');
+                
+                // Optional: Redirect to login if unauthorized
+                if (error.response?.status === 401) {
+                    navigate('/login');
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+    
+        fetchSubjects();
+    }, [navigate]);
+    
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         handleFile(file);
@@ -146,7 +290,20 @@ const HomePage = () => {
             setLoading(false);
         }
     };
+    const handleSubjectCreated = (newSubject) => {
+        setSubjects(prevSubjects => [...prevSubjects, newSubject]);
+    };
 
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <div className="w-10 h-10 border-t-2 border-blue-500 rounded-full animate-spin"></div>
+            </div>
+        );
+    }
+    if (subjects.length === 0) {
+        return <SubjectSetup onSubjectCreated={handleSubjectCreated} />;
+    }
     return (
         <div className="p-6 bg-blue-200 shadow-xl rounded-2xl">
             <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2">
