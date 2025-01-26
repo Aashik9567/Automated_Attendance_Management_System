@@ -4,43 +4,54 @@ import { persist } from "zustand/middleware";
 const initialLoginState = {
     _id: null,
     email: null,
-    firstName: null,
+    fullName: null,
     role: null,
-    lastName: null,
+    semester: null,
+    avatar: null,
 };
 
-const store = create(
+const useLoginStore = create(
+    persist(
         (set) => ({
             loginUserData: initialLoginState,
             isLogin: false,
-            // Fixed to properly set login status and user data together
-            setLoggedInUser: (data,token) => {
+            accessToken: null,
+            refreshToken: null,
+
+            // Sets user data and tokens on login
+            setLoggedInUser: (data, accessToken, refreshToken) => {
                 set({ 
                     loginUserData: data,
-                    isLogin: true ,
-                    
+                    isLogin: true,
+                    accessToken,
+                    refreshToken
                 });
             },
-            // Separate method if you only need to update login status
-            setLoginStatus: (status) => {
-                set({ isLogin: status });
+
+            // Updates access token if it is refreshed
+            updateAccessToken: (newAccessToken) => {
+                set({ accessToken: newAccessToken });
             },
-            
-            // Properly reset everything on logout
+
+            // Logs out the user and clears all stored data
             logoutUser: () => {
                 set({ 
                     loginUserData: initialLoginState,
-                    isLogin: false
+                    isLogin: false,
+                    accessToken: null,
+                    refreshToken: null
                 });
-            }
+            },
         }),
         {
             name: 'auth-storage', // unique name for localStorage
             partialize: (state) => ({
                 loginUserData: state.loginUserData,
-                isLogin: state.isLogin
+                isLogin: state.isLogin,
+                accessToken: state.accessToken,
+                refreshToken: state.refreshToken
             }),
         }
     )
-
-export default store;
+);
+export default useLoginStore;

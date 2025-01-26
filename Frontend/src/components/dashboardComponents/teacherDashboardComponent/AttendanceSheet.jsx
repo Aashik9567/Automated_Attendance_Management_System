@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
@@ -17,6 +18,7 @@ import {
   CheckCircleOutlined,
   CloseCircleOutlined 
 } from '@ant-design/icons';
+import useAttendanceStore from '/Users/aashiqmahato/Documents/Codes/Attendance Management System/Frontend/src/zustand/attendanceStore.js';
 
 const AttendanceSheet = () => {
   const [subjects, setSubjects] = useState([]);
@@ -59,7 +61,16 @@ const AttendanceSheet = () => {
     }
   }, [selectedSubject]);
 
-  const loadStudents = async () => {
+   // Get attendance records from Zustand store
+   const { attendanceRecords } = useAttendanceStore();
+
+   useEffect(() => {
+     if (selectedSubject) {
+       loadStudents();
+     }
+   }, [selectedSubject, attendanceRecords]);  // Add attendanceRecords to dependency
+ 
+   const loadStudents = async () => {
     setLoading(true);
     try {
       const response = await axios.get('http://localhost:8080/api/v1/users/students', {
@@ -67,15 +78,34 @@ const AttendanceSheet = () => {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
         }
       });
-
-      const studentsWithAttendance = response.data.data.map(student => ({
-        id: student._id,
-        name: student.fullName,
-        semester: student.semester,
-        present: recognizedStudents.some(rs => rs.name === student.fullName)
-      }));
-
+  
+      const latestRecord = attendanceRecords
+        .filter(record => 
+          record.subjects.some(subject => subject._id === selectedSubject)
+        )
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
+  
+      const studentsWithAttendance = response.data.data.map(student => {
+        const recognizedStudent = latestRecord?.students.find(
+          rs => rs.name.toLowerCase().trim() === student.fullName.toLowerCase().trim()
+        );
+  
+        return {
+          id: student._id,
+          name: student.fullName,
+          semester: student.semester,
+          // Mark present only if confidence is 75% or higher
+          present: recognizedStudent ? recognizedStudent.confidence >= 0.75 : false,
+          confidence: recognizedStudent?.confidence || 0
+        };
+      });
+  
       setAttendanceData(studentsWithAttendance);
+      
+      if (latestRecord) {
+        setRecognizedStudents(latestRecord.students);
+      }
+  
       message.success(`Loaded ${studentsWithAttendance.length} students`);
     } catch (error) {
       message.error('Failed to load students');
@@ -83,7 +113,6 @@ const AttendanceSheet = () => {
       setLoading(false);
     }
   };
-
   const handleAttendanceSubmit = async () => {
     try {
       const attendancePayload = {
@@ -114,14 +143,16 @@ const AttendanceSheet = () => {
       key: 'name',
       responsive: ['md'],
       render: (name, record) => {
-        const recognizedStudent = recognizedStudents.find(rs => rs.name === name);
+        const recognizedStudent = recognizedStudents.find(
+          rs => rs.name.toLowerCase().trim() === name.toLowerCase().trim()
+        );
         return (
           <div className="flex items-center transition-all duration-300 transform hover:scale-105">
             <UserOutlined className="mr-2 text-blue-500" />
             {name}
             {recognizedStudent && (
               <Tag color="blue" className="hidden ml-2 md:inline">
-                {(recognizedStudent.confidence * 100).toFixed(2)}% Confidence
+                {(record.confidence * 100).toFixed(2)}% Confidence
               </Tag>
             )}
           </div>

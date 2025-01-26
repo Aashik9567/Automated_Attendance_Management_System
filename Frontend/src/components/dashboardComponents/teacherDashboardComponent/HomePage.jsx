@@ -4,6 +4,7 @@ import { message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { Upload, Camera, BookOpen, Users, AlertCircle, Plus } from "lucide-react";
 import StudentStats from './StudentStats';
+import useAttendanceStore from "../../../zustand/attendanceStore.js";
 
 const SubjectSetup = ({ onSubjectCreated }) => {
     const [subjectData, setSubjectData] = useState({
@@ -118,6 +119,7 @@ const SubjectSetup = ({ onSubjectCreated }) => {
     );
 };
 const HomePage = () => {
+    const { addAttendanceRecord } = useAttendanceStore();
     const navigate = useNavigate();
     const [subjects, setSubjects] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -245,8 +247,13 @@ const HomePage = () => {
 
                 if (response.data.cloudinary_url) {
                     setCloudinaryUrl(response.data.cloudinary_url);
+                    addAttendanceRecord(
+                        response.data.results, 
+                        subjects, 
+                        response.data.cloudinary_url
+                      );
                 }
-
+                
                 message.success({
                     content: `Successfully processed! Found ${response.data.faces_detected || 0} faces.`,
                     key: messageKey,
@@ -289,6 +296,7 @@ const HomePage = () => {
         } finally {
             setLoading(false);
         }
+          console.log(addAttendanceRecord)
     };
     const handleSubjectCreated = (newSubject) => {
         setSubjects(prevSubjects => [...prevSubjects, newSubject]);

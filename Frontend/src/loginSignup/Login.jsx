@@ -29,36 +29,32 @@ const Login = () => {
         resolver: zodResolver(schema)
     })
 
-    const  submitHandle = async (formData) => {
-        try{
+    const submitHandle = async (formData) => {
+        try {
             const response = await axios.post('http://localhost:8080/api/v1/users/login', {
                 email: formData.email,
-                password: formData.password
+                password: formData.password,
             });
-            setLoginStatus(true);
-            const userData=response.data.data.loginUser;
-            const accessToken= response.data.data.accessToken
-            const refreshToken=response.data.data.refreshToken
-        
-            setLoggedInUser(userData);
+    
+            const userData = response.data.data.loginUser;
+            const accessToken = response.data.data.accessToken;
+            const refreshToken = response.data.data.refreshToken;
+    
+            setLoggedInUser(userData, accessToken, refreshToken); // Pass tokens to the store
+    
             message.success(response.data?.message);
-            localStorage.setItem('accessToken',accessToken);
-            localStorage.setItem('refreshToken',refreshToken);
-            if(userData.role==="Teacher"){
+    
+            if (userData.role === "Teacher") {
                 navigate("/teacherdashboard");
-            }else{
+            } else {
                 navigate("/studentdashboard");
             }
-
+        } catch (error) {
+            console.error(error);
+            message.error(error.response?.data?.message || "Login failed.");
         }
-        catch(error){
-            console.log(error)
-            message.error(error.response.data.message);
-        }
-        finally{
-            // setLoading(false)
-        }
-    }
+    };
+    
     return (
         <div className="flex flex-col-reverse md:flex-row ">
             {/* Image Part */}
