@@ -4,6 +4,7 @@ import store from '../../../zustand/loginStore';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { message } from 'antd';
 import axios from 'axios';
+import {motion } from "framer-motion";
 
 const TeacherDashboard = () => {
   const navigate = useNavigate();
@@ -23,7 +24,6 @@ const TeacherDashboard = () => {
         headers:{
           Authorization:`Bearer ${accessToken}`
         }});
-      setLoginStatus(false);
       message.success(response.data.message);
       logoutUser();
       
@@ -100,13 +100,18 @@ const TeacherDashboard = () => {
               <FaBars size={24} />
             </button>
           </header>
-          <div className="p-2">
-            <div className="p-6 mb-2 text-white rounded-lg shadow-lg bg-gradient-to-r from-blue-500 to-purple-600">
-              <h2 className="mb-2 text-4xl font-bold">
+          <div className="p-1">
+            <motion.header 
+                    className="px-4 py-10 m-1 text-gray-700 shadow-2xl bg-gradient-to-r from-blue-400 to-indigo-400 sm:px-6 rounded-2xl"
+                    initial={{ opacity: 0, y: -100 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1 }}
+                  >
+                 <h2 className="mb-1 text-4xl font-bold">
                 {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
               </h2>
               <p className={`text-blue-100 ${activeTab === 'Home' ? '' : 'hidden'}`}>Manage your classroom with ease</p>
-            </div>
+              </motion.header>
             <Outlet context={{ changeTab }} />
           </div>
         </main>

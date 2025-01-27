@@ -20,7 +20,7 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { loginUserData, setLoginStatus } = store((state) => state);
+  const { loginUserData,logoutUser } = store((state) => state);
 
   const changeTab = (tabName, path) => {
     setActiveTab(tabName);
@@ -35,7 +35,6 @@ const StudentDashboard = () => {
         headers:{
           Authorization:`Bearer ${accessToken}`
         }});
-      setLoginStatus(false);
       message.success(response.data.message);
       logoutUser();
       
@@ -97,15 +96,14 @@ const StudentDashboard = () => {
             </button>
           ))}
         </nav>
-        <div className="flex items-center justify-between p-4 mb-4 transition hover:bg-blue-500 hover:border-l-4 hover:border-white hover:rounded-lg">
-          <div className="flex items-center">
-            <FaSignOutAlt className="mr-3" />
-            <span>Log Out</span>
-          </div>
-          <button onClick={handleLogout}>
-            <FaChevronRight />
-          </button>
-        </div>
+      <button onClick={handleLogout} >
+                 <div className="flex items-center justify-between p-4 mb-4 transition hover:bg-blue-500 hover:border-l-4 hover:border-white hover:rounded-lg">
+                   <div className="flex items-center ">
+                     <FaSignOutAlt className="mr-3" />
+                     <span>Log Out</span>
+                   </div>
+                 </div>
+               </button>
       </aside>
 
       {/* Main Content */}

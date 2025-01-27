@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
@@ -76,7 +75,7 @@ const AttendanceSheet = () => {
     }
   }, [selectedSubject, attendanceRecords]);
 
-  const loadStudents = async () => {
+const loadStudents = async () => {
     setLoading(true);
     try {
       const response = await api.get('/users/students');
@@ -98,8 +97,7 @@ const AttendanceSheet = () => {
         present: false,
         confidence: 0
       }));
-
-      // Update with recognition data if available
+  // Update with recognition data if available
       if (latestRecord && Array.isArray(latestRecord.students)) {
         studentsWithAttendance.forEach(student => {
           const recognizedStudent = latestRecord.students.find(
