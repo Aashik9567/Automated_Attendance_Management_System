@@ -40,10 +40,16 @@ const Login = () => {
             const accessToken = response.data.data.accessToken;
             const refreshToken = response.data.data.refreshToken;
     
-            setLoggedInUser(userData, accessToken, refreshToken); // Pass tokens to the store
+            // Store tokens in localStorage
+            localStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('refreshToken', refreshToken);
+    
+            // Set logged-in user in your state management
+            setLoggedInUser(userData, accessToken, refreshToken);
     
             message.success(response.data?.message);
     
+            // Route based on user role
             if (userData.role === "Teacher") {
                 navigate("/teacherdashboard");
             } else {
@@ -54,6 +60,66 @@ const Login = () => {
             message.error(error.response?.data?.message || "Login failed.");
         }
     };
+    
+    // Create a custom axios instance with interceptors
+    const axiosInstance = axios.create({
+        baseURL: 'http://localhost:8080/api/v1',
+        withCredentials: true
+    });
+    
+    // Add a request interceptor to include the access token
+    axiosInstance.interceptors.request.use(
+        (config) => {
+            const token = localStorage.getItem('accessToken');
+            if (token) {
+                config.headers['Authorization'] = `Bearer ${token}`;
+            }
+            return config;
+        },
+        (error) => Promise.reject(error)
+    );
+    
+    // Add a response interceptor for token refresh
+    axiosInstance.interceptors.response.use(
+        (response) => response,
+        async (error) => {
+            const originalRequest = error.config;
+    
+            // Check if the error is due to token expiration and not already retried
+            if (error.response?.status === 401 && !originalRequest._retry) {
+                originalRequest._retry = true;
+    
+                try {
+                    // Call the backend refresh token endpoint
+                    const response = await axios.post(
+                        'http://localhost:8080/api/v1/users/refreshtoken', 
+                        { refreshToken: localStorage.getItem('refreshToken') },
+                        { withCredentials: true }
+                    );
+    
+                    const { accessToken, refreshToken } = response.data.data;
+    
+                    // Update stored tokens
+                    localStorage.setItem('accessToken', accessToken);
+                    localStorage.setItem('refreshToken', refreshToken);
+    
+                    // Update authorization header for the original request
+                    originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
+    
+                    return axiosInstance(originalRequest);
+                } catch (refreshError) {
+                    // Logout user if refresh fails
+                    localStorage.removeItem('accessToken');
+                    localStorage.removeItem('refreshToken');
+                    window.location.href = '/login';
+                    return Promise.reject(refreshError);
+                }
+            }
+    
+            return Promise.reject(error);
+        }
+    );
+    
     
     return (
         <div className="flex flex-col-reverse md:flex-row ">

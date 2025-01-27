@@ -23,5 +23,7 @@ then(() =>{
 // Routes import 
 import userRoutes from "./routes/user.routes.js";
 import subjectRoutes from "./routes/subject.routes.js";
+import attendanceRoutes from "./routes/attendance.routes.js";
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/subjects", subjectRoutes);
+app.use("/api/v1/attendance", attendanceRoutes);

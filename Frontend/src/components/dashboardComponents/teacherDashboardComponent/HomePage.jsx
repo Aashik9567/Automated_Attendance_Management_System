@@ -1,11 +1,78 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { X } from "lucide-react";
 import axios from "axios";
 import { message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { Upload, Camera, BookOpen, Users, AlertCircle, Plus } from "lucide-react";
 import StudentStats from './StudentStats';
 import useAttendanceStore from "../../../zustand/attendanceStore.js";
+const CameraCapture = ({ onCapture, onClose }) => {
+    const videoRef = useRef(null);
+    const [stream, setStream] = useState(null);
 
+    useEffect(() => {
+        const startCamera = async () => {
+            try {
+                const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoRef.current.srcObject = mediaStream;
+                setStream(mediaStream);
+            } catch (err) {
+                message.error('Could not access camera');
+                console.error(err);
+            }
+        };
+
+        startCamera();
+
+        return () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        };
+    }, []);
+
+    const captureImage = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = videoRef.current.videoWidth;
+        canvas.height = videoRef.current.videoHeight;
+        canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
+        
+        canvas.toBlob(blob => {
+            const file = new File([blob], 'captured-image.jpg', { type: 'image/jpeg' });
+            onCapture(file);
+            
+            // Stop camera stream
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        }, 'image/jpeg');
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm">
+            <div className="relative w-full max-w-md aspect-video">
+                <video 
+                    ref={videoRef} 
+                    autoPlay 
+                    className="object-cover w-full h-full rounded-xl"
+                />
+                <button 
+                    onClick={onClose} 
+                    className="absolute p-2 transition-all rounded-full top-4 right-4 bg-white/20 hover:bg-white/40"
+                >
+                    <X className="text-white" />
+                </button>
+            </div>
+            <button 
+                onClick={captureImage}
+                className="flex items-center gap-2 px-8 py-4 mt-6 text-white transition-all bg-blue-600 rounded-xl hover:bg-blue-700"
+            >
+                <Camera className="w-5 h-5" />
+                Capture Photo
+            </button>
+        </div>
+    );
+};
 const SubjectSetup = ({ onSubjectCreated }) => {
     const [subjectData, setSubjectData] = useState({
         name: '',
@@ -129,7 +196,7 @@ const HomePage = () => {
     const [cloudinaryUrl, setCloudinaryUrl] = useState(null);
     const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
     const [isDragging, setIsDragging] = useState(false);
-
+    const [showCamera, setShowCamera] = useState(false);
     useEffect(() => {
         const fetchSubjects = async () => {
             try {
@@ -160,7 +227,10 @@ const HomePage = () => {
     
         fetchSubjects();
     }, [navigate]);
-    
+    const handleCameraCapture = (capturedFile) => {
+        handleFile(capturedFile);
+        setShowCamera(false);
+    };
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         handleFile(file);
@@ -313,23 +383,30 @@ const HomePage = () => {
         return <SubjectSetup onSubjectCreated={handleSubjectCreated} />;
     }
     return (
-        <div className="p-6 bg-blue-200 shadow-xl rounded-2xl">
-            <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2">
+        <div className="min-h-screen p-6 bg-gradient-to-br from-blue-100 to-blue-200">
+        {showCamera && (
+            <CameraCapture 
+                onCapture={handleCameraCapture} 
+                onClose={() => setShowCamera(false)} 
+            />
+        )}
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="space-y-6">
                 <div className="overflow-hidden bg-white shadow-xl rounded-2xl">
                     <div className="p-6 bg-gradient-to-r from-blue-600 to-blue-800">
-                        <div className="flex items-center gap-3">
-                            <Camera className="w-8 h-8 text-white" />
-                            <h3 className="text-2xl font-bold text-white">
-                                Upload Attendance Image
-                            </h3>
-                        </div>
+                        <h3 className="flex items-center gap-3 text-2xl font-bold text-white">
+                            <Camera className="w-8 h-8" />
+                            Attendance Upload
+                        </h3>
                     </div>
                     <div className="p-8">
-                        <div
-                            className={`relative mb-6 rounded-xl border-2 border-dashed transition-all duration-300 ease-in-out ${isDragging
+                        <div 
+                            className={`relative mb-6 rounded-xl border-2 border-dashed transition-all duration-300 ease-in-out ${
+                                isDragging
                                     ? 'border-blue-500 bg-blue-50'
                                     : 'border-gray-300 hover:border-blue-400'
-                                }`}
+                            }`}
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
                             onDrop={handleDrop}
@@ -353,8 +430,30 @@ const HomePage = () => {
                             </div>
                         </div>
 
+                        <div className="flex gap-4 mb-4">
+                            <button
+                                onClick={() => setShowCamera(true)}
+                                className="flex items-center justify-center w-full gap-2 px-6 py-3 text-white transition-all bg-green-600 rounded-xl hover:bg-green-700"
+                            >
+                                <Camera className="w-5 h-5" />
+                                Open Camera
+                            </button>
+                            <button
+                                onClick={handleUpload}
+                                disabled={loading || !image}
+                                className={`w-full px-6 py-3 text-white rounded-xl transition-all flex items-center justify-center gap-2 ${
+                                    loading || !image
+                                        ? 'bg-blue-400 cursor-not-allowed'
+                                        : 'bg-blue-600 hover:bg-blue-700'
+                                }`}
+                            >
+                                <Upload className="w-5 h-5" />
+                                Upload Image
+                            </button>
+                        </div>
+
                         {imagePreviewUrl && (
-                            <div className="mb-8 overflow-hidden bg-gray-50 rounded-xl">
+                            <div className="mb-4 overflow-hidden bg-gray-50 rounded-xl">
                                 <div className="relative aspect-video">
                                     <img
                                         src={imagePreviewUrl}
@@ -366,35 +465,15 @@ const HomePage = () => {
                             </div>
                         )}
 
-                        <button
-                            onClick={handleUpload}
-                            disabled={loading}
-                            className={`w-full px-6 py-4 text-white text-lg font-semibold rounded-xl transition-all duration-300 transform ${loading
-                                    ? 'bg-blue-400 cursor-not-allowed'
-                                    : 'bg-blue-600 hover:bg-blue-700 hover:-translate-y-1 hover:shadow-lg'
-                                }`}
-                        >
-                            <div className="flex items-center justify-center gap-2">
-                                {loading ? (
-                                    <>Processing...</>
-                                ) : (
-                                    <>
-                                        <Upload className="w-5 h-5" />
-                                        Upload Image
-                                    </>
-                                )}
-                            </div>
-                        </button>
-
                         {error && (
-                            <div className="flex items-start gap-3 p-4 mt-6 text-red-700 rounded-xl bg-red-50">
+                            <div className="flex items-start gap-3 p-4 mt-4 text-red-700 rounded-xl bg-red-50">
                                 <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
                                 <p>{error}</p>
                             </div>
                         )}
 
                         {results && results.results && (
-                            <div className="p-6 mt-6 rounded-xl bg-gray-50">
+                            <div className="p-6 mt-4 rounded-xl bg-gray-50">
                                 <h4 className="mb-4 text-xl font-semibold text-gray-800">
                                     Recognition Results
                                 </h4>
@@ -425,6 +504,7 @@ const HomePage = () => {
                         )}
                     </div>
                 </div>
+            </div>
 
                 <div className="space-y-8">
                     <div className="p-8 bg-white shadow-xl rounded-2xl">

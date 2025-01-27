@@ -120,16 +120,33 @@ const AttendanceSheet = () => {
         date: attendanceDate.toDate(),
         students: attendanceData.map(student => ({
           student: student.id,
-          status: student.present ? 'present' : 'absent'
+          status: student.present ? 'present' : 'absent',
+          confidence: student.confidence || null // Include confidence from recognition
         }))
       };
-
-      await axios.post('http://localhost:8080/api/v1/attendance/mark', attendancePayload, {
+  
+      // API call to save attendance
+      const response = await axios.post('http://localhost:8080/api/v1/attendance/mark', attendancePayload, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
         }
       });
-
+  
+      // Get the Zustand store method to add attendance record
+      const { addAttendanceRecord } = useAttendanceStore.getState();
+  
+      // Prepare recognition results from attendanceData
+      const recognitionResults = attendanceData.map(student => ({
+        name: student.name,
+        confidence: student.confidence
+      }));
+  
+      // Fetch subjects for the selected subject
+      const subjects = subjects.filter(subject => subject._id === selectedSubject);
+  
+      // Add the attendance record to Zustand store
+      addAttendanceRecord(recognitionResults, subjects, null); // cloudinaryUrl is null if not available
+  
       message.success('Attendance marked successfully!');
     } catch (error) {
       message.error('Failed to mark attendance');

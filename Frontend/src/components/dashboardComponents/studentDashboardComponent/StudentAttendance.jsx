@@ -2,7 +2,7 @@ import React from 'react'
 
 const StudentAttendance = () => {
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
+    <div className="p-6 rounded-lg shadow-md bg-gradient-to-br from-blue-200 to-indigo-300">
     <h3 className="mb-4 text-xl font-semibold">Attendance Sheet</h3>
     <div className="overflow-x-auto">
       <table className="min-w-full">

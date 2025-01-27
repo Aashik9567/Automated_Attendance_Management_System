@@ -2,7 +2,7 @@ import React from "react";
 
 const CourseDetail = () => {
   return (
-    <div className="p-6 bg-blue-300 rounded-lg shadow-md">
+    <div className="p-6 rounded-lg shadow-md bg-gradient-to-br from-blue-200 to-indigo-300">
       <h3 className="mb-4 text-xl font-semibold">
         Your Courses Completion data
       </h3>

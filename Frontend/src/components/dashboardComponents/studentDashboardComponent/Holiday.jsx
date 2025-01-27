@@ -2,7 +2,7 @@ import React from 'react'
 
 const Holiday = () => {
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
+    <div className="p-6 rounded-lg shadow-md bg-gradient-to-br from-blue-200 to-indigo-300">
     <h3 className="mb-4 text-xl font-semibold">Upcoming Holidays</h3>
     <table className="min-w-full">
       <thead>
