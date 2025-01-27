@@ -4,7 +4,8 @@ import {StudentSubject} from '../models/studentSubject.model.js';
 export const markAttendance = async (req, res) => {
     try {
       const { subjectId, students, date } = req.body;
-      
+      console.log('Received attendance data:', req.body);
+      console.log('User:', req.user);
       // Validate input
       if (!subjectId || !students || students.length === 0) {
         return res.status(400).json({ message: 'Invalid attendance data' });

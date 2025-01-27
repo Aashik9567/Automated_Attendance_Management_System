@@ -7,8 +7,7 @@ import {
   DatePicker, 
   Select, 
   Button, 
-  message, 
-  Modal 
+  message,
 } from 'antd';
 import moment from 'moment';
 import { 
@@ -20,6 +19,23 @@ import {
 } from '@ant-design/icons';
 import useAttendanceStore from '/Users/aashiqmahato/Documents/Codes/Attendance Management System/Frontend/src/zustand/attendanceStore.js';
 
+// Create axios instance with default config
+const api = axios.create({
+  baseURL: 'http://localhost:8080/api/v1',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// Add request interceptor to include token
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('accessToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 const AttendanceSheet = () => {
   const [subjects, setSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState(null);
@@ -28,128 +44,132 @@ const AttendanceSheet = () => {
   const [recognizedStudents, setRecognizedStudents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const { attendanceRecords, addAttendanceRecord } = useAttendanceStore();
 
   // Responsive check
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Fetch subjects
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/v1/subjects/getsubject', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-          }
-        });
-        setSubjects(response.data.data || []);
+        const response = await api.get('/subjects/getsubject');
+        if (response.data?.data) {
+          setSubjects(response.data.data);
+        }
       } catch (error) {
+        console.error('Failed to load subjects:', error);
         message.error('Failed to load subjects');
       }
     };
     fetchSubjects();
   }, []);
 
+  // Load students when subject changes
   useEffect(() => {
     if (selectedSubject) {
       loadStudents();
     }
-  }, [selectedSubject]);
+  }, [selectedSubject, attendanceRecords]);
 
-   // Get attendance records from Zustand store
-   const { attendanceRecords } = useAttendanceStore();
-
-   useEffect(() => {
-     if (selectedSubject) {
-       loadStudents();
-     }
-   }, [selectedSubject, attendanceRecords]);  // Add attendanceRecords to dependency
- 
-   const loadStudents = async () => {
+  const loadStudents = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:8080/api/v1/users/students', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        }
-      });
-  
+      const response = await api.get('/users/students');
+      
+      // Add null checks and validation
       const latestRecord = attendanceRecords
         .filter(record => 
-          record.subjects.some(subject => subject._id === selectedSubject)
+          record && 
+          record.subjects && 
+          Array.isArray(record.subjects) && 
+          record.subjects.some(subject => subject && subject._id === selectedSubject)
         )
         .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
-  
-      const studentsWithAttendance = response.data.data.map(student => {
-        const recognizedStudent = latestRecord?.students.find(
-          rs => rs.name.toLowerCase().trim() === student.fullName.toLowerCase().trim()
-        );
-  
-        return {
-          id: student._id,
-          name: student.fullName,
-          semester: student.semester,
-          // Mark present only if confidence is 75% or higher
-          present: recognizedStudent ? recognizedStudent.confidence >= 0.75 : false,
-          confidence: recognizedStudent?.confidence || 0
-        };
-      });
-  
-      setAttendanceData(studentsWithAttendance);
-      
-      if (latestRecord) {
+
+      const studentsWithAttendance = response.data.data.map(student => ({
+        id: student._id,
+        name: student.fullName,
+        semester: student.semester,
+        present: false,
+        confidence: 0
+      }));
+
+      // Update with recognition data if available
+      if (latestRecord && Array.isArray(latestRecord.students)) {
+        studentsWithAttendance.forEach(student => {
+          const recognizedStudent = latestRecord.students.find(
+            rs => rs && rs.name && student.name && 
+                 rs.name.toLowerCase().trim() === student.name.toLowerCase().trim()
+          );
+          if (recognizedStudent) {
+            student.present = recognizedStudent.confidence >= 0.75;
+            student.confidence = recognizedStudent.confidence;
+          }
+        });
         setRecognizedStudents(latestRecord.students);
+      } else {
+        setRecognizedStudents([]);
       }
-  
+
+      setAttendanceData(studentsWithAttendance);
       message.success(`Loaded ${studentsWithAttendance.length} students`);
     } catch (error) {
+      console.error('Failed to load students:', error);
       message.error('Failed to load students');
     } finally {
       setLoading(false);
     }
   };
+
+
   const handleAttendanceSubmit = async () => {
     try {
+      if (!selectedSubject || !attendanceDate || !attendanceData?.length) {
+        message.error('Please ensure all required fields are filled');
+        return;
+      }
+
       const attendancePayload = {
         subjectId: selectedSubject,
         date: attendanceDate.toDate(),
         students: attendanceData.map(student => ({
           student: student.id,
           status: student.present ? 'present' : 'absent',
-          confidence: student.confidence || null // Include confidence from recognition
+          confidence: student.confidence || null
         }))
       };
-  
-      // API call to save attendance
-      const response = await axios.post('http://localhost:8080/api/v1/attendance/mark', attendancePayload, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        }
-      });
-  
-      // Get the Zustand store method to add attendance record
-      const { addAttendanceRecord } = useAttendanceStore.getState();
-  
-      // Prepare recognition results from attendanceData
-      const recognitionResults = attendanceData.map(student => ({
-        name: student.name,
-        confidence: student.confidence
-      }));
-  
-      // Fetch subjects for the selected subject
-      const subjects = subjects.filter(subject => subject._id === selectedSubject);
-  
-      // Add the attendance record to Zustand store
-      addAttendanceRecord(recognitionResults, subjects, null); // cloudinaryUrl is null if not available
-  
-      message.success('Attendance marked successfully!');
+
+      // Get current subject details
+      const currentSubject = subjects.find(subject => subject._id === selectedSubject);
+      
+      // Submit attendance
+      const response = await api.post('/attendance/markattendance', attendancePayload);
+
+      if (response.data) {
+        const recognitionResults = attendanceData.map(student => ({
+          name: student.name,
+          confidence: student.confidence
+        }));
+
+        // Add to store with current subject
+        addAttendanceRecord(recognitionResults, currentSubject, null);
+        message.success('Attendance marked successfully!');
+        
+        // Optionally refresh the student list
+        await loadStudents();
+      }
     } catch (error) {
-      message.error('Failed to mark attendance');
+      console.error('Attendance submission error:', error);
+      if (error.response?.data?.message) {
+        message.error(`Error: ${error.response.data.message}`);
+      } else {
+        message.error('Failed to mark attendance. Please try again.');
+      }
     }
   };
 
