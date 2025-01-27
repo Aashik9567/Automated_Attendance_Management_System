@@ -14,6 +14,7 @@ import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import store from "../../../zustand/loginStore";
 import axios from "axios";
 import { message } from 'antd';
+import {motion }from "framer-motion";
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -114,11 +115,16 @@ const StudentDashboard = () => {
             <FaBars size={24} />
           </button>
         </header>
-        <div className="p-2 pt-3">
-          <div className="p-6 mb-2 text-white rounded-lg shadow-lg bg-gradient-to-r from-blue-500 to-purple-600">
-            <h2 className="mb-2 text-4xl font-bold">{activeTab}</h2>
-            <p className={`text-blue-100 ${activeTab === "Home" ? "" : "hidden"}`}>Manage your classroom with ease</p>
-          </div>
+        <motion.header 
+        className="px-4 py-10 m-1 text-gray-700 shadow-2xl bg-gradient-to-r from-blue-400 to-indigo-400 sm:px-6 rounded-2xl"
+        initial={{ opacity: 0, y: -100 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1 }}
+      >
+     <h2 className="mb-2 text-4xl font-bold">{activeTab}</h2>
+     <p className={`text-gray-700 ${activeTab === "Home" ? "" : "hidden"}`}>Manage your classroom with ease</p>
+      </motion.header>
+        <div className="p-1 p-q">
           <Outlet />
         </div>
       </main>
