@@ -63,7 +63,7 @@ const TeacherDashboard = () => {
             </div>
             <div className="p-6">
               <h1 className="mb-2 text-3xl font-bold text-slate-300">Teacher Dashboard</h1>
-              <p className="font-bold text-indigo-600 text-md">Welcome back! {loginUserData.firstName}</p>
+              <p className="font-bold text-indigo-600 text-md">Welcome back! {loginUserData.fullName}</p>
             </div>
             <nav className="mt-8">
               {navItems.map((item) => (
@@ -110,7 +110,7 @@ const TeacherDashboard = () => {
                  <h2 className="mb-1 text-4xl font-bold">
                 {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
               </h2>
-              <p className={`text-blue-100 ${activeTab === 'Home' ? '' : 'hidden'}`}>Manage your classroom with ease</p>
+              <p className={`text-orange-100 ${activeTab === 'Home' ? '' : 'hidden'}`}>Manage your classroom with ease Mr. {loginUserData.fullName}</p>
               </motion.header>
             <Outlet context={{ changeTab }} />
           </div>

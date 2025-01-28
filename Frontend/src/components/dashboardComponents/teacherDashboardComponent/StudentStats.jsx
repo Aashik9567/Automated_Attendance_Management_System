@@ -1,161 +1,95 @@
-import React from 'react';
-import { Card, Statistic, Progress, Row, Col, Tooltip, Badge } from 'antd';
-import { 
-  UserOutlined, 
-  TeamOutlined, 
-  ReadOutlined, 
-  SafetyCertificateOutlined,
-  RocketOutlined,
-  AlertOutlined
-} from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Card, Row, Col, Statistic, Progress, Spin, message, Badge, Tooltip, Table, Select } from 'antd';
+import { UserOutlined, TeamOutlined, AlertOutlined, SafetyCertificateOutlined, } from '@ant-design/icons';
 
 const StudentStats = () => {
-  // Mock data - in a real application, this would come from an API or backend
-  const studentData = {
-    totalStudents: 450,
-    averageAttendance: 88.5,
-    studentsAtRisk: 15,
-    graduationRate: 95,
-    newEnrollments: 120,
-    internshipPlacements: 75
-  };
+  const [stats, setStats] = useState({
+    totalStudents: 0,
+    averageAttendance: 0,
+    attendanceBySubject: [],
+    semesterDistribution: {},
+    totalSubjects: 0
+  });
+
+  const subjectColumns = [
+    {
+      title: 'Subject',
+      dataIndex: 'subjectName',
+      key: 'subjectName',
+    },
+    {
+      title: 'Code',
+      dataIndex: 'subjectCode',
+      key: 'subjectCode',
+    },
+    {
+      title: 'Attendance Rate',
+      dataIndex: 'attendanceRate',
+      key: 'attendanceRate',
+      render: (rate) => (
+        <Progress 
+          percent={Number(rate)} 
+          size="small" 
+          status={rate < 75 ? 'exception' : 'success'}
+        />
+      ),
+    },
+    {
+      title: 'Total Classes',
+      dataIndex: 'totalClasses',
+      key: 'totalClasses',
+    },
+  ];
+
 
   return (
-    <Card 
-      title="Student Performance Dashboard" 
-      style={{ 
-        header: {
-          backgroundColor: '#f0f2f5',
-          borderBottom: '2px solid #1890ff',
-        },
-        borderRadius: '12px', 
-        boxShadow: '0 4px 6px rgba(0,0,0,0.1)' 
-      }}
-    >
-      <Row gutter={[16, 16]}>
-        {/* Total Students */}
-        <Col xs={24} sm={12} md={8}>
-          <Card 
-            hoverable 
-            style={{ 
-              borderRadius: '10px', 
-              background: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)' 
-            }}
-          >
-            <Statistic
-              title={
-                <div style={{ color: '#ffffff', fontWeight: 'bold' }}>
-                  Total Students
-                </div>
-              }
-              value={studentData.totalStudents}
-              prefix={<UserOutlined style={{ color: '#ffffff', fontSize: '24px' }} />}
-              valueStyle={{ color: '#ffffff', fontSize: '24px' }}
+    <div className="space-y-4">
+      <Card className="shadow-lg rounded-xl">
+
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={14} md={12}>
+            <Card 
+              hoverable 
+              className="rounded-lg bg-gradient-to-r from-blue-400 to-blue-600"
+            >
+              <Statistic
+                title={<div className="font-bold text-white">Total Students</div>}
+                value={stats.totalStudents}
+                prefix={<UserOutlined className="text-2xl text-white" />}
+                valueStyle={{ color: '#ffffff', fontSize: '24px' }}
+              />
+            </Card>
+          </Col>
+
+          <Col xs={24} sm={14} md={12}>
+            <Card 
+              hoverable 
+              className="rounded-lg bg-gradient-to-r from-green-400 to-green-600"
+            >
+              <Statistic
+                title={<div className="font-bold text-white">Average Attendance</div>}
+                value={stats.averageAttendance}
+                prefix={<TeamOutlined className="text-2xl text-white" />}
+                suffix="%"
+                valueStyle={{ color: '#ffffff', fontSize: '24px' }}
+              />
+            </Card>
+          </Col>
+
+        </Row>
+
+        <div className="mt-8">
+          <Card title="Subject-wise Attendance" className="rounded-lg">
+            <Table 
+              columns={subjectColumns} 
+              rowKey="subjectCode"
+              pagination={false}
+              className="overflow-x-auto"
             />
           </Card>
-        </Col>
-
-        {/* Average Attendance */}
-        <Col xs={24} sm={12} md={8}>
-          <Card 
-            hoverable 
-            style={{ 
-              borderRadius: '10px', 
-              background: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)' 
-            }}
-          >
-            <Statistic
-              title={
-                <div style={{ color: '#ffffff', fontWeight: 'bold' }}>
-                  Average Attendance
-                </div>
-              }
-              value={`${studentData.averageAttendance}%`}
-              prefix={<TeamOutlined style={{ color: '#ffffff', fontSize: '24px' }} />}
-              suffix={
-                <Tooltip title="Improvement from last semester">
-                  <Badge 
-                    count={"+5.36%"} 
-                    style={{ 
-                      backgroundColor: '#52c41a', 
-                      color: '#ffffff' 
-                    }} 
-                  />
-                </Tooltip>
-              }
-              valueStyle={{ color: '#ffffff', fontSize: '24px' }}
-            />
-          </Card>
-        </Col>
-
-        {/* Students at Risk */}
-        <Col xs={24} sm={12} md={8}>
-          <Card 
-            hoverable 
-            style={{ 
-              borderRadius: '10px', 
-              background: 'linear-gradient(135deg, #ff8a78 0%, #ff6a88 100%)' 
-            }}
-          >
-            <Statistic
-              title={
-                <div style={{ color: '#ffffff', fontWeight: 'bold' }}>
-                  Students at Risk
-                </div>
-              }
-              value={studentData.studentsAtRisk}
-              prefix={<AlertOutlined style={{ color: '#ffffff', fontSize: '24px' }} />}
-              valueStyle={{ color: '#ffffff', fontSize: '24px' }}
-            />
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Additional Statistics Row */}
-      <Row gutter={[16, 16]} style={{ marginTop: '16px' }}>
-        <Col xs={24} sm={12} md={8}>
-          <Statistic
-            title="Graduation Rate"
-            value={`${studentData.graduationRate}%`}
-            prefix={<SafetyCertificateOutlined />}
-            valueStyle={{ color: '#52c41a' }}
-          />
-        </Col>
-        <Col xs={24} sm={12} md={8}>
-          <Statistic
-            title="New Enrollments"
-            value={studentData.newEnrollments}
-            prefix={<RocketOutlined />}
-            valueStyle={{ color: '#1890ff' }}
-          />
-        </Col>
-        <Col xs={24} sm={12} md={8}>
-          <Statistic
-            title="Internship Placements"
-            value={studentData.internshipPlacements}
-            prefix={<ReadOutlined />}
-            valueStyle={{ color: '#722ed1' }}
-          />
-        </Col>
-      </Row>
-
-      {/* Attendance Overview Progress */}
-      <div style={{ marginTop: 24 }}>
-        <h3 style={{ marginBottom: 16 }}>Attendance Overview</h3>
-        <Progress
-          percent={studentData.averageAttendance}
-          status="active"
-          strokeColor={{
-            '0%': '#108ee9',
-            '100%': '#87d068',
-          }}
-          style={{ 
-            borderRadius: '10px', 
-            overflow: 'hidden' 
-          }}
-        />
-      </div>
-    </Card>
+        </div>
+      </Card>
+    </div>
   );
 };
 

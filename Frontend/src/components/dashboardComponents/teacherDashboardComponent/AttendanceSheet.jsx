@@ -14,10 +14,12 @@ import {
   CalendarOutlined, 
   BookOutlined, 
   CheckCircleOutlined,
-  CloseCircleOutlined 
+  CloseCircleOutlined ,
+  SyncOutlined
 } from '@ant-design/icons';
 import useAttendanceStore from '/Users/aashiqmahato/Documents/Codes/Attendance Management System/Frontend/src/zustand/attendanceStore.js';
-
+import { motion } from 'framer-motion';
+import { variants, itemVariants } from './animationVariants.js'
 // Create axios instance with default config
 const api = axios.create({
   baseURL: 'http://localhost:8080/api/v1',
@@ -244,69 +246,226 @@ const loadStudents = async () => {
   ];
 
   return (
-    <div className="min-h-screen p-4 md:p-8 bg-gradient-to-br from-blue-100 to-blue-200">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen p-4 md:p-8 bg-gradient-to-br from-blue-50 to-indigo-100"
+    >
       <div className="w-full max-w-6xl mx-auto">
-        <div className="p-4 mb-4 transition-all duration-500 transform bg-white shadow-2xl md:p-8 md:mb-8 rounded-2xl hover:shadow-3xl">
-          <h2 className="flex items-center mb-4 text-xl font-bold text-gray-800 md:mb-6 md:text-3xl">
-            <CalendarOutlined className="mr-2 text-blue-600 md:mr-4" />
-            Attendance Management
-          </h2>
-          <div className="grid grid-cols-1 gap-4 md:gap-6 md:grid-cols-2">
-            <div>
-              <label className="block mb-2 text-gray-700">Select Subject</label>
+        {/* Header Section */}
+        <motion.div
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="p-4 mb-4 bg-white shadow-2xl md:p-8 md:mb-8 rounded-2xl backdrop-blur-lg bg-opacity-90"
+        >
+          <div className="flex items-center mb-6">
+            <motion.div
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ repeat: Infinity, duration: 4 }}
+              className="mr-4"
+            >
+              <CalendarOutlined className="text-3xl text-blue-600" />
+            </motion.div>
+            <motion.h1
+              initial={{ x: -20 }}
+              animate={{ x: 0 }}
+              className="text-2xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text md:text-4xl"
+            >
+              Attendance Portal
+            </motion.h1>
+          </div>
+  
+          <motion.div
+            className="grid grid-cols-1 gap-4 md:gap-6 md:grid-cols-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            <motion.div whileHover={{ scale: 1.02 }}>
+              <label className="block mb-2 font-medium text-gray-700">Subject</label>
               <Select
-                placeholder="Choose Subject"
+                placeholder="Select Subject"
                 className="w-full"
-                onChange={(value) => setSelectedSubject(value)}
+                suffixIcon={
+                  <motion.div whileHover={{ scale: 1.1 }}>
+                    <BookOutlined className="text-blue-500" />
+                  </motion.div>
+                }
                 options={subjects.map(subject => ({
                   value: subject._id,
                   label: isMobile 
                     ? `${subject.name}` 
                     : `${subject.name} (${subject.code})`
                 }))}
-                suffixIcon={<BookOutlined className="text-blue-500" />}
+                onChange={(value) => setSelectedSubject(value)}
               />
-            </div>
-            <div>
-              <label className="block mb-2 text-gray-700">Select Date</label>
-              <DatePicker 
+            </motion.div>
+  
+            <motion.div whileHover={{ scale: 1.02 }}>
+              <label className="block mb-2 font-medium text-gray-700">Date</label>
+              <DatePicker
+                className="w-full"
                 value={attendanceDate}
                 onChange={(date) => setAttendanceDate(date)}
-                className="w-full"
-                placeholder="Pick Attendance Date"
+                suffixIcon={
+                  <motion.div whileTap={{ scale: 0.9 }}>
+                    <CalendarOutlined className="text-blue-500" />
+                  </motion.div>
+                }
               />
-            </div>
-          </div>
-        </div>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+  
+        <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+        className="overflow-hidden bg-white shadow-xl rounded-2xl backdrop-blur-lg bg-opacity-90"
+      >
+        <Table
+          columns={[
+            {
+              title: 'Student',
+              key: 'mobile-view',
+              responsive: ['xs'],
+              render: (_, record) => (
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="font-medium">
+                      <UserOutlined className="mr-2 text-blue-500" />
+                      {record.name.split(' ')[0]} {/* Show first name only */}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      Sem {record.semester}
+                    </span>
+                  </div>
+                  <Tag 
+                    icon={record.present ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
+                    color={record.present ? 'green' : 'red'}
+                    className="ml-2"
+                  >
+                    {isMobile ? '' : record.present ? 'Present' : 'Absent'}
+                  </Tag>
+                </div>
+              )
+            },
+            {
+              title: 'Name',
+              dataIndex: 'name',
+              key: 'name',
+              responsive: ['md'],
+              render: (name, record) => (
+                <div className="flex items-center">
+                  <UserOutlined className="mr-2 text-blue-500" />
+                  {name}
+                  {recognizedStudents.some(rs => 
+                    rs.name.toLowerCase() === name.toLowerCase()
+                  ) && (
+                    <Tag color="blue" className="hidden ml-2 md:inline">
+                      {(record.confidence * 100).toFixed(2)}%
+                    </Tag>
+                  )}
+                </div>
+              )
+            },
+            {
+              title: 'Semester',
+              dataIndex: 'semester',
+              key: 'semester',
+              responsive: ['md'],
+              render: (semester) => (
+                <div className="flex items-center">
+                  <BookOutlined className="mr-2 text-green-500" />
+                  {semester}
+                </div>
+              )
+            },
+            {
+              title: 'Status',
+              dataIndex: 'present',
+              key: 'status',
+              responsive: ['md'],
+              render: (present) => (
+                <Tag 
+                  icon={present ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
+                  color={present ? 'green' : 'red'}
+                >
+                  {present ? 'Present' : 'Absent'}
+                </Tag>
+              )
+            },
+            {
+              title: 'Actions',
+              key: 'actions',
+              render: (_, record) => (
+                <Button 
+                  onClick={() => {
+                    setAttendanceData(prev => 
+                      prev.map(student => 
+                        student.id === record.id 
+                          ? { ...student, present: !student.present } 
+                          : student
+                      )
+                    );
+                  }}
+                  type="link"
+                  className="p-0"
+                >
+                  {isMobile ? (
+                    <SyncOutlined className="text-blue-600" />
+                  ) : (
+                    <span className="text-blue-600">Toggle</span>
+                  )}
+                </Button>
+              )
+            }
+          ]}
+          dataSource={attendanceData}
+          rowKey="id"
+          loading={loading}
+          scroll={{ x: true }}
+          locale={{ emptyText: 'Select a subject to view students' }}
+          rowClassName="group hover:bg-blue-50 transition-colors duration-200"
+          pagination={{ 
+            position: ['bottomRight'],
+            showSizeChanger: false,
+            pageSizeOptions: ['10', '20', '50'],
+            className: 'px-4 py-2',
+            responsive: true
+          }}
+        />
+      </motion.div>
 
-        <div className="overflow-x-auto transition-all duration-500 transform bg-white shadow-xl rounded-2xl hover:shadow-2xl">
-          <Table 
-            columns={columns}
-            dataSource={attendanceData}
-            rowKey="id"
-            loading={loading}
-            scroll={{ x: 'max-content' }}
-            locale={{ 
-              emptyText: 'Select a subject to view students' 
-            }}
-            rowClassName="transition-all duration-300 hover:bg-blue-50"
-            className="w-full"
-          />
-        </div>
-
-        <div className="mt-4 text-center md:mt-6 md:text-right">
-          <Button 
-            type="primary" 
-            size="large" 
-            onClick={handleAttendanceSubmit}
-            disabled={attendanceData.length === 0 || !selectedSubject}
-            className="w-full transition-all duration-300 transform bg-green-600 shadow-md md:w-auto hover:bg-green-700 hover:scale-105 hover:shadow-lg"
+      {/* Submit Button */}
+      <motion.div
+        className="mt-6 text-center md:text-right"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1 }}
+      >
+        <Button 
+          type="primary"
+          size="large"
+          onClick={handleAttendanceSubmit}
+          disabled={attendanceData.length === 0 || !selectedSubject}
+          className="w-full font-semibold text-white transition-all duration-300 transform shadow-lg md:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 hover:shadow-xl"
+        >
+          <motion.span
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+            className="flex items-center justify-center gap-2"
           >
-            Submit Attendance
-          </Button>
-        </div>
+            <CheckCircleOutlined />
+            <span className="hidden md:inline">Submit Attendance</span>
+            <span className="md:hidden">Submit</span>
+          </motion.span>
+        </Button>
+      </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
