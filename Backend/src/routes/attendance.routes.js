@@ -3,10 +3,8 @@ import express from 'express';
 import { 
     markAttendance,
     getAttendanceBySubject,
-    getAttendanceByStudent,
     updateAttendance,
-    deleteAttendance,
-    getStudentAttendanceBySubject
+    deleteAttendance
 } from '../controllers/attendance.controller.js';
 import { authenticateUser } from '../middlewares/auth.middleware.js';
 
@@ -18,16 +16,11 @@ router.route("/markattendance")
 router.route("/subject/:subjectId")
     .get(authenticateUser, getAttendanceBySubject);
 
-router.route("/student/:studentId")
-    .get(authenticateUser, getAttendanceByStudent);
-
 router.route("/update/:attendanceId")
     .put(authenticateUser, updateAttendance);
 
 router.route("/delete/:attendanceId")
     .delete(authenticateUser, deleteAttendance);
 
-router.route("/student/:studentId/subject/:subjectId")
-    .get(authenticateUser, getStudentAttendanceBySubject);
 
 export default router;

@@ -43,7 +43,7 @@ const TeacherDashboard = () => {
   const navItems = [
     { name: 'Home', icon: FaChalkboardTeacher, path: '/teacherdashboard' },
     { name: 'Attendance', icon: FaUserGraduate, path: '/teacherdashboard/attendance' },
-    { name: 'Courses', icon: FaBook, path: '/teacherdashboard/courses' },
+    { name: 'Assignment', icon: FaBook, path: '/teacherdashboard/assignment' },
     { name: 'Reports', icon: FaChartBar, path: '/teacherdashboard/reports' },
     { name: 'Settings', icon: FaCog, path: '/teacherdashboard/settings' },
   ];

@@ -136,5 +136,53 @@ export const getAllStudents = async (req, res) => {
       });
     }
   };
+  const updateProfile = asyncHandler(async (req, res) => {
+    const { fullName, semester } = req.body;
+    const userId = req.user?._id;
 
-export {signupUser,loginUser,logoutUser,refreshAccessToken }
+    if (!userId) {
+        throw new apiError(401, "Unauthorized request");
+    }
+
+    const updateFields = {};
+
+    // Only add fields that are provided and valid
+    if (fullName?.trim()) {
+        updateFields.fullName = fullName;
+    }
+
+    if (semester) {
+        // Validate semester range (1-8)
+        if (semester < 1 || semester > 8) {
+            throw new apiError(400, "Semester must be between 1 and 8");
+        }
+        updateFields.semester = semester;
+    }
+
+
+    // Check if there are any fields to update
+    if (Object.keys(updateFields).length === 0) {
+        throw new apiError(400, "Please provide at least one field to update");
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        {
+            $set: updateFields
+        },
+        {
+            new: true,
+            runValidators: true
+        }
+    ).select("-password -refreshToken");
+
+    if (!updatedUser) {
+        throw new apiError(404, "User not found");
+    }
+
+    return res.status(200).json(
+        new apiResponse(200, "Profile updated successfully", updatedUser)
+    );
+});
+
+export {signupUser,loginUser,logoutUser,refreshAccessToken,updateProfile }

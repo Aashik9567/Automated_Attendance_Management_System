@@ -10,11 +10,11 @@ import StudentDashboard from "../dashboardComponents/studentDashboardComponent/S
 import HomePage from "../dashboardComponents/teacherDashboardComponent/HomePage";
 import AttendanceSheet from "../dashboardComponents/teacherDashboardComponent/AttendanceSheet";
 import Settings from "../dashboardComponents/teacherDashboardComponent/Settings";
-import CourseList from "../dashboardComponents/teacherDashboardComponent/CourseList";
+import AssignmentManagement from "../dashboardComponents/teacherDashboardComponent/AssignmentManagement";
 import AttendanceReport from "../dashboardComponents/teacherDashboardComponent/AttendanceReport.jsx";
 import StudentHomePage from "../dashboardComponents/studentDashboardComponent/StudentHomePage.jsx";
 import StudentCalendar from "../dashboardComponents/studentDashboardComponent/StudentCalendar.jsx";
-import CourseDetail from "../dashboardComponents/studentDashboardComponent/CourseDetail.jsx";
+import StudentAssignmentViewer from "../dashboardComponents/studentDashboardComponent/StudentAssignmentViewer.jsx";
 import Holiday from "../dashboardComponents/studentDashboardComponent/Holiday.jsx";
 import StudentAttendance from "../dashboardComponents/studentDashboardComponent/StudentAttendance.jsx";
 import {useNavigate,useLocation } from 'react-router-dom';
@@ -43,7 +43,7 @@ const Webroutes = () => {
         >
           <Route index element={<StudentHomePage />} />
           <Route path="calendar" element={<StudentCalendar />} />
-          <Route path="course" element={<CourseDetail />} />
+          <Route path="assignments" element={<StudentAssignmentViewer />} />
           <Route path="Attendance" element={<StudentAttendance />} />
           <Route path="holidays" element={<Holiday/>} />
           <Route path="settings" element={<Settings />} />
@@ -59,7 +59,7 @@ const Webroutes = () => {
         >
           <Route index element={<HomePage />} />
           <Route path="attendance" element={<AttendanceSheet />} />
-          <Route path="courses" element={<CourseList />} />
+          <Route path="assignment" element={<AssignmentManagement />} />
           <Route
             path="reports"
             element={<AttendanceReport attendanceData={attendanceData} />}

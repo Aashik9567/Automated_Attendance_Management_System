@@ -55,7 +55,7 @@ const StudentDashboard = () => {
   const navItems = [
     { name: "Home", path: "/studentdashboard", icon: <FaHome className="w-6 h-6" /> },
     { name: "Calendar", path: "/studentdashboard/calendar", icon: <FaCalendarAlt className="w-6 h-6" /> },
-    { name: "Course", path: "/studentdashboard/course", icon: <FaUserGraduate className="w-6 h-6" /> },
+    { name: "Assignments", path: "/studentdashboard/assignments", icon: <FaUserGraduate className="w-6 h-6" /> },
     { name: "Holidays", path: "/studentdashboard/holidays", icon: <FaStar className="w-6 h-6" /> },
     { name: "Attendance", path: "/studentdashboard/attendance", icon: <FaClipboardCheck className="w-6 h-6" /> },
   ];

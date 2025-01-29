@@ -20,162 +20,160 @@ const AttendanceReport = () => {
     totalAbsent: 0
   });
 
-  const api = axios.create({
-    baseURL: 'http://localhost:8080/api/v1',
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-      'Content-Type': 'application/json'
-    }
-  });
-
-  useEffect(() => {
-    fetchSubjects();
-  }, []);
-
-  useEffect(() => {
-    if (selectedSubject) {
-      fetchAttendanceData();
-    }
-  }, [selectedSubject]);
-
-  const fetchSubjects = async () => {
+  const fetchData = async () => {
     try {
-      const response = await api.get('/subjects/getsubject');
-      setSubjects(response.data.data);
-      if (response.data.data.length > 0) {
-        setSelectedSubject(response.data.data[0]._id);
-      }
-    } catch (error) {
-      message.error('Failed to fetch subjects');
-      console.error(error);
-    }
-  };
-
-  const fetchAttendanceData = async () => {
-    setLoading(true);
-    try {
-      const response = await api.get(`/attendance/${selectedSubject}`);
-      const attendanceRecords = response.data.data;
-
-      const processedData = attendanceRecords.map(record => ({
-        date: new Date(record.date).toLocaleDateString(),
-        presentCount: record.students.filter(s => s.status === 'present').length,
-        totalStudents: record.students.length
-      }));
-
-      const totalPresent = attendanceRecords.reduce((sum, record) => 
-        sum + record.students.filter(s => s.status === 'present').length, 0);
-      
-      const totalStudents = attendanceRecords.reduce((sum, record) => 
-        sum + record.students.length, 0);
-
-      setAttendanceData(processedData);
-      setOverallStats({
-        totalDays: processedData.length,
-        avgAttendance: processedData.length ? (totalPresent / processedData.length).toFixed(2) : 0,
-        highestAttendance: Math.max(...processedData.map(d => d.presentCount)),
-        lowestAttendance: Math.min(...processedData.map(d => d.presentCount)),
-        totalPresent: totalPresent,
-        totalAbsent: totalStudents - totalPresent
+      // Fetch subjects first
+      const subjectsRes = await axios.get('http://localhost:8080/api/v1/subjects/getsubject', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
       });
+      const subjects = subjectsRes.data.data;
+      setSubjects(subjects);
+
+      // Set first subject as default selected
+      if (subjects.length > 0 && !selectedSubject) {
+        setSelectedSubject(subjects[0]._id);
+      }
+
+      if (selectedSubject) {
+        // Fetch attendance data for selected subject
+        const attendanceRes = await axios.get(`http://localhost:8080/api/v1/attendance/subject/${selectedSubject}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
+        });
+        const attendanceRecords = attendanceRes.data;
+
+        // Process attendance data for charts
+        const processedData = attendanceRecords.map(record => {
+          const presentCount = record.students.filter(s => s.status === 'present').length;
+          return {
+            date: new Date(record.date).toLocaleDateString(),
+            presentCount,
+            totalStudents: record.students.length
+          };
+        });
+
+        // Calculate statistics
+        const totalPresent = attendanceRecords.reduce((sum, record) => 
+          sum + record.students.filter(s => s.status === 'present').length, 0);
+        const totalStudents = attendanceRecords.reduce((sum, record) => 
+          sum + record.students.length, 0);
+        const presentCounts = processedData.map(d => d.presentCount);
+
+        setAttendanceData(processedData);
+        setOverallStats({
+          totalDays: processedData.length,
+          avgAttendance: processedData.length ? (totalPresent / processedData.length).toFixed(2) : 0,
+          highestAttendance: Math.max(...presentCounts, 0),
+          lowestAttendance: Math.min(...presentCounts, 0),
+          totalPresent,
+          totalAbsent: totalStudents - totalPresent
+        });
+      }
+
+      setLoading(false);
     } catch (error) {
-      message.error('Failed to fetch attendance data');
-      console.error(error);
-    } finally {
+      console.error('Error fetching data:', error);
+      message.error('Failed to fetch data');
       setLoading(false);
     }
   };
 
-  const barChartConfig = {
-    data: attendanceData,
-    xField: 'date',
-    yField: 'presentCount',
-    color: '#1890ff',
-    label: {
-      position: 'middle',
-      style: {
-        fill: '#FFFFFF',
-        opacity: 0.6,
-      },
-    },
+  useEffect(() => {
+    fetchData();
+  }, [selectedSubject]);
+
+  const handleSubjectChange = (value) => {
+    setSelectedSubject(value);
+    setLoading(true);
   };
 
-  const pieChartConfig = {
-    data: [
-      { type: 'Present', value: overallStats.totalPresent },
-      { type: 'Absent', value: overallStats.totalAbsent }
-    ],
-    angleField: 'value',
-    colorField: 'type',
-    color: ['#52c41a', '#ff4d4f'],
-    label: {
-      text: ({ type, value, percent }) => 
-        `${type} ${value} (${(percent * 100).toFixed(2)}%)`,
-      position: 'outside',
+  const chartConfigs = {
+    bar: {
+      data: attendanceData,
+      xField: 'date',
+      yField: 'presentCount',
+      color: '#1890ff',
+      label: {
+        position: 'middle',
+        style: { fill: '#fff', opacity: 0.6 }
+      }
     },
-    legend: {
-      position: 'bottom',
-    },
+    pie: {
+      data: [
+        { type: 'Present', value: overallStats.totalPresent },
+        { type: 'Absent', value: overallStats.totalAbsent }
+      ],
+      angleField: 'value',
+      colorField: 'type',
+      color: ['#52c41a', '#ff4d4f'],
+      label: ({ type, percent }) => `${type} (${(percent * 100).toFixed(2)}%)`,
+      legend: { position: 'bottom' }
+    }
   };
 
-  if (loading) {
-    return <Spin size="large" className="flex items-center justify-center min-h-screen" />;
-  }
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-screen">
+      <Spin size="large" />
+    </div>
+  );
 
   return (
-    <Card className="w-full bg-blue-200 rounded-lg shadow-md">
-      <Row gutter={[16, 16]} className="mb-4">
-        <Col span={24}>
-          <Select
-            className="w-full"
-            placeholder="Select Subject"
-            value={selectedSubject}
-            onChange={setSelectedSubject}
-            options={subjects.map(subject => ({
-              value: subject._id,
-              label: `${subject.name} (${subject.code})`
-            }))}
-          />
-        </Col>
-      </Row>
+    <div className="p-4 space-y-4">
+      <Card className="shadow-lg rounded-xl">
+        <Select
+          className="w-full mb-6"
+          placeholder="Select Subject"
+          value={selectedSubject}
+          onChange={handleSubjectChange}
+          options={subjects.map(s => ({
+            value: s._id,
+            label: `${s.name} (${s.code})`
+          }))}
+        />
 
-      <Row gutter={[16, 16]}>
-        <Col xs={24} sm={24} md={12} lg={12}>
-          <Card type="inner" title="Daily Attendance">
-            <Column {...barChartConfig} height={300} />
-          </Card>
-        </Col>
+        <Row gutter={[24, 24]}>
+          <Col xs={24} md={12}>
+            <Card 
+              title="Daily Attendance" 
+              className="shadow-md rounded-xl"
+            >
+              <Column {...chartConfigs.bar} height={300} />
+            </Card>
+          </Col>
 
-        <Col xs={24} sm={24} md={12} lg={12}>
-          <Card type="inner" title="Overall Attendance">
-            <Pie {...pieChartConfig} height={300} />
-          </Card>
-        </Col>
+          <Col xs={24} md={12}>
+            <Card 
+              title="Overall Attendance" 
+              className="shadow-md rounded-xl"
+            >
+              <Pie {...chartConfigs.pie} height={300} />
+            </Card>
+          </Col>
 
-        <Col xs={24}>
-          <Card type="inner" title="Summary Statistics">
-            <Row gutter={[16, 16]}>
-              <Col xs={24} sm={12} md={6}>
-                <Text strong>Total Days: </Text>
-                <Text>{overallStats.totalDays}</Text>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Text strong>Avg. Attendance: </Text>
-                <Text>{overallStats.avgAttendance} students</Text>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Text strong>Highest Attendance: </Text>
-                <Text>{overallStats.highestAttendance} students</Text>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Text strong>Lowest Attendance: </Text>
-                <Text>{overallStats.lowestAttendance} students</Text>
-              </Col>
-            </Row>
-          </Card>
-        </Col>
-      </Row>
-    </Card>
+          <Col span={24}>
+            <Card 
+              title="Summary Statistics" 
+              className="shadow-md rounded-xl"
+            >
+              <Row gutter={[24, 16]}>
+                {Object.entries({
+                  'Total Days': overallStats.totalDays,
+                  'Avg. Attendance': `${overallStats.avgAttendance} students`,
+                  'Highest Attendance': `${overallStats.highestAttendance} students`,
+                  'Lowest Attendance': `${overallStats.lowestAttendance} students`
+                }).map(([label, value], idx) => (
+                  <Col key={idx} xs={24} sm={12} md={6}>
+                    <div className="p-3 rounded-lg bg-blue-50">
+                      <Text strong className="text-gray-600">{label}: </Text>
+                      <Text className="text-blue-600">{value}</Text>
+                    </div>
+                  </Col>
+                ))}
+              </Row>
+            </Card>
+          </Col>
+        </Row>
+      </Card>
+    </div>
   );
 };
 

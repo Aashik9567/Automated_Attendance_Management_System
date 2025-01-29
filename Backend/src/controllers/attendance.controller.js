@@ -5,8 +5,6 @@ import { StudentSubject } from '../models/studentSubject.model.js';
 export const markAttendance = async (req, res) => {
     try {
         const { subjectId, students, date } = req.body;
-        console.log('Received attendance data:', req.body);
-        console.log('User:', req.user);
 
         if (!subjectId || !students || students.length === 0) {
             return res.status(400).json({ message: 'Invalid attendance data' });
@@ -75,20 +73,7 @@ export const getAttendanceBySubject = async (req, res) => {
     }
 };
 
-// Get attendance by student
-export const getAttendanceByStudent = async (req, res) => {
-    try {
-        const { studentId } = req.params;
-        const attendance = await Attendance.find({ 'students.student': studentId })
-            .populate('subject', 'name code')
-            .populate('teacher', 'fullName')
-            .sort({ date: -1 });
 
-        res.status(200).json(attendance);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
 
 
 // Update attendance record
