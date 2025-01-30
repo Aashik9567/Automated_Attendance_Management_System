@@ -1,9 +1,7 @@
 // StudentAssignmentViewer.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Card, 
-  Typography, 
-  Table, 
+  Card, Typography, Table, Grid,
   Tag, 
   Button, 
   Modal, 
@@ -18,11 +16,7 @@ import {
   Tooltip
 } from 'antd';
 import {
-  CloudUploadOutlined,
-  EyeOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  FilePdfOutlined,
+  CloudUploadOutlined, EyeOutlined, CheckCircleOutlined, ClockCircleOutlined, FilePdfOutlined,
   FileExcelOutlined,
   FileWordOutlined,
   FileImageOutlined,
@@ -33,8 +27,6 @@ import {
   DownloadOutlined
 } from '@ant-design/icons';
 import { motion, AnimatePresence } from 'framer-motion';
-import Lottie from 'react-lottie';
-import uploadAnimation from '../animations/upload.json';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -42,8 +34,9 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 
 const { Title, Text, Paragraph } = Typography;
-
+const { useBreakpoint } = Grid;
 const StudentAssignmentViewer = () => {
+  const screens = useBreakpoint();
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
@@ -53,14 +46,8 @@ const StudentAssignmentViewer = () => {
   const [uploadFile, setUploadFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const lottieOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: uploadAnimation,
-    rendererSettings: {
-      preserveAspectRatio: 'xMidYMid slice'
-    }
-  };
+ 
+
 
   useEffect(() => {
     fetchAssignments();
@@ -175,74 +162,82 @@ const StudentAssignmentViewer = () => {
     );
   };
 
-  const columns = [
-    {
-      title: 'Assignment',
-      dataIndex: 'title',
-      key: 'title',
-      render: (text, record) => (
-        <div className="flex flex-col">
-          <Text strong className="text-lg">{text}</Text>
-          <Text type="secondary" className="text-sm">
-            {record.subject.name}
-          </Text>
-        </div>
-      ),
-    },
-    {
-      title: 'Due Date',
-      dataIndex: 'dueDate',
-      key: 'dueDate',
-      render: (date) => (
-        <Tooltip title={dayjs(date).format('MMMM D, YYYY h:mm A')}>
-          <span className="flex items-center">
-            <CalendarOutlined className="mr-2" />
-            {dayjs(date).format('MMM D, YYYY')}
-          </span>
-        </Tooltip>
-      ),
-    },
-    {
-      title: 'Status',
-      key: 'status',
-      render: (_, record) => getStatusTag(record),
-    },
-    {
-      title: 'Actions',
-      key: 'actions',
-      render: (_, record) => (
-        <Space>
-          <Tooltip title="View Details">
-            <Button
-              type="primary"
-              icon={<EyeOutlined />}
-              onClick={() => {
-                setSelectedAssignment(record);
-                setDrawerVisible(true);
-              }}
-              className="bg-blue-500 hover:bg-blue-600"
-            >
-              View
-            </Button>
+  const responsiveColumns = () => {
+    const baseColumns = [
+      {
+        title: 'Assignment',
+        dataIndex: 'title',
+        key: 'title',
+        render: (text, record) => (
+          <div className="flex flex-col">
+            <Text strong className="text-base md:text-lg">{text}</Text>
+            <Text type="secondary" className="text-xs md:text-sm">
+              {record.subject.name}
+            </Text>
+          </div>
+        ),
+      },
+      {
+        title: 'Due Date',
+        dataIndex: 'dueDate',
+        key: 'dueDate',
+        responsive: ['md'],
+        render: (date) => (
+          <Tooltip title={dayjs(date).format('MMMM D, YYYY h:mm A')}>
+            <span className="flex items-center">
+              <CalendarOutlined className="mr-2" />
+              {dayjs(date).format(screens.md ? 'MMM D, YYYY' : 'MM/DD/YY')}
+            </span>
           </Tooltip>
-          {!record.submissions?.some(sub => sub.student === localStorage.getItem('userId')) && (
-            <Tooltip title="Submit Assignment">
+        ),
+      },
+      {
+        title: 'Status',
+        key: 'status',
+        responsive: ['sm'],
+        render: (_, record) => getStatusTag(record),
+      },
+      {
+        title: 'Actions',
+        key: 'actions',
+        render: (_, record) => (
+          <Space direction={screens.md ? 'horizontal' : 'vertical'}>
+            <Tooltip title="View Details">
               <Button
-                icon={<CloudUploadOutlined />}
+                type="primary"
+                icon={<EyeOutlined />}
                 onClick={() => {
                   setSelectedAssignment(record);
-                  setSubmitModalVisible(true);
+                  setDrawerVisible(true);
                 }}
-                className="hover:border-blue-500 hover:text-blue-500"
+                className="text-xs bg-blue-500 hover:bg-blue-600 md:text-base"
+                size={screens.md ? 'default' : 'small'}
               >
-                Submit
+                {screens.md ? 'View' : <EyeOutlined />}
               </Button>
             </Tooltip>
-          )}
-        </Space>
-      ),
-    },
-  ];
+            {!record.submissions?.some(sub => sub.student === localStorage.getItem('userId')) && (
+              <Tooltip title="Submit Assignment">
+                <Button
+                  icon={<CloudUploadOutlined />}
+                  onClick={() => {
+                    setSelectedAssignment(record);
+                    setSubmitModalVisible(true);
+                  }}
+                  className="text-xs hover:border-blue-500 hover:text-blue-500 md:text-base"
+                  size={screens.md ? 'default' : 'small'}
+                >
+                  {screens.md ? 'Submit' : <CloudUploadOutlined />}
+                </Button>
+              </Tooltip>
+            )}
+          </Space>
+        ),
+      },
+    ];
+
+    return baseColumns.filter(col => !col.responsive || col.responsive.some(br => screens[br]));
+  };
 
   const downloadFile = (url) => {
     window.open(url, '_blank');
@@ -253,7 +248,7 @@ const StudentAssignmentViewer = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen p-6 bg-gradient-to-br from-blue-50 to-indigo-50"
+      className="min-h-screen p-4 md:p-6 bg-gradient-to-br from-blue-50 to-indigo-50"
     >
       <Card className="shadow-xl rounded-xl backdrop-blur-lg bg-white/90">
         <motion.div
@@ -261,7 +256,7 @@ const StudentAssignmentViewer = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <Title level={3} className="mb-6 text-gradient">My Assignments</Title>
+          <Title level={3} className="mb-4 text-lg md:mb-6 md:text-2xl text-gradient">My Assignments</Title>
         </motion.div>
         
         <AnimatePresence mode="wait">
@@ -297,15 +292,18 @@ const StudentAssignmentViewer = () => {
               exit={{ opacity: 0 }}
             >
               <Table
-                columns={columns}
+                columns={responsiveColumns()}
                 dataSource={assignments}
                 rowKey="_id"
                 className="transition-all duration-300"
                 rowClassName="hover:bg-blue-50 transition-colors duration-200"
                 pagination={{
                   pageSize: 8,
-                  className: "pb-4"
+                  className: "pb-4",
+                  showSizeChanger: false
                 }}
+                scroll={{ x: true }}
+                size={screens.md ? 'default' : 'middle'}
               />
             </motion.div>
           )}
@@ -314,24 +312,26 @@ const StudentAssignmentViewer = () => {
 
       <Drawer
         title={
-          <Text strong className="text-xl">
+          <Text strong className="text-lg md:text-xl">
             {selectedAssignment?.title}
           </Text>
         }
         placement="right"
-        width={600}
+        width={screens.md ? 600 : '100%'}
         onClose={() => setDrawerVisible(false)}
         open={drawerVisible}
         className="assignment-drawer"
       >
         {selectedAssignment && (
-          <div className="space-y-6">
-            <Descriptions bordered column={1}>
+          <div className="space-y-4 md:space-y-6">
+            <Descriptions bordered column={1} size={screens.md ? 'default' : 'small'}>
               <Descriptions.Item label="Subject">
                 {selectedAssignment.subject.name}
               </Descriptions.Item>
               <Descriptions.Item label="Due Date">
-                {dayjs(selectedAssignment.dueDate).format('MMMM D, YYYY h:mm A')}
+                {dayjs(selectedAssignment.dueDate).format(
+                  screens.md ? 'MMMM D, YYYY h:mm A' : 'MMM D, YYYY'
+                )}
               </Descriptions.Item>
               <Descriptions.Item label="Status">
                 {getStatusTag(selectedAssignment)}
@@ -339,33 +339,32 @@ const StudentAssignmentViewer = () => {
             </Descriptions>
 
             <div>
-              <Title level={5}>Description</Title>
-              <Paragraph className="p-4 rounded-lg bg-gray-50">
+              <Title level={5} className="text-base md:text-lg">Description</Title>
+              <Paragraph className="p-2 text-sm rounded-lg md:p-4 md:text-base bg-gray-50">
                 {selectedAssignment.description}
               </Paragraph>
             </div>
 
             {selectedAssignment.attachments?.length > 0 && (
               <div>
-                <Title level={5}>Attachments</Title>
+                <Title level={5} className="text-base md:text-lg">Attachments</Title>
                 <div className="space-y-2">
                   {selectedAssignment.attachments.map((file, index) => (
                     <motion.div 
                       key={index}
                       whileHover={{ scale: 1.02 }}
-                      className="flex items-center justify-between p-3 transition-colors rounded-lg bg-gray-50 hover:bg-gray-100"
+                      className="flex items-center justify-between p-2 text-sm rounded-lg md:p-3 md:text-base bg-gray-50 hover:bg-gray-100"
                     >
-                      <div className="flex items-center">
+                      <div className="flex items-center truncate">
                         {getFileIcon(file)}
-                        <Text className="ml-2">{file.split('/').pop()}</Text>
+                        <Text className="ml-2 truncate">{file.split('/').pop()}</Text>
                       </div>
                       <Button
                         type="link"
                         icon={<DownloadOutlined />}
                         onClick={() => downloadFile(file)}
-                      >
-                        Download
-                      </Button>
+                        size="small"
+                      />
                     </motion.div>
                   ))}
                 </div>
@@ -411,8 +410,8 @@ const StudentAssignmentViewer = () => {
       <Modal
         title={
           <div className="flex items-center space-x-2">
-            <CloudUploadOutlined className="text-xl text-blue-500" />
-            <span>Submit Assignment</span>
+            <CloudUploadOutlined className="text-lg text-blue-500 md:text-xl" />
+            <span className="text-base md:text-lg">Submit Assignment</span>
           </div>
         }
         open={submitModalVisible}
@@ -424,73 +423,41 @@ const StudentAssignmentViewer = () => {
         onOk={handleSubmission}
         okButtonProps={{ 
           loading: submitting,
-          className: "bg-blue-500 hover:bg-blue-600"
+          className: "bg-blue-500 hover:bg-blue-600 text-xs md:text-base"
         }}
         okText="Submit"
         className="submission-modal"
+        destroyOnClose
+        width={screens.md ? 600 : '90%'}
       >
-        <div className="p-4 text-center">
-  {!uploadFile && (
-    <div className="mb-4">
-      <Lottie 
-        options={lottieOptions}
-        height={200}
-        width={200}
-      />
-    </div>
-  )}
-  
-  <Upload.Dragger
-    maxCount={1}
-    beforeUpload={(file) => {
-      setUploadFile(file);
-      return false;
-    }}
-    onRemove={() => {
-      setUploadFile(null);
-      setUploadProgress(0);
-    }}
-    fileList={uploadFile ? [uploadFile] : []}
-    className="px-4 py-8"
-  >
-    <p className="text-3xl">
-      <InboxOutlined />
-    </p>
-    <p className="text-lg">Click or drag file to upload</p>
-    <p className="text-gray-500">Support for PDF, DOC, DOCX, and image files</p>
-  </Upload.Dragger>
-  
-  {uploadFile && uploadProgress > 0 && (
-    <Progress percent={uploadProgress} status="active" className="mt-4" />
-  )}
-</div>
-          </Modal>
-          <Modal
-        title="Submit Assignment"
-        open={submitModalVisible}
-        onCancel={() => {
-          setSubmitModalVisible(false);
-          setUploadFile(null);
-        }}
-        onOk={handleSubmission}
-        okButtonProps={{ 
-          loading: submitting,
-          className: "bg-blue-500"
-        }}
-        okText="Submit"
-      >
-        <Upload
-          beforeUpload={(file) => {
-            setUploadFile(file);
-            return false;
-          }}
-          maxCount={1}
-          onRemove={() => setUploadFile(null)}
-        >
-          <Button icon={<CloudUploadOutlined />}>Select File</Button>
-        </Upload>
+        <div className="p-2 text-center md:p-4">
+          
+          <Upload.Dragger
+            maxCount={1}
+            beforeUpload={(file) => {
+              setUploadFile(file);
+              return false;
+            }}
+            onRemove={() => {
+              setUploadFile(null);
+              setUploadProgress(0);
+            }}
+            fileList={uploadFile ? [uploadFile] : []}
+            className="px-2 py-4 text-xs md:px-4 md:py-8 md:text-base"
+          >
+            <p className="text-2xl md:text-3xl">
+              <InboxOutlined />
+            </p>
+            <p className="text-sm md:text-lg">Click or drag file to upload</p>
+            <p className="text-xs text-gray-500 md:text-sm">Support for PDF, DOC, DOCX, and image files</p>
+          </Upload.Dragger>
+          
+          {uploadFile && uploadProgress > 0 && (
+            <Progress percent={uploadProgress} status="active" className="mt-2 md:mt-4" />
+          )}
+        </div>
       </Modal>
-      </motion.div>
+    </motion.div>
   );
 };
 export default StudentAssignmentViewer;
