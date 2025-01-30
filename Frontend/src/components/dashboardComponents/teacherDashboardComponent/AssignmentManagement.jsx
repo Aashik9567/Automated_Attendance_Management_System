@@ -1,27 +1,15 @@
+
 import React, { useState, useEffect } from 'react';
 import { 
-  Card, 
-  Button, 
-  Modal, 
-  Form, 
-  Input, 
-  Select, 
-  DatePicker, 
-  Table, 
-  Tag, 
-  message, 
-  Spin,
-  Typography,
-  Upload 
+  Card, Button, Modal, Form, Input, Select, DatePicker, 
+  Table, Tag, message, Spin, Typography, Upload 
 } from 'antd';
 import { 
-  PlusOutlined, 
-  FileTextOutlined, 
-  CalendarOutlined,
-  UploadOutlined,
-  DeleteOutlined,
-  EditOutlined
+  PlusOutlined, FileTextOutlined, CalendarOutlined,
+  UploadOutlined, DeleteOutlined, EditOutlined,CheckCircleOutlined,
+  CloseCircleOutlined, LoadingOutlined
 } from '@ant-design/icons';
+import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
 const { Title, Text } = Typography;
@@ -29,6 +17,7 @@ const { TextArea } = Input;
 const { Option } = Select;
 
 const AssignmentManagement = () => {
+  // ... existing state variables
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [assignments, setAssignments] = useState([]);
@@ -39,7 +28,6 @@ const AssignmentManagement = () => {
     fetchAssignments();
     fetchSubjects();
   }, []);
-
   const fetchAssignments = async () => {
     try {
       const res = await axios.get('http://localhost:8080/api/v1/assignments', {
@@ -67,23 +55,46 @@ const AssignmentManagement = () => {
   const handleSubmit = async (values) => {
     try {
       setLoading(true);
-      await axios.post('http://localhost:8080/api/v1/assignments', {
-        ...values,
-        dueDate: values.dueDate.format('YYYY-MM-DD'),
-      }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
+      const formData = new FormData();
+      
+      // Append basic fields
+      formData.append('title', values.title);
+      formData.append('description', values.description);
+      formData.append('subject', values.subject);
+      formData.append('dueDate', values.dueDate.format('YYYY-MM-DD'));
+      
+      // Append files
+      values.attachments?.fileList?.forEach((file) => {
+        formData.append('files', file.originFileObj);
       });
-      message.success('Assignment created successfully');
+
+      await axios.post(
+        'http://localhost:8080/api/v1/assignments',
+        formData,
+        {
+          headers: { 
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+
+      message.success({
+        content: 'Assignment created successfully',
+        icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />
+      });
       setIsModalVisible(false);
       form.resetFields();
       fetchAssignments();
     } catch (error) {
-      message.error('Failed to create assignment');
+      message.error({
+        content: 'Failed to create assignment',
+        icon: <CloseCircleOutlined style={{ color: '#ff4d4f' }} />
+      });
     } finally {
       setLoading(false);
     }
   };
-
   const columns = [
     {
       title: 'Title',
@@ -153,44 +164,71 @@ const AssignmentManagement = () => {
   ];
 
   return (
-    <div className="min-h-screen p-6 bg-gradient-to-br from-blue-50 to-indigo-50">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen p-6 bg-gradient-to-br from-blue-50 to-indigo-50"
+    >
       <Card 
         className="transition-all duration-300 shadow-xl rounded-xl backdrop-blur-lg bg-white/90 hover:shadow-2xl"
         title={
-          <div className="flex items-center justify-between">
-            <Title level={3} className="mb-0">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="flex items-center justify-between"
+          >
+            <Title level={3} className="mb-0 text-gradient">
               Assignment Management
             </Title>
             <Button
               type="primary"
               icon={<PlusOutlined />}
               onClick={() => setIsModalVisible(true)}
-              className="transition-colors duration-300 bg-blue-500 hover:bg-blue-600"
+              className="transition-all duration-300 transform bg-blue-500 hover:bg-blue-600 hover:scale-105"
             >
               Create Assignment
             </Button>
-          </div>
+          </motion.div>
         }
       >
-        {loading ? (
-          <div className="flex items-center justify-center h-64">
-            <Spin size="large" />
-          </div>
-        ) : (
-          <Table
-            columns={columns}
-            dataSource={assignments}
-            rowKey="_id"
-            className="transition-all duration-300"
-            rowClassName="hover:bg-blue-50 transition-colors duration-200"
-            pagination={{
-              pageSize: 8,
-              className: "pb-4"
-            }}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {loading ? (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-center justify-center h-64"
+            >
+              <Spin indicator={<LoadingOutlined style={{ fontSize: 40 }} spin />} />
+              <Text className="mt-4">Loading assignments...</Text>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="content"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <Table
+                columns={columns}
+                dataSource={assignments}
+                rowKey="_id"
+                className="transition-all duration-300"
+                rowClassName="hover:bg-blue-50 transition-colors duration-200"
+                pagination={{
+                  pageSize: 8,
+                  className: "pb-4"
+                }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </Card>
 
+      {/* Create Assignment Modal */}
       <Modal
         title="Create New Assignment"
         open={isModalVisible}
@@ -292,7 +330,15 @@ const AssignmentManagement = () => {
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+
+      <style jsx>{`
+        .text-gradient {
+          background: linear-gradient(to right, #2563eb, #3b82f6);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+      `}</style>
+    </motion.div>
   );
 };
 

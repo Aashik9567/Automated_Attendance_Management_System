@@ -45,10 +45,12 @@ app.use((req, res, next) => {
 import userRoutes from "./routes/user.routes.js";
 import subjectRoutes from "./routes/subject.routes.js";
 import attendanceRoutes from "./routes/attendance.routes.js";
+import assignmentRoutes from "./routes/assignment.routes.js";
 
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/subjects", subjectRoutes);
 app.use("/api/v1/attendance", attendanceRoutes);
+app.use("/api/v1/assignments", assignmentRoutes);
 
 // Database connection and server start
 connectDb()
