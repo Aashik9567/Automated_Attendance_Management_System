@@ -202,7 +202,7 @@ const loadStudents = async () => {
       key: 'semester',
       responsive: ['md'],
       render: (semester) => (
-        <div className="flex items-center text-gray-600">
+        <div className="flex items-center text-gray-800">
           <BookOutlined className="mr-2 text-green-500" />
           {semester}
         </div>
@@ -252,13 +252,13 @@ const loadStudents = async () => {
       transition={{ duration: 0.5 }}
       className="min-h-screen p-4 md:p-8 bg-gradient-to-br from-blue-50 to-indigo-100"
     >
-      <div className="w-full max-w-6xl mx-auto">
+      <div className="w-full">
         {/* Header Section */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="p-4 mb-4 bg-white shadow-2xl md:p-8 md:mb-8 rounded-2xl backdrop-blur-lg bg-opacity-90"
+          className="p-4 mb-4 bg-gray-100 shadow-2xl md:p-8 md:mb-8 rounded-2xl backdrop-blur-lg bg-opacity-90"
         >
           <div className="flex items-center mb-6">
             <motion.div
@@ -323,7 +323,7 @@ const loadStudents = async () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="overflow-hidden bg-white shadow-xl rounded-2xl backdrop-blur-lg bg-opacity-90"
+        className="overflow-hidden bg-gray-100 shadow-xl rounded-2xl backdrop-blur-lg bg-opacity-90"
       >
         <Table
           columns={[
@@ -338,7 +338,7 @@ const loadStudents = async () => {
                       <UserOutlined className="mr-2 text-blue-500" />
                       {record.name.split(' ')[0]} {/* Show first name only */}
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-700">
                       Sem {record.semester}
                     </span>
                   </div>
