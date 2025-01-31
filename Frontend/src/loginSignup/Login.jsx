@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import login from '../assets/login.png'
 import { Link } from 'react-router-dom';
 import logo from '../assets/Logo.png'
@@ -18,9 +18,15 @@ const schema = z.object({
         .min(3, { message: "Password must be at least 3 characters" })
 })
 const Login = () => {
-    const {setLoginStatus,setLoggedInUser}=store(state=>state)
+    const { setLoggedInUser, isLogin, loginUserData } = store(state => ({
+        setLoggedInUser: state.setLoggedInUser,
+        isLogin: state.isLogin,
+        loginUserData: state.loginUserData
+    }));
     
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
     const navigate = useNavigate();
+
     const {
         register,
         handleSubmit,
@@ -28,45 +34,55 @@ const Login = () => {
     } = useForm({
         resolver: zodResolver(schema)
     })
+    useEffect(() => {
+        if (isLogin && loginUserData?.role) {
+            const dashboardPath = loginUserData.role === "Teacher" 
+                ? "/teacherdashboard" 
+                : "/studentdashboard";
+            navigate(dashboardPath, { replace: true });
+        }
+    }, [isLogin, loginUserData.role, navigate]);
 
     const submitHandle = async (formData) => {
         try {
+            setIsLoggingIn(true);
             const response = await axios.post('http://localhost:8080/api/v1/users/login', {
                 email: formData.email,
                 password: formData.password,
             });
-    
+
             const userData = response.data.data.loginUser;
             const accessToken = response.data.data.accessToken;
             const refreshToken = response.data.data.refreshToken;
-    
+
+            if (!userData?.role) {
+                throw new Error("Invalid user data received");
+            }
+
             // Store tokens in localStorage
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', refreshToken);
-    
-            // Set logged-in user in your state management
+
+            // Update Zustand store
             setLoggedInUser(userData, accessToken, refreshToken);
-    
+            
             message.success(response.data?.message);
-    
-            // Route based on user role
-            if (userData.role === "Teacher") {
-                navigate("/teacherdashboard");
-            } else {
-                navigate("/studentdashboard");
-            }
+
         } catch (error) {
             console.error(error);
             message.error(error.response?.data?.message || "Login failed.");
+        } finally {
+            setIsLoggingIn(false);
         }
     };
-    
+
+
     // Create a custom axios instance with interceptors
     const axiosInstance = axios.create({
         baseURL: 'http://localhost:8080/api/v1',
         withCredentials: true
     });
-    
+
     // Add a request interceptor to include the access token
     axiosInstance.interceptors.request.use(
         (config) => {
@@ -78,34 +94,34 @@ const Login = () => {
         },
         (error) => Promise.reject(error)
     );
-    
+
     // Add a response interceptor for token refresh
     axiosInstance.interceptors.response.use(
         (response) => response,
         async (error) => {
             const originalRequest = error.config;
-    
+
             // Check if the error is due to token expiration and not already retried
             if (error.response?.status === 401 && !originalRequest._retry) {
                 originalRequest._retry = true;
-    
+
                 try {
                     // Call the backend refresh token endpoint
                     const response = await axios.post(
-                        'http://localhost:8080/api/v1/users/refreshtoken', 
+                        'http://localhost:8080/api/v1/users/refreshtoken',
                         { refreshToken: localStorage.getItem('refreshToken') },
                         { withCredentials: true }
                     );
-    
+
                     const { accessToken, refreshToken } = response.data.data;
-    
+
                     // Update stored tokens
                     localStorage.setItem('accessToken', accessToken);
                     localStorage.setItem('refreshToken', refreshToken);
-    
+
                     // Update authorization header for the original request
                     originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
-    
+
                     return axiosInstance(originalRequest);
                 } catch (refreshError) {
                     // Logout user if refresh fails
@@ -115,12 +131,12 @@ const Login = () => {
                     return Promise.reject(refreshError);
                 }
             }
-    
+
             return Promise.reject(error);
         }
     );
-    
-    
+
+
     return (
         <div className="flex flex-col-reverse md:flex-row ">
             {/* Image Part */}
@@ -154,8 +170,14 @@ const Login = () => {
                                 </div>
                                 <Link to="#" className="text-sm font-medium text-blue-500 hover:underline">Forgot password?</Link>
                             </div>
-                            <button type="submit" className="w-full bg-cyan-300 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mt-4">Login</button>
-                            <p className="mt-4 text-sm font-light text-center">
+                            <button
+                                type="submit"
+                                disabled={isLoggingIn}
+                                className={`w-full bg-cyan-300 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mt-4 ${isLoggingIn ? 'opacity-50 cursor-not-allowed' : ''
+                                    }`}
+                            >
+                                {isLoggingIn ? 'Logging in...' : 'Login'}
+                            </button>                            <p className="mt-4 text-sm font-light text-center">
                                 Don’t have an account yet?<button onClick={() => navigate('/signup')} type="button" className="px-5 py-2 mx-3 mb-2 text-sm font-medium text-center text-white rounded-lg shadow-lg bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 dark:focus:ring-teal-800 shadow-teal-500/50 dark:shadow-lg dark:shadow-teal-800/80 me-2">Signup</button>
                             </p>
 

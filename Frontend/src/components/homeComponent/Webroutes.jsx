@@ -36,7 +36,7 @@ const Webroutes = () => {
         <Route
           path="/studentdashboard"
           element={
-            <ProtectedRouter>
+            <ProtectedRouter allowedRoles={['Student']}>
             <StudentDashboard />
             </ProtectedRouter>
             }
@@ -52,8 +52,8 @@ const Webroutes = () => {
         <Route
           path="/teacherdashboard"
           element={
-           <ProtectedRouter>
-              <TeacherDashboard/>
+           <ProtectedRouter  allowedRoles={['Teacher']}>
+              <TeacherDashboard />
              </ProtectedRouter>
           }
         >

@@ -10,7 +10,7 @@ const TeacherDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { loginUserData, setLoginStatus,logoutUser } = store(state => state);
+  const { loginUserData,logoutUser } = store(state => state);
   // Determine active tab from current path
   const getActiveTab = (path) => {
     if (path === '/teacherdashboard') return 'Home';
@@ -53,46 +53,75 @@ const TeacherDashboard = () => {
     <>
       <div className="flex h-screen">
         {/* Sidebar */}
-        <aside className={`bg-purple-400 text-white w-64 fixed h-full z-20 transition-all duration-300 ease-in-out flex flex-col ${isSidebarOpen ? 'left-0' : '-left-64'} md:left-0`}>
-          <div className="flex-grow">
-            <div className="flex items-center justify-between p-4 md:hidden">
-              <h1 className="text-2xl font-bold">Dashboard</h1>
-              <button onClick={toggleSidebar} className="text-white">
-                <FaTimes size={24} />
-              </button>
-            </div>
-            <div className="p-6">
-              <h1 className="mb-2 text-3xl font-bold text-slate-300">Teacher Dashboard</h1>
-              <p className="font-bold text-indigo-600 text-md">Welcome back! {loginUserData.fullName}</p>
-            </div>
-            <nav className="mt-8">
-              {navItems.map((item) => (
-                <button
-                  key={item.name}
-                  onClick={() => changeTab(item.name, item.path)}
-                  className={`flex items-center w-full p-4 transition
-            ${activeTab === item.name.charAt(0).toUpperCase() + item.name.slice(1).toLowerCase()
-                      ? 'bg-blue-700 border-l-4 border-white'
-                      : 'hover:bg-blue-700 hover:border-l-4 hover:border-white'
-                    }`}
-                >
-                  <item.icon className="mr-3" />
-                  {item.name}
-                </button>
-              ))}
-            </nav>
-          </div>
+        <aside className={`bg-gradient-to-br from-blue-600 to-teal-500 text-white w-64 fixed h-full z-20 transition-all duration-300 ease-in-out flex flex-col shadow-2xl ${isSidebarOpen ? 'left-0' : '-left-64'} md:left-0 backdrop-blur-lg bg-opacity-90`}>
+  <div className="flex-grow">
+    <div className="flex items-center justify-between p-4 md:hidden">
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        className="text-2xl font-bold tracking-wider"
+      >
+        👩🏫 EduPro
+      </motion.div>
+      <button onClick={toggleSidebar} className="text-white transition-colors hover:text-blue-200">
+        <FaTimes size={24} />
+      </button>
+    </div>
 
-          <button onClick={handleLogout} >
-            <div className="flex items-center justify-between p-4 mb-4 transition hover:bg-blue-500 hover:border-l-4 hover:border-white hover:rounded-lg">
-              <div className="flex items-center">
-                <FaSignOutAlt className="mr-3" />
-                <span>Log Out</span>
-              </div>
-              <FaChevronRight />
-            </div>
-          </button>
-        </aside>
+    <motion.div 
+      className="px-6 py-8 border-b border-white/10"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+    >
+      <div className="flex items-center gap-4">
+        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-white/10">
+          <span className="text-xl font-bold">👨🏫</span>
+        </div>
+        <div>
+          <h1 className="text-xl font-semibold">Mr. {loginUserData.fullName}</h1>
+          <p className="text-sm text-blue-100/80">Educator Profile</p>
+        </div>
+      </div>
+    </motion.div>
+
+    <nav className="px-4 mt-6 space-y-2">
+      {navItems.map((item) => (
+        <motion.button
+          key={item.name}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => changeTab(item.name, item.path)}
+          className={`flex items-center w-full p-3 rounded-xl transition-all
+            ${
+              activeTab === item.name 
+                ? "bg-white/20 backdrop-blur-sm shadow-lg"
+                : "hover:bg-white/10"
+            }`}
+        >
+          <item.icon className="w-5 h-5 mr-3 text-blue-100" />
+          <span className="font-medium tracking-wide">{item.name}</span>
+        </motion.button>
+      ))}
+    </nav>
+  </div>
+
+  <motion.div 
+    className="p-4 border-t border-white/10"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+  >
+    <button 
+      onClick={handleLogout}
+      className="flex items-center justify-between w-full p-3 transition-all rounded-lg bg-white/5 hover:bg-white/10 group"
+    >
+      <div className="flex items-center">
+        <FaSignOutAlt className="mr-3 text-blue-100" />
+        <span className="font-medium">Log Out</span>
+      </div>
+      <FaChevronRight className="text-sm text-blue-100 transition-transform group-hover:translate-x-1" />
+    </button>
+  </motion.div>
+</aside>
         {/* Main Content */}
         <main className="flex-1 transition-all duration-300 ease-in-out md:ml-64">
           <header className="p-4 shadow-md bg-stone-300 md:hidden">
