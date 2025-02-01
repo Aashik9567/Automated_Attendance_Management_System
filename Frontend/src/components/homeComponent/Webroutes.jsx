@@ -17,14 +17,8 @@ import StudentCalendar from "../dashboardComponents/studentDashboardComponent/St
 import StudentAssignmentViewer from "../dashboardComponents/studentDashboardComponent/StudentAssignmentViewer.jsx";
 import Holiday from "../dashboardComponents/studentDashboardComponent/Holiday.jsx";
 import StudentAttendance from "../dashboardComponents/studentDashboardComponent/StudentAttendance.jsx";
-import {useNavigate,useLocation } from 'react-router-dom';
+import TeacherHolidayAnnouncement from "../dashboardComponents/teacherDashboardComponent/TeacherHolidayAnnoucement.jsx";
 const Webroutes = () => {
-  const attendanceData = [
-    { date: "2023-07-01", presentCount: 15, totalStudents: 20 },
-    { date: "2023-07-02", presentCount: 18, totalStudents: 20 },
-    { date: "2023-07-03", presentCount: 17, totalStudents: 20 },
-    // ... more data
-  ];
   
   return (
     <BrowserRouter>
@@ -62,9 +56,10 @@ const Webroutes = () => {
           <Route path="assignment" element={<AssignmentManagement />} />
           <Route
             path="reports"
-            element={<AttendanceReport attendanceData={attendanceData} />}
+            element={<AttendanceReport />}
           />
           <Route path="settings" element={<Settings />} />
+          <Route path="holiday-annoucement" element={<TeacherHolidayAnnouncement />} />
         </Route>
       </Routes>
     </BrowserRouter>

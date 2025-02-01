@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaChalkboardTeacher, FaUserGraduate, FaBook, FaChartBar, FaCog, FaBars, FaTimes, FaSignOutAlt, FaChevronRight } from 'react-icons/fa';
+import { FaChalkboardTeacher, FaUserGraduate, FaBook, FaChartBar, FaCog, FaStar, FaBars, FaTimes, FaSignOutAlt, FaChevronRight } from 'react-icons/fa';
 import store from '../../../zustand/loginStore';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { message } from 'antd';
@@ -46,6 +46,7 @@ const TeacherDashboard = () => {
     { name: 'Attendance', icon: FaUserGraduate, path: '/teacherdashboard/attendance' },
     { name: 'Assignment', icon: FaBook, path: '/teacherdashboard/assignment' },
     { name: 'Reports', icon: FaChartBar, path: '/teacherdashboard/reports' },
+    { name: 'HolidayAnnoucement', icon: FaStar, path: '/teacherdashboard/holiday-annoucement' },
     { name: 'Settings', icon: FaCog, path: '/teacherdashboard/settings' },
   ];
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);

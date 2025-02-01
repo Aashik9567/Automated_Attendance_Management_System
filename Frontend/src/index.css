@@ -5,8 +5,3 @@
 .body{
  background-color: bisque;
 }
-.text-gradient {
-    background: linear-gradient(to right, #1890ff, #722ed1);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
