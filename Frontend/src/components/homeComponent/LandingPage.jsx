@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaUserCheck, FaChartLine, FaDatabase, FaShieldAlt, FaRocket,FaFacebook, FaTimes } from 'react-icons/fa';
-import logo from '../../assets/Logo.png';
+import logo from '../../assets/Logo.svg';
 import { Link } from 'react-router-dom';
 import { ReactTyped } from "react-typed";
 
@@ -19,10 +19,10 @@ const LandingPage = () => {
           
           <div className="flex items-center space-x-4">
             <Link to="/teacherdashboard" className="px-6 py-2 font-medium transition-all duration-300 rounded-full bg-white/10 hover:bg-white/20 hover:shadow-glow">
-              Teacher Portal
+              Educator Portal
             </Link>
-            <Link to="/login" className="px-6 py-2 font-medium text-purple-900 transition-all duration-300 bg-purple-300 rounded-full hover:bg-purple-400 hover:shadow-glow">
-              Student Login
+            <Link to="/login" className="px-6 py-2 font-medium text-purple-900 transition-all duration-300 bg-purple-300 rounded-lg hover:bg-purple-400 hover:shadow-glow">
+              Login
             </Link>
           </div>
         </nav>

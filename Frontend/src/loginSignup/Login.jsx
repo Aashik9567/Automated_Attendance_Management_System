@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import login from '../assets/login.png'
-import { Link } from 'react-router-dom';
-import logo from '../assets/Logo.png'
-import ImageDisplayer from './ImageDisplayer';
+import loginImage from '../assets/login.png';
+import logo from '../assets/Logo.svg';
 import { useNavigate } from 'react-router-dom';
 import { z } from "zod";
 import axios from 'axios';
 import { message } from 'antd';
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod"
-import store from '../zustand/loginStore'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { motion, AnimatePresence } from 'framer-motion';
+import {  FaLock, FaEnvelope, FaArrowRight } from 'react-icons/fa';
+import store from '../zustand/loginStore';
+
 const schema = z.object({
-    email: z.string()
-        .min(1, { message: "Email is required" })
-        .email("Please enter valid email format"),
-    password: z.string()
-        .min(3, { message: "Password must be at least 3 characters" })
-})
+  email: z.string()
+    .min(1, { message: "Email is required" })
+    .email("Please enter valid email format"),
+  password: z.string()
+    .min(3, { message: "Password must be at least 3 characters" })
+});
 const Login = () => {
     const { setLoggedInUser, isLogin, loginUserData } = store(state => ({
         setLoggedInUser: state.setLoggedInUser,
@@ -138,55 +139,165 @@ const Login = () => {
 
 
     return (
-        <div className="flex flex-col-reverse md:flex-row ">
-            {/* Image Part */}
-            <ImageDisplayer login={login} />
-            {/* Login Part */}
-            <div className="flex flex-col justify-center h-screen px-6 py-8 md:w-1/2 bg-gradient-to-b from-purple-400 to-indigo-400">
-                <div className="mb-4 text-center md:mb-8">
-                    <img className="w-[90px] h-[70px] inline-block mr-2" src={logo} alt="logo" />
-                    <span className="text-2xl font-semibold">AAMS</span>
-                </div>
-                <div className="w-full mx-auto rounded-lg shadow sm:max-w-md xl:p-0">
-                    <div className="p-6 md:space-y-4 sm:p-8">
-                        <h1 className="mb-6 text-xl font-bold text-center md:text-2xl">
-                            Sign in to your account
-                        </h1>
-                        <form onSubmit={handleSubmit(submitHandle)} className="space-y-2 md:space-y-4">
-                            <div>
-                                <label htmlFor="email" className="block mb-2 text-sm font-medium">Your email</label>
-                                <input type="email" {...register('email',)} id="email" className="block w-full p-2 border border-blue-500 rounded-lg focus:ring-primary-600 focus:border-primary-600" placeholder="name@acem.edu.np" />
-                                {errors.email && (<p className="text-red-400">{errors.email.message}</p>)}
-                            </div>
-                            <div>
-                                <label htmlFor="password" className="block mb-2 text-sm font-medium">Password</label>
-                                <input type="password" {...register('password',)} id="password" placeholder="Enter password" className="block w-full p-2 border border-blue-500 rounded-lg focus:ring-primary-600 focus:border-primary-600" />
-                                {errors.password && <p className='text-red-400'>{errors.password.message}</p>}
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-start">
-                                    <input id="remember" type="checkbox" className="w-4 h-4 border border-blue-500 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600" />
-                                    <label htmlFor="remember" className="ml-2 text-sm">Remember me</label>
-                                </div>
-                                <Link to="#" className="text-sm font-medium text-blue-500 hover:underline">Forgot password?</Link>
-                            </div>
-                            <button
-                                type="submit"
-                                disabled={isLoggingIn}
-                                className={`w-full bg-cyan-300 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mt-4 ${isLoggingIn ? 'opacity-50 cursor-not-allowed' : ''
-                                    }`}
-                            >
-                                {isLoggingIn ? 'Logging in...' : 'Login'}
-                            </button>                            <p className="mt-4 text-sm font-light text-center">
-                                Don’t have an account yet?<button onClick={() => navigate('/signup')} type="button" className="px-5 py-2 mx-3 mb-2 text-sm font-medium text-center text-white rounded-lg shadow-lg bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 dark:focus:ring-teal-800 shadow-teal-500/50 dark:shadow-lg dark:shadow-teal-800/80 me-2">Signup</button>
-                            </p>
-
-                        </form>
-                    </div>
-                </div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50"
+      >
+        <div className="flex flex-col w-full mx-4 overflow-hidden bg-white/80 shadow-2xl backdrop-blur-xl max-w-6xl rounded-[40px] md:flex-row ring-1 ring-white/20">
+          {/* Image Section */}
+          <motion.div
+            initial={{ x: -100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+            className="relative flex-col justify-center hidden p-8 md:w-1/2 md:flex bg-gradient-to-br from-purple-600/90 via-blue-600/90 to-indigo-600/90"
+          >
+            <div className="relative z-10 space-y-6 text-white">
+              <motion.h1 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="text-5xl font-bold leading-tight"
+              >
+                Welcome Back!<br />
+                <span className="text-3xl font-medium">Continue Your Journey</span>
+              </motion.h1>
+              <motion.img 
+                src={loginImage} 
+                alt="Login Illustration"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="w-full max-w-md mx-auto mt-8 transform hover:scale-[1.02] transition-all duration-300"
+              />
             </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+          </motion.div>
+  
+          {/* Form Section */}
+          <motion.div
+            initial={{ x: 100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+            className="p-8 md:w-1/2 md:p-12 lg:p-16 bg-white/70 backdrop-blur-lg"
+          >
+            <motion.div 
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              className="flex items-center justify-center mb-8"
+            >
+              <img 
+                src={logo} 
+                alt="Logo" 
+                className="w-20 h-20 mr-3 rounded-xl shadow-xl transform hover:rotate-[-4deg] transition-transform"
+              />
+              <h2 className="text-4xl font-bold text-transparent bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text">
+                AttendEase
+              </h2>
+            </motion.div>
+  
+            <motion.h1 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mb-6 text-3xl font-bold text-center text-gray-800"
+            >
+              Welcome Back! 👋
+            </motion.h1>
+  
+            <form onSubmit={handleSubmit(submitHandle)} className="space-y-6">
+              {/* Email Field */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="relative group"
+              >
+                <FaEnvelope className="absolute text-gray-500 transition-colors transform -translate-y-1/2 left-4 top-1/2 group-focus-within:text-purple-600" />
+                <input
+                  type="email"
+                  {...register('email')}
+                  placeholder="Enter your email"
+                  className="w-full py-4 pl-12 pr-6 transition-all duration-300 border-2 border-gray-200/80 rounded-2xl focus:border-purple-500 focus:ring-4 focus:ring-purple-200/30 placeholder-gray-400/80 hover:border-gray-300 bg-white/50"
+                />
+                <AnimatePresence>
+                  {errors.email && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -5 }}
+                      className="mt-2 text-sm text-red-500"
+                    >
+                      {errors.email.message}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+  
+              {/* Password Field */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="relative group"
+              >
+                <FaLock className="absolute text-gray-500 transition-colors transform -translate-y-1/2 left-4 top-1/2 group-focus-within:text-purple-600" />
+                <input
+                  type="password"
+                  {...register('password')}
+                  placeholder="Enter your password"
+                  className="w-full py-4 pl-12 pr-6 transition-all duration-300 border-2 border-gray-200/80 rounded-2xl focus:border-purple-500 focus:ring-4 focus:ring-purple-200/30 placeholder-gray-400/80 hover:border-gray-300 bg-white/50"
+                />
+                <AnimatePresence>
+                  {errors.password && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -5 }}
+                      className="mt-2 text-sm text-red-500"
+                    >
+                      {errors.password.message}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+  
+              {/* Submit Button */}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                disabled={isLoggingIn}
+                className="w-full px-8 py-4 font-semibold text-white transition-all duration-300 shadow-lg bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 rounded-2xl hover:shadow-xl hover:bg-gradient-to-r hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 group"
+              >
+                <span className="flex items-center justify-center">
+                  {isLoggingIn ? 'Logging in...' : 'Continue'}
+                  <FaArrowRight className="ml-3 transition-transform group-hover:translate-x-1" />
+                </span>
+              </motion.button>
+  
+              {/* Divider */}
+              <div className="relative flex items-center py-6">
+                <div className="flex-grow border-t border-gray-300/50"></div>
+                <span className="flex-shrink mx-4 text-gray-500/80">or</span>
+                <div className="flex-grow border-t border-gray-300/50"></div>
+              </div>
+  
+              {/* Additional Links */}
+              <div className="flex flex-col space-y-4 text-center">
+                <button
+                  onClick={() => navigate('/signup')}
+                  className="font-medium transition-colors text-gray-600/90 hover:text-purple-600"
+                >
+                  Create new account
+                </button>
+                <button className="text-sm transition-colors text-gray-500/80 hover:text-purple-600">
+                  Forgot password?
+                </button>
+              </div>
+            </form>
+          </motion.div>
         </div>
+      </motion.div>
     );
-}
-
-export default Login;
+  };
+  
+  export default Login;

@@ -1,34 +1,90 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import dayjs from 'dayjs';
+import axios from 'axios';
+import { message } from 'antd';
 
 const Holiday = () => {
-  return (
-    <div className="p-6 rounded-lg shadow-md bg-gradient-to-br from-blue-200 to-indigo-300">
-    <h3 className="mb-4 text-xl font-semibold">Upcoming Holidays</h3>
-    <table className="min-w-full">
-      <thead>
-        <tr className="bg-stone-300">
-          <th className="p-2 text-left">Date</th>
-          <th className="p-2 text-left">Holiday</th>
-          <th className="p-2 text-left">Type</th>
-        </tr>
-      </thead>
-      <tbody>
-        {[
-          { date: '2024-12-25', name: 'Christmas Day', type: 'Public Holiday' },
-          { date: '2025-01-01', name: 'New Year\'s Day', type: 'Public Holiday' },
-          { date: '2025-01-26', name: 'Republic Day', type: 'National Holiday' },
-          { date: '2025-03-21', name: 'Holi', type: 'Festival' },
-        ].map((holiday, index) => (
-          <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
-            <td className="p-2">{holiday.date}</td>
-            <td className="p-2">{holiday.name}</td>
-            <td className="p-2">{holiday.type}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-  )
-}
+  const [holidays, setHolidays] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-export default Holiday
+  const fetchHolidays = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axios.get('http://localhost:8080/api/v1/holidays', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+        }
+      });
+      setHolidays(data.data);
+    } catch (error) {
+      message.error(error.response?.data?.error || 'Failed to fetch holidays');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchHolidays();
+  }, []);
+
+  const getHolidayStatus = (startDate, endDate) => {
+    const today = dayjs();
+    if (today.isBefore(startDate)) return 'upcoming';
+    if (today.isAfter(endDate)) return 'passed';
+    return 'ongoing';
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="min-h-screen p-6 bg-gradient-to-br from-blue-50/90 to-indigo-50/90"
+    >
+      <div className="mx-auto max-w-7xl">
+        <h2 className="mb-8 text-2xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
+          🎉 Upcoming Holidays
+        </h2>
+
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {holidays.map((holiday) => {
+            const status = getHolidayStatus(dayjs(holiday.startDate), dayjs(holiday.endDate));
+            const statusColors = {
+              upcoming: 'bg-orange-100 text-orange-800',
+              ongoing: 'bg-green-100 text-green-800',
+              passed: 'bg-gray-100 text-gray-600',
+            };
+
+            return (
+              <motion.div
+                key={holiday._id}
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
+                className="p-6 transition-shadow shadow-xl bg-white/90 backdrop-blur-sm rounded-2xl hover:shadow-2xl"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-blue-600">{holiday.title}</h3>
+                  <span className={`${statusColors[status]} px-3 py-1 rounded-full text-sm`}>
+                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                  </span>
+                </div>
+                <p className="mb-4 text-gray-600">{holiday.description}</p>
+                <div className="flex items-center justify-between text-sm">
+                  <div className="text-gray-500">
+                    <div>📅 Starts: {dayjs(holiday.startDate).format('MMM D, YYYY')}</div>
+                    <div>📅 Ends: {dayjs(holiday.endDate).format('MMM D, YYYY')}</div>
+                  </div>
+                  <span className="text-2xl">
+                    {status === 'ongoing' ? '🎉' : '📅'}
+                  </span>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+export default Holiday;

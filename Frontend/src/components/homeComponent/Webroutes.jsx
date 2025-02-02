@@ -39,7 +39,7 @@ const Webroutes = () => {
           <Route path="calendar" element={<StudentCalendar />} />
           <Route path="assignments" element={<StudentAssignmentViewer />} />
           <Route path="Attendance" element={<StudentAttendance />} />
-          <Route path="holidays" element={<Holiday/>} />
+          <Route path="holidays" element={<Holiday />} />
           <Route path="settings" element={<Settings />} />
         </Route>
 

@@ -1,12 +1,13 @@
-import React,{useState} from 'react'
-import login from '../assets/login.png'
-import ImageDisplayer from './ImageDisplayer'
-import {useNavigate} from 'react-router-dom'
-import { z } from "zod"
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { z } from "zod";
 import { useForm } from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod"
-import axios from 'axios'
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from 'axios';
 import { message } from 'antd';
+import { motion } from 'framer-motion';
+import { FaUser, FaLock, FaEnvelope, FaBook, FaArrowRight, FaGraduationCap, FaChalkboardTeacher, FaUserGraduate, FaKey } from 'react-icons/fa';
+
 const schema=z.object({
   email: z.string().min(1, { message: "Email is required" }).email("please enter valid format of email"),
   password: z.string().min(1, { message: "Password is required" }),
@@ -25,7 +26,7 @@ const schema=z.object({
 })
 const SignUp = () => {
   const [loading, setLoading] = useState(false);
-  const nav=useNavigate();
+  const navigate=useNavigate();
   const {
     register,
     handleSubmit,
@@ -54,65 +55,233 @@ const SignUp = () => {
     setLoading(false)
   }
   }
-
+  const fadeInUp = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.5 }
+  };
   return (
-    <>
-      <div className="flex flex-col-reverse md:flex-row ">
-        {/* Image Part */}
-        <ImageDisplayer login={login} />
-        {/* signup part */}
-        <div className="flex flex-col justify-center h-screen px-6 py-8 md:w-1/2 bg-gradient-to-b from-purple-400 to-indigo-400">
-          <div className="w-full mx-auto rounded-lg shadow sm:max-w-md xl:p-0">
-            <div className="p-6 md:space-y-4 sm:p-8">
-              <h1 className="mb-4 text-xl font-bold text-center md:text-2xl">
-                Sign Up
-              </h1>
-              <div className='mb-5 text-sm font-light'>Enter details to create your account</div>
-              <form onSubmit={handleSubmit(submitHandle)} className="space-y-4 md:space-y-4" action="#">
-                <select id="role" className="block w-full p-2 text-sm border rounded-lg bg-gray-50 border-blur-e00" {...register("role")}>
-                       <option value="Teacher" >Teacher</option>
-                       <option value="Student">Student</option>
-                </select>
-                 {errors.role && (<p className="text-red-600">{errors.role.message}</p>)}
-                <div className="grid md:grid-cols-2 md:gap-6">
-                  <div className="relative z-0 w-full mb-5 group">
-                    <input type="text" {...register("fullName")} id="fullName" className="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" "/>
-                    <label htmlFor="fullName" className="peer-focus:font-medium absolute text-sm duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Full Name</label>
-                    {errors.fullName && (<p className="text-red-600">{errors.fullName.message}</p>)}
+    <div className="h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-200 via-indigo-300 to-white">
+      <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] bg-fixed"></div>
+      
+      <div className="relative flex items-center justify-center min-h-screen p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-6xl"
+        >
+          <div className="grid overflow-hidden bg-white shadow-2xl rounded-3xl md:grid-cols-2">
+            {/* Left Column - Form */}
+            <div className="p-8 lg:p-12">
+              <motion.div {...fadeInUp} className="mb-8">
+                <h1 className="text-4xl font-bold text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text">
+                  Create Your Account
+                </h1>
+                <p className="mt-2 text-gray-600">Join our educational platform today</p>
+              </motion.div>
+
+              <form onSubmit={handleSubmit(submitHandle)} className="space-y-6">
+                {/* Role Selection Cards */}
+                <motion.div {...fadeInUp} className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="relative">
+                    <input 
+                      type="radio" 
+                      {...register("role")} 
+                      value="Teacher" 
+                      id="teacher-role"
+                      className="hidden peer" 
+                    />
+                    <label 
+                      htmlFor="teacher-role"
+                      className="flex flex-col items-center p-4 text-gray-600 transition-all bg-white border-2 border-gray-200 cursor-pointer rounded-xl hover:border-purple-400 peer-checked:border-purple-500 peer-checked:bg-purple-50"
+                    >
+                      <FaChalkboardTeacher className="w-8 h-8 mb-2 text-purple-500" />
+                      <span className="font-medium">Teacher</span>
+                    </label>
                   </div>
-                  <div className="relative z-0 w-full mb-5 group">
-                    <input type="text" {...register("semester")} id="semester" className="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" "/>
-                    <label htmlFor="semester" className="peer-focus:font-medium absolute text-sm  duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">semester (1-8)</label>
-                    {errors.semester && (<p className="text-red-600">{errors.semester.message}</p>)}
+                  
+                  <div className="relative">
+                    <input 
+                      type="radio" 
+                      {...register("role")} 
+                      value="Student" 
+                      id="student-role"
+                      className="hidden peer" 
+                    />
+                    <label 
+                      htmlFor="student-role"
+                      className="flex flex-col items-center p-4 text-gray-600 transition-all bg-white border-2 border-gray-200 cursor-pointer rounded-xl hover:border-purple-400 peer-checked:border-purple-500 peer-checked:bg-purple-50"
+                    >
+                      <FaUserGraduate className="w-8 h-8 mb-2 text-purple-500" />
+                      <span className="font-medium">Student</span>
+                    </label>
                   </div>
-                </div>
-                <div>
-                  <label htmlFor="email" className="block mb-2 text-sm font-medium">Your email</label>
-                  <input type="email" {...register("email")} id="email" className="block w-full p-2 border border-blue-500 rounded-lg focus:ring-primary-600 focus:border-primary-600" placeholder="name@acem.edu.np"/>
-                  {errors.email && (<p className="text-red-600">{errors.email.message}</p>)}
-                </div>
-                <div>
-                  <label htmlFor="password" className="block mb-2 text-sm font-medium">Password</label>
-                  <input type="password" {...register("password")} id="password" placeholder="Enter password" className="block w-full p-2 border border-blue-500 rounded-lg focus:ring-primary-600 focus:border-primary-600" />
-                  {errors.password && <p className='text-red-600'>{errors.password.message}</p>}
-                </div>
-                <div>
-                  <label htmlFor="confirm-password" className="block mb-2 text-sm font-medium">Confirm Password</label>
-                  <input type="confirm-password" {...register("confirmPassword")} id="confirm-password" placeholder="Confirm password" className="block w-full p-2 border border-blue-500 rounded-lg focus:ring-primary-600 focus:border-primary-600"/>
-                  {errors.confirmPassword && <p className='text-red-600'>{errors.confirmPassword.message}</p>}
-                </div>
-                <button type="submit" disabled={loading} className="w-full bg-cyan-300 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mt-4">{loading ? "Loading...." : "Create an account"}</button>
-                <p className="text-sm font-light ">
-                  Already have an account? <button onClick={()=> nav("/login")} type="button" className="px-4 py-2 mx-3 mb-2 text-sm font-medium text-center text-white rounded-lg shadow-lg bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 shadow-teal-500/50 dark:shadow-teal-800/80 me-2">Login here</button>
+                </motion.div>
+
+                <motion.div {...fadeInUp} className="space-y-4">
+                  {/* Full Name Input */}
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                      <FaUser className="text-purple-500" />
+                    </div>
+                    <input
+                      {...register("fullName")}
+                      type="text"
+                      placeholder="Full Name"
+                      className="w-full py-4 pl-12 pr-4 text-gray-700 transition-all border-2 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-200 bg-white/50"
+                    />
+                    {errors.fullName && (
+                      <p className="mt-1 text-sm text-red-500">{errors.fullName.message}</p>
+                    )}
+                  </div>
+
+                  {/* Email Input */}
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                      <FaEnvelope className="text-purple-500" />
+                    </div>
+                    <input
+                      {...register("email")}
+                      type="email"
+                      placeholder="Email Address"
+                      className="w-full py-4 pl-12 pr-4 text-gray-700 transition-all border-2 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-200 bg-white/50"
+                    />
+                    {errors.email && (
+                      <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
+                    )}
+                  </div>
+
+                  {/* Semester Input */}
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                      <FaBook className="text-purple-500" />
+                    </div>
+                    <input
+                      {...register("semester")}
+                      type="number"
+                      placeholder="Semester (1-8)"
+                      className="w-full py-4 pl-12 pr-4 text-gray-700 transition-all border-2 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-200 bg-white/50"
+                    />
+                    {errors.semester && (
+                      <p className="mt-1 text-sm text-red-500">{errors.semester.message}</p>
+                    )}
+                  </div>
+
+                  {/* Password Input */}
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                      <FaKey className="text-purple-500" />
+                    </div>
+                    <input
+                      {...register("password")}
+                      type="password"
+                      placeholder="Password"
+                      className="w-full py-4 pl-12 pr-4 text-gray-700 transition-all border-2 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-200 bg-white/50"
+                    />
+                    {errors.password && (
+                      <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
+                    )}
+                  </div>
+
+                  {/* Confirm Password Input */}
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                      <FaLock className="text-purple-500" />
+                    </div>
+                    <input
+                      {...register("confirmPassword")}
+                      type="password"
+                      placeholder="Confirm Password"
+                      className="w-full py-4 pl-12 pr-4 text-gray-700 transition-all border-2 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-200 bg-white/50"
+                    />
+                    {errors.confirmPassword && (
+                      <p className="mt-1 text-sm text-red-500">{errors.confirmPassword.message}</p>
+                    )}
+                  </div>
+                </motion.div>
+
+                {/* Sign Up Button */}
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full py-4 font-semibold text-white transition-all rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:shadow-lg hover:shadow-purple-500/30"
+                >
+                  <span className="flex items-center justify-center space-x-2">
+                    <span>{loading ? 'Creating Account...' : 'Create Account'}</span>
+                    <FaArrowRight className={`transition-transform ${loading ? 'translate-x-2' : ''}`} />
+                  </span>
+                </motion.button>
+
+                {/* Login Link */}
+                <p className="text-center text-gray-600">
+                  Already have an account?{' '}
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="font-semibold text-purple-600 hover:text-purple-700"
+                  >
+                    Sign in
+                  </button>
                 </p>
               </form>
             </div>
+
+            {/* Right Column - Features */}
+            <div className="relative hidden md:block">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-indigo-600">
+                <div className="absolute inset-0 bg-grid-white/[0.2] [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))]"></div>
+              </div>
+              
+              <div className="relative h-full p-12 text-white">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="flex flex-col justify-center h-full"
+                >
+                  <h2 className="mb-8 text-4xl font-bold">Welcome to AttendEase</h2>
+                  
+                  <div className="space-y-6">
+                    <div className="p-6 transition-all bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20">
+                      <h3 className="flex items-center mb-4 text-xl font-semibold">
+                        <FaGraduationCap className="mr-3" />
+                        Smart Attendance
+                      </h3>
+                      <p className="text-white/80">
+                        Automated attendance tracking system that saves time and improves accuracy
+                      </p>
+                    </div>
+
+                    <div className="p-6 transition-all bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20">
+                      <h3 className="flex items-center mb-4 text-xl font-semibold">
+                        <FaChalkboardTeacher className="mr-3" />
+                        Easy Management
+                      </h3>
+                      <p className="text-white/80">
+                        Intuitive tools for teachers to manage classes and track student progress
+                      </p>
+                    </div>
+
+                    <div className="p-6 transition-all bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20">
+                      <h3 className="flex items-center mb-4 text-xl font-semibold">
+                        <FaBook className="mr-3" />
+                        Real-time Analytics
+                      </h3>
+                      <p className="text-white/80">
+                        Get instant insights into attendance patterns and student engagement
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </div>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </>
+    </div>
+  );
+};
 
-  )
-}
-
-export default SignUp
+export default SignUp;

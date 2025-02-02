@@ -1,5 +1,4 @@
 import { Holiday } from '../models/holiday.model.js';
-import { User } from '../models/user.model.js';
 
 export const createHoliday = async (req, res) => {
   try {
