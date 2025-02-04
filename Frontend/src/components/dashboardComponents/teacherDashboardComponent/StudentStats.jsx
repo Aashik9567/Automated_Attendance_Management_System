@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Statistic, Progress, Table, Spin, message } from 'antd';
-import { UserOutlined, TeamOutlined } from '@ant-design/icons';
+import { Users, LineChart } from 'lucide-react';
+import { motion } from 'framer-motion';
 import axios from 'axios';
 
 const StudentStats = () => {
@@ -103,45 +104,54 @@ const StudentStats = () => {
   if (loading) return <Spin size="large" className="flex justify-center mt-8" />;
 
   return (
-    <div className="space-y-4">
-      <Card className="shadow-lg rounded-xl">
-        <Row gutter={[16, 16]}>
-          <Col xs={24} sm={12} md={12}>
-            <Card hoverable className="rounded-lg bg-gradient-to-r from-blue-400 to-blue-600">
-              <Statistic
-                title={<div className="font-bold text-white">Total Students</div>}
-                value={stats.totalStudents}
-                prefix={<UserOutlined className="text-2xl text-white" />}
-                valueStyle={{ color: '#ffffff', fontSize: '24px' }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={12}>
-            <Card hoverable className="rounded-lg bg-gradient-to-r from-green-400 to-green-600">
-              <Statistic
-                title={<div className="font-bold text-white">Average Attendance</div>}
-                value={stats.averageAttendance.toFixed(2)}
-                prefix={<TeamOutlined className="text-2xl text-white" />}
-                suffix="%"
-                valueStyle={{ color: '#ffffff', fontSize: '24px' }}
-              />
-            </Card>
-          </Col>
-        </Row>
+    <div className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-2">
+            <motion.div 
+                whileHover={{ scale: 1.02 }}
+                className="p-6 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl"
+            >
+                <div className="flex items-center justify-between">
+                    <div>
+                        <p className="text-sm font-medium text-blue-100">Total Students</p>
+                        <p className="mt-2 text-3xl font-bold text-white">{stats.totalStudents}</p>
+                    </div>
+                    <div className="p-3 bg-white/10 rounded-xl">
+                        <Users className="w-8 h-8 text-white" />
+                    </div>
+                </div>
+            </motion.div>
 
-        <div className="mt-8">
-          <Card title="Subject-wise Attendance" className="rounded-lg">
-            <Table
-              columns={subjectColumns}
-              dataSource={stats.attendanceBySubject}
-              rowKey="subjectCode"
-              pagination={false}
-            />
-          </Card>
+            <motion.div 
+                whileHover={{ scale: 1.02 }}
+                className="p-6 bg-gradient-to-br from-green-600 to-emerald-700 rounded-2xl"
+            >
+                <div className="flex items-center justify-between">
+                    <div>
+                        <p className="text-sm font-medium text-green-100">Avg Attendance</p>
+                        <p className="mt-2 text-3xl font-bold text-white">
+                            {stats.averageAttendance.toFixed(2)}%
+                        </p>
+                    </div>
+                    <div className="p-3 bg-white/10 rounded-xl">
+                        <LineChart className="w-8 h-8 text-white" />
+                    </div>
+                </div>
+            </motion.div>
         </div>
-      </Card>
+
+        <div className="p-6 bg-white shadow-sm rounded-2xl">
+            <h4 className="mb-4 text-xl font-semibold text-gray-800">Subject Performance</h4>
+            <Table
+                columns={subjectColumns}
+                dataSource={stats.attendanceBySubject}
+                rowKey="subjectCode"
+                pagination={false}
+                rowClassName="hover:bg-gray-50 transition-colors"
+                className="overflow-hidden rounded-lg"
+            />
+        </div>
     </div>
-  );
+);
 };
 
 export default StudentStats;

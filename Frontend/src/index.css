@@ -5,3 +5,12 @@
 .body{
  background-color: bisque;
 }
+@keyframes glow {
+    0% { filter: drop-shadow(0 0 5px rgba(96, 165, 250, 0.5)); }
+    50% { filter: drop-shadow(0 0 15px rgba(96, 165, 250, 0.8)); }
+    100% { filter: drop-shadow(0 0 5px rgba(96, 165, 250, 0.5)); }
+  }
+  
+  .hover\:shadow-blue-glow:hover {
+    animation: glow 1.5s infinite;
+  }

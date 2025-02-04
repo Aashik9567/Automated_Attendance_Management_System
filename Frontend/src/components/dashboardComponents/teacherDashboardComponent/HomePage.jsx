@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { X } from "lucide-react";
+import { X, Camera, Upload, Users, BookOpen, AlertCircle, RotateCw, CloudUpload,Plus } from 'lucide-react';
 import axios from "axios";
 import { message } from "antd";
 import { useNavigate } from "react-router-dom";
-import { Upload, Camera, BookOpen, Users, AlertCircle, Plus } from "lucide-react";
+import { ReactTyped } from 'react-typed';
+import { motion, AnimatePresence } from 'framer-motion';
+
 import StudentStats from './StudentStats';
 import useAttendanceStore from "../../../zustand/attendanceStore.js";
 const CameraCapture = ({ onCapture, onClose }) => {
@@ -36,11 +38,11 @@ const CameraCapture = ({ onCapture, onClose }) => {
         canvas.width = videoRef.current.videoWidth;
         canvas.height = videoRef.current.videoHeight;
         canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
-        
+
         canvas.toBlob(blob => {
             const file = new File([blob], 'captured-image.jpg', { type: 'image/jpeg' });
             onCapture(file);
-            
+
             // Stop camera stream
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
@@ -51,19 +53,19 @@ const CameraCapture = ({ onCapture, onClose }) => {
     return (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm">
             <div className="relative w-full max-w-md aspect-video">
-                <video 
-                    ref={videoRef} 
-                    autoPlay 
+                <video
+                    ref={videoRef}
+                    autoPlay
                     className="object-cover w-full h-full rounded-xl"
                 />
-                <button 
-                    onClick={onClose} 
+                <button
+                    onClick={onClose}
                     className="absolute p-2 transition-all rounded-full top-4 right-4 bg-white/20 hover:bg-white/40"
                 >
                     <X className="text-white" />
                 </button>
             </div>
-            <button 
+            <button
                 onClick={captureImage}
                 className="flex items-center gap-2 px-8 py-4 mt-6 text-white transition-all bg-blue-600 rounded-xl hover:bg-blue-700"
             >
@@ -93,7 +95,7 @@ const SubjectSetup = ({ onSubjectCreated }) => {
         e.preventDefault();
         try {
             const response = await axios.post(
-                'http://localhost:8080/api/v1/subjects/createsubject', 
+                'http://localhost:8080/api/v1/subjects/createsubject',
                 subjectData,
                 {
                     headers: {
@@ -102,7 +104,7 @@ const SubjectSetup = ({ onSubjectCreated }) => {
                     }
                 }
             );
-            
+
             message.success('Subject created successfully!');
             onSubjectCreated(response.data);
         } catch (error) {
@@ -201,13 +203,13 @@ const HomePage = () => {
         const fetchSubjects = async () => {
             try {
                 const accessToken = localStorage.getItem('accessToken');
-                
+
                 const response = await axios.get('http://localhost:8080/api/v1/subjects/getsubject', {
                     headers: {
                         'Authorization': `Bearer ${accessToken}`
                     }
                 });
-        
+
                 // Ensure we're setting an array
                 const fetchedSubjects = response.data.data || [];
                 setSubjects(fetchedSubjects);
@@ -215,7 +217,7 @@ const HomePage = () => {
             } catch (error) {
                 setSubjects([]);
                 setError(error.response?.data?.message || 'Failed to fetch subjects');
-                
+
                 // Optional: Redirect to login if unauthorized
                 if (error.response?.status === 401) {
                     navigate('/login');
@@ -224,7 +226,7 @@ const HomePage = () => {
                 setLoading(false);
             }
         };
-    
+
         fetchSubjects();
     }, [navigate]);
     const handleCameraCapture = (capturedFile) => {
@@ -318,12 +320,12 @@ const HomePage = () => {
                 if (response.data.cloudinary_url) {
                     setCloudinaryUrl(response.data.cloudinary_url);
                     addAttendanceRecord(
-                        response.data.results, 
-                        subjects, 
+                        response.data.results,
+                        subjects,
                         response.data.cloudinary_url
-                      );
+                    );
                 }
-                
+
                 message.success({
                     content: `Successfully processed! Found ${response.data.faces_detected || 0} faces.`,
                     key: messageKey,
@@ -366,7 +368,7 @@ const HomePage = () => {
         } finally {
             setLoading(false);
         }
-          console.log(addAttendanceRecord)
+        console.log(addAttendanceRecord)
     };
     const handleSubjectCreated = (newSubject) => {
         setSubjects(prevSubjects => [...prevSubjects, newSubject]);
@@ -383,30 +385,76 @@ const HomePage = () => {
         return <SubjectSetup onSubjectCreated={handleSubjectCreated} />;
     }
     return (
-        <div className="min-h-screen p-6 bg-gradient-to-br from-blue-100 to-blue-200">
-        {showCamera && (
-            <CameraCapture 
-                onCapture={handleCameraCapture} 
-                onClose={() => setShowCamera(false)} 
-            />
-        )}
+        <div className="min-h-screen p-8 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+            <AnimatePresence>
+                {showCamera && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <CameraCapture
+                            onCapture={handleCameraCapture}
+                            onClose={() => setShowCamera(false)}
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+            <div className="grid grid-cols-1 gap-8 mx-auto max-w-7xl lg:grid-cols-2">
+                {/* Upload Section */}
+                <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="relative overflow-hidden border shadow-2xl bg-white/5 backdrop-blur-xl rounded-3xl border-white/10"
+                >
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20" />
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div className="space-y-6">
-                <div className="overflow-hidden bg-white shadow-xl rounded-2xl">
-                    <div className="p-6 bg-gradient-to-r from-blue-600 to-blue-800">
-                        <h3 className="flex items-center gap-3 text-2xl font-bold text-white">
-                            <Camera className="w-8 h-8" />
-                            Attendance Upload
-                        </h3>
-                    </div>
-                    <div className="p-8">
-                        <div 
-                            className={`relative mb-6 rounded-xl border-2 border-dashed transition-all duration-300 ease-in-out ${
-                                isDragging
-                                    ? 'border-blue-500 bg-blue-50'
-                                    : 'border-gray-300 hover:border-blue-400'
-                            }`}
+                    <div className="relative p-8">
+                        <div className="mb-8">
+                            <h2 className="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-400 to-purple-300 bg-clip-text">
+                                <ReactTyped
+                                    strings={["Intelligent Attendance Capture"]}
+                                    typeSpeed={40}
+                                    showCursor={false}
+                                />
+                            </h2>
+                            <p className="mt-2 text-blue-200">AI-powered face recognition system</p>
+                        </div>
+                        {/* Image Preview Section */}
+                        
+                        {imagePreviewUrl && !loading && (
+                         <motion.div 
+                         initial={{ opacity: 0, y: -20 }}
+                         animate={{ opacity: 1, y: 0 }}
+                         className="mb-6 overflow-hidden border border-white/10 rounded-xl"
+                       >
+                         <div className="relative aspect-video">
+                           <img 
+                             src={imagePreviewUrl} 
+                             alt="Preview" 
+                             className="absolute inset-0 object-contain w-full h-full"
+                             onLoad={handleImageLoad}
+                           />
+                           <button
+                             onClick={() => {
+                               setImagePreviewUrl(null);
+                               setImage(null);
+                               setResults(null);
+                             }}
+                             className="absolute p-2 transition-all rounded-full bg-black/50 top-2 right-2 hover:bg-black/70"
+                           >
+                             <X className="w-4 h-4 text-white" />
+                           </button>
+                         </div>
+                       </motion.div>
+                        )}
+
+                        {/* Upload Area */}
+                        {!imagePreviewUrl && (
+                        <motion.div
+                            whileHover={{ scale: 1.02 }}
+                            className={`relative group rounded-2xl border-2 border-dashed ${isDragging ? 'border-emerald-400' : 'border-white/20'
+                                } transition-all duration-300 min-h-[200px]`}
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
                             onDrop={handleDrop}
@@ -419,130 +467,167 @@ const HomePage = () => {
                                 disabled={loading}
                                 className="absolute inset-0 z-10 w-full h-full opacity-0 cursor-pointer"
                             />
-                            <div className="flex flex-col items-center justify-center p-8 text-center">
-                                <Upload className="w-12 h-12 mb-4 text-blue-500" />
-                                <p className="mb-2 text-lg font-medium text-gray-700">
-                                    Drag and drop your image here
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                    or click to browse (max 5MB)
-                                </p>
+                            <div className="flex flex-col items-center justify-center h-full p-8 space-y-4">
+                                <CloudUpload className="w-8 h-8 text-purple-400 transition-colors group-hover:text-emerald-400" />
+                                {!imagePreviewUrl && (
+                                    <ReactTyped
+                                        strings={[
+                                            "Drag & Drop Attendance Photo",
+                                            "Supported Formats: JPG/PNG/HEIC",
+                                            "Max File Size: 5MB"
+                                        ]}
+                                        typeSpeed={50}
+                                        backSpeed={30}
+                                        loop
+                                        className="text-lg text-center text-blue-200"
+                                    />
+                                )}
                             </div>
-                        </div>
+                        </motion.div>
+                        )}
 
-                        <div className="flex gap-4 mb-4">
-                            <button
+                        {/* Action Buttons */}
+                        <div className="grid gap-4 mt-8 sm:grid-cols-2">
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="flex items-center justify-center gap-3 p-4 transition-all bg-white/5 rounded-xl hover:bg-white/10"
                                 onClick={() => setShowCamera(true)}
-                                className="flex items-center justify-center w-full gap-2 px-6 py-3 text-white transition-all bg-green-600 rounded-xl hover:bg-green-700"
                             >
-                                <Camera className="w-5 h-5" />
-                                Open Camera
-                            </button>
-                            <button
+                                <Camera className="w-6 h-6 text-purple-400" />
+                                <span className="text-transparent bg-gradient-to-r from-blue-300 to-purple-200 bg-clip-text">
+                                    Live Capture
+                                </span>
+                            </motion.button>
+
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="flex items-center justify-center gap-3 p-4 transition-all bg-gradient-to-r from-blue-600 to-purple-500 rounded-xl hover:shadow-blue-glow disabled:opacity-50 disabled:cursor-not-allowed"
                                 onClick={handleUpload}
                                 disabled={loading || !image}
-                                className={`w-full px-6 py-3 text-white rounded-xl transition-all flex items-center justify-center gap-2 ${
-                                    loading || !image
-                                        ? 'bg-blue-400 cursor-not-allowed'
-                                        : 'bg-blue-600 hover:bg-blue-700'
-                                }`}
                             >
-                                <Upload className="w-5 h-5" />
-                                Upload Image
-                            </button>
+                                {loading ? (
+                                    <RotateCw className="w-6 h-6 text-white animate-spin" />
+                                ) : (
+                                    <>
+                                        <Upload className="w-6 h-6 text-white" />
+                                        <span className="font-medium text-white">
+                                            Process Attendance
+                                        </span>
+                                    </>
+                                )}
+                            </motion.button>
                         </div>
 
-                        {imagePreviewUrl && (
-                            <div className="mb-4 overflow-hidden bg-gray-50 rounded-xl">
-                                <div className="relative aspect-video">
-                                    <img
-                                        src={imagePreviewUrl}
-                                        alt="Preview"
-                                        className="absolute inset-0 object-contain w-full h-full"
-                                        onLoad={handleImageLoad}
-                                    />
-                                </div>
-                            </div>
-                        )}
+                        {/* Results Section */}
+                        {results && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="mt-8 space-y-6"
+                            >
+                                <div className="p-6 bg-white/5 rounded-xl backdrop-blur-lg">
+                                    <h3 className="mb-4 text-xl font-semibold text-blue-200">
+                                        Recognition Analytics
+                                    </h3>
 
-                        {error && (
-                            <div className="flex items-start gap-3 p-4 mt-4 text-red-700 rounded-xl bg-red-50">
-                                <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                                <p>{error}</p>
-                            </div>
-                        )}
-
-                        {results && results.results && (
-                            <div className="p-6 mt-4 rounded-xl bg-gray-50">
-                                <h4 className="mb-4 text-xl font-semibold text-gray-800">
-                                    Recognition Results
-                                </h4>
-                                <div className="p-4 mb-4 bg-white rounded-lg shadow-sm">
-                                    <p className="text-lg text-gray-700">
-                                        Faces Detected: <span className="font-semibold">{results.faces_detected}</span>
-                                    </p>
-                                </div>
-                                <div className="space-y-3">
-                                    {results.results.map((face, index) => (
-                                        <div key={index} className="p-4 bg-white rounded-lg shadow-sm">
-                                            <p className="mb-2 font-medium text-gray-800">
-                                                Name: {face.name}
-                                            </p>
-                                            <div className="w-full h-2 mb-1 bg-gray-100 rounded-full">
-                                                <div
-                                                    className="h-2 bg-blue-500 rounded-full"
-                                                    style={{ width: `${face.confidence * 100}%` }}
-                                                />
-                                            </div>
-                                            <p className="text-sm text-gray-600">
-                                                Confidence: {(face.confidence * 100).toFixed(2)}%
-                                            </p>
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between p-4 rounded-lg bg-black/20">
+                                            <span className="text-blue-300">Total Detections</span>
+                                            <span className="text-2xl font-bold text-emerald-400">
+                                                {results.faces_detected}
+                                            </span>
                                         </div>
-                                    ))}
+
+                                        {results.results.map((face, index) => (
+                                            <motion.div
+                                                key={index}
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                className="p-4 transition-colors rounded-lg bg-black/20 group hover:bg-white/5"
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <h4 className="font-medium text-blue-200">{face.name}</h4>
+                                                        <p className="text-sm text-blue-300/80">
+                                                            Confidence: {(face.confidence * 100).toFixed(1)}%
+                                                        </p>
+                                                    </div>
+                                                    <div className="w-24 h-2 overflow-hidden rounded-full bg-white/10">
+                                                        <div
+                                                            className="h-full transition-all duration-500 bg-gradient-to-r from-blue-400 to-purple-400"
+                                                            style={{ width: `${face.confidence * 100}%` }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
+                            </motion.div>
                         )}
                     </div>
-                </div>
-            </div>
+                </motion.div>
 
+                {/* Quick Actions Section */}
                 <div className="space-y-8">
-                    <div className="p-8 bg-white shadow-xl rounded-2xl">
-                        <h3 className="mb-6 text-2xl font-bold text-gray-800">Quick Actions</h3>
-                        <div className="grid gap-4">
-                            <button
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="p-8 border shadow-2xl bg-white/5 backdrop-blur-xl rounded-3xl border-white/10"
+                    >
+                        <h3 className="mb-8 text-2xl font-bold text-transparent bg-gradient-to-r from-blue-400 to-purple-300 bg-clip-text">
+                            Academic Dashboard
+                        </h3>
+
+                        <div className="space-y-6">
+                            <motion.button
+                                whileHover={{ y: -2 }}
+                                className="w-full p-6 transition-all bg-white/5 rounded-xl hover:bg-white/10 group"
                                 onClick={() => navigate('/teacherdashboard/attendance')}
-                                className="flex items-center justify-center w-full gap-3 px-6 py-4 text-lg font-semibold text-white transition-all duration-300 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl hover:-translate-y-1 hover:shadow-lg"
                             >
-                                <Users className="w-5 h-5" />
-                                Take Attendance
-                            </button>
-                            <button
-                                className="flex items-center justify-center w-full gap-3 px-6 py-4 text-lg font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-600 to-green-700 rounded-xl hover:-translate-y-1 hover:shadow-lg"
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 rounded-lg bg-gradient-to-r from-blue-600 to-purple-500">
+                                        <Users className="w-6 h-6 text-white" />
+                                    </div>
+                                    <div className="text-left">
+                                        <h4 className="text-lg font-semibold text-blue-200">Live Attendance</h4>
+                                        <p className="text-sm text-blue-300/80">Real-time tracking system</p>
+                                    </div>
+                                </div>
+                            </motion.button>
+
+                            <motion.button
+                                whileHover={{ y: -2 }}
+                                className="w-full p-6 transition-all bg-white/5 rounded-xl hover:bg-white/10 group"
                             >
-                                <BookOpen className="w-5 h-5" />
-                                Create Assignment
-                            </button>
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 rounded-lg bg-gradient-to-r from-emerald-600 to-cyan-500">
+                                        <BookOpen className="w-6 h-6 text-white" />
+                                    </div>
+                                    <div className="text-left">
+                                        <h4 className="text-lg font-semibold text-blue-200">Assignment Hub</h4>
+                                        <p className="text-sm text-blue-300/80">Create & manage tasks</p>
+                                    </div>
+                                </div>
+                            </motion.button>
                         </div>
-                    </div>
+                    </motion.div>
 
+                    {/* Statistics Card */}
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="p-8 border shadow-2xl bg-white/5 backdrop-blur-xl rounded-3xl border-white/10"
+                    >
+                        <h3 className="mb-6 text-2xl font-bold text-transparent bg-gradient-to-r from-emerald-400 to-cyan-300 bg-clip-text">
+                            Student Insights
+                        </h3>
 
-                    <div className="overflow-hidden bg-white shadow-xl rounded-2xl">
-                        <div className="p-6 bg-gradient-to-r from-green-600 to-green-800">
-                            <div className="flex items-center gap-3">
-                                <Users className="w-8 h-8 text-white" />
-                                <h3 className="text-2xl font-bold text-white">
-                                    Student Statistics
-                                </h3>
-                            </div>
-                            <p className="mt-2 text-green-100">
-                                Overview of student performance
-                            </p>
-                        </div>
-                        <div className="p-8">
-                            <StudentStats />
-                        </div>
-                    </div>
+                        <StudentStats />
+                    </motion.div>
                 </div>
             </div>
         </div>

@@ -5,37 +5,37 @@ import jwt from "jsonwebtoken";
 
 export const authenticateUser = asyncHandler(async (req, res, next) => {
     try {
-        // Token extraction logic is good
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
-        
+
         if (!token) {
             throw new apiError(401, "Please authenticate to access this route");
         }
-        // Verify the token
-        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-        
-        // Find user and exclude sensitive information
-        const user = await User.findById(decoded?._id).select("-password -refreshToken");
- 
-        if (!user) {
-            throw new apiError(401, "Invalid token");
-        }
 
-        // Attach user to request object
-        req.user = user;
-        next();
-    } catch (error) {
-        // More specific error handling would be beneficial
-        if (error.name === 'JsonWebTokenError') {
+        try {
+            const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+            const user = await User.findById(decoded?._id).select("-password -refreshToken");
+
+            if (!user) {
+                throw new apiError(401, "Invalid token");
+            }
+
+            req.user = user;
+            return next();
+        } catch (error) {
+            if (error.name === 'TokenExpiredError') {
+                // Allow logout even if the token is expired
+                if (req.path === "/logout") {
+                    return next();
+                }
+                throw new apiError(401, "Token has expired");
+            }
             throw new apiError(401, "Invalid token");
-        } else if (error.name === 'TokenExpiredError') {
-            throw new apiError(401, "Token has expired");
-        } else {
-            // Generic error for other authentication issues
-            throw new apiError(401, error.message || "Authentication failed");
         }
+    } catch (error) {
+        throw new apiError(401, error.message || "Authentication failed");
     }
 });
+
 export const authorizeRoles = (...allowedRoles) => {
     return (req, res, next) => {
         if (!req.user) {
