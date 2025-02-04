@@ -8,7 +8,8 @@ import { message } from 'antd';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from 'framer-motion';
-import {  FaLock, FaEnvelope, FaArrowRight } from 'react-icons/fa';
+import { FaLock, FaEnvelope, FaArrowRight, FaShieldAlt } from 'react-icons/fa';
+import { ReactTyped } from 'react-typed';
 import store from '../zustand/loginStore';
 
 const schema = z.object({
@@ -143,35 +144,62 @@ const Login = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50"
+        className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900"
       >
-        <div className="flex flex-col w-full mx-4 overflow-hidden bg-white/80 shadow-2xl backdrop-blur-xl max-w-6xl rounded-[40px] md:flex-row ring-1 ring-white/20">
+        <div className="flex flex-col w-full mx-4 overflow-hidden bg-white/5 shadow-2xl backdrop-blur-xl max-w-6xl rounded-[40px] md:flex-row ring-1 ring-white/20">
           {/* Image Section */}
           <motion.div
             initial={{ x: -100, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8 }}
-            className="relative flex-col justify-center hidden p-8 md:w-1/2 md:flex bg-gradient-to-br from-purple-600/90 via-blue-600/90 to-indigo-600/90"
+            className="relative flex-col justify-center hidden p-8 md:w-1/2 md:flex bg-gradient-to-br from-purple-600/40 via-blue-600/40 to-indigo-600/40"
           >
-            <div className="relative z-10 space-y-6 text-white">
+            <div className="relative z-10 space-y-6">
               <motion.h1 
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                className="text-5xl font-bold leading-tight"
+                className="text-5xl font-bold leading-tight text-transparent bg-gradient-to-r from-purple-300 via-blue-200 to-indigo-100 bg-clip-text"
               >
-                Welcome Back!<br />
-                <span className="text-3xl font-medium">Continue Your Journey</span>
+                <ReactTyped
+                  strings={["Secure Academic Access"]}
+                  typeSpeed={40}
+                  showCursor={false}
+                />
+                <br />
+                <span className="text-2xl font-medium text-purple-200">
+                  AI-Powered Attendance System
+                </span>
               </motion.h1>
-              <motion.img 
-                src={loginImage} 
-                alt="Login Illustration"
+              
+              <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="w-full max-w-md mx-auto mt-8 transform hover:scale-[1.02] transition-all duration-300"
-              />
+                className="relative overflow-hidden rounded-3xl group"
+              >
+                <img 
+                  src={loginImage} 
+                  alt="Login Illustration"
+                  className="w-full max-w-md mx-auto transition-all duration-500 transform group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+              </motion.div>
+  
+              <div className="grid grid-cols-3 gap-4 mt-8 text-center">
+                <div className="p-4 bg-white/5 rounded-xl">
+                  <div className="text-2xl font-bold text-purple-400">99.6%</div>
+                  <div className="text-sm text-purple-200">Accuracy</div>
+                </div>
+                <div className="p-4 bg-white/5 rounded-xl">
+                  <div className="text-2xl font-bold text-blue-400">0.2s</div>
+                  <div className="text-sm text-blue-200">Recognition</div>
+                </div>
+                <div className="p-4 bg-white/5 rounded-xl">
+                  <div className="text-2xl font-bold text-indigo-400">256-bit</div>
+                  <div className="text-sm text-indigo-200">Encryption</div>
+                </div>
+              </div>
             </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
           </motion.div>
   
           {/* Form Section */}
@@ -179,19 +207,19 @@ const Login = () => {
             initial={{ x: 100, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.8 }}
-            className="p-8 md:w-1/2 md:p-12 lg:p-16 bg-white/70 backdrop-blur-lg"
+            className="p-8 md:w-1/2 md:p-12 lg:p-16 bg-gradient-to-br from-gray-800/60 to-purple-900/40 backdrop-blur-2xl"
           >
             <motion.div 
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
-              className="flex items-center justify-center mb-8"
+              className="flex items-center justify-center mb-8 space-x-4"
             >
               <img 
                 src={logo} 
                 alt="Logo" 
-                className="w-20 h-20 mr-3 rounded-xl shadow-xl transform hover:rotate-[-4deg] transition-transform"
+                className="w-16 h-16 transition-all duration-500 rounded-xl hover:rotate-[8deg] hover:shadow-glow"
               />
-              <h2 className="text-4xl font-bold text-transparent bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text">
+              <h2 className="text-4xl font-bold text-transparent bg-gradient-to-r from-purple-300 via-blue-200 to-indigo-100 bg-clip-text">
                 AttendEase
               </h2>
             </motion.div>
@@ -199,24 +227,28 @@ const Login = () => {
             <motion.h1 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="mb-6 text-3xl font-bold text-center text-gray-800"
+              className="mb-6 text-3xl font-bold text-center text-purple-100"
             >
-              Welcome Back! 👋
+              <ReactTyped
+                strings={["Faculty Portal Access"]}
+                typeSpeed={40}
+                showCursor={false}
+              />
             </motion.h1>
   
-            <form onSubmit={handleSubmit(submitHandle)} className="space-y-6">
+            <form onSubmit={handleSubmit(submitHandle)} className="space-y-8">
               {/* Email Field */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="relative group"
               >
-                <FaEnvelope className="absolute text-gray-500 transition-colors transform -translate-y-1/2 left-4 top-1/2 group-focus-within:text-purple-600" />
+                <FaEnvelope className="absolute transition-colors transform -translate-y-1/2 text-purple-300/80 left-4 top-1/2 group-focus-within:text-purple-100" />
                 <input
                   type="email"
                   {...register('email')}
-                  placeholder="Enter your email"
-                  className="w-full py-4 pl-12 pr-6 transition-all duration-300 border-2 border-gray-200/80 rounded-2xl focus:border-purple-500 focus:ring-4 focus:ring-purple-200/30 placeholder-gray-400/80 hover:border-gray-300 bg-white/50"
+                  placeholder="Academic Email"
+                  className="w-full py-4 pl-12 pr-6 transition-all duration-300 border-2 border-white/20 rounded-2xl focus:border-purple-300 focus:ring-4 focus:ring-purple-500/30 placeholder-purple-300/60 hover:border-white/30 bg-white/5 backdrop-blur-sm"
                 />
                 <AnimatePresence>
                   {errors.email && (
@@ -224,8 +256,9 @@ const Login = () => {
                       initial={{ opacity: 0, y: -5 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -5 }}
-                      className="mt-2 text-sm text-red-500"
+                      className="flex items-center gap-2 mt-2 text-sm text-red-300"
                     >
+                      <FaShieldAlt className="flex-shrink-0" />
                       {errors.email.message}
                     </motion.p>
                   )}
@@ -239,12 +272,12 @@ const Login = () => {
                 transition={{ delay: 0.1 }}
                 className="relative group"
               >
-                <FaLock className="absolute text-gray-500 transition-colors transform -translate-y-1/2 left-4 top-1/2 group-focus-within:text-purple-600" />
+                <FaLock className="absolute transition-colors transform -translate-y-1/2 text-purple-300/80 left-4 top-1/2 group-focus-within:text-purple-100" />
                 <input
                   type="password"
                   {...register('password')}
-                  placeholder="Enter your password"
-                  className="w-full py-4 pl-12 pr-6 transition-all duration-300 border-2 border-gray-200/80 rounded-2xl focus:border-purple-500 focus:ring-4 focus:ring-purple-200/30 placeholder-gray-400/80 hover:border-gray-300 bg-white/50"
+                  placeholder="Secure Password"
+                  className="w-full py-4 pl-12 pr-6 transition-all duration-300 border-2 border-white/20 rounded-2xl focus:border-purple-300 focus:ring-4 focus:ring-purple-500/30 placeholder-purple-300/60 hover:border-white/30 bg-white/5 backdrop-blur-sm"
                 />
                 <AnimatePresence>
                   {errors.password && (
@@ -252,8 +285,9 @@ const Login = () => {
                       initial={{ opacity: 0, y: -5 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -5 }}
-                      className="mt-2 text-sm text-red-500"
+                      className="flex items-center gap-2 mt-2 text-sm text-red-300"
                     >
+                      <FaShieldAlt className="flex-shrink-0" />
                       {errors.password.message}
                     </motion.p>
                   )}
@@ -266,31 +300,40 @@ const Login = () => {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={isLoggingIn}
-                className="w-full px-8 py-4 font-semibold text-white transition-all duration-300 shadow-lg bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 rounded-2xl hover:shadow-xl hover:bg-gradient-to-r hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 group"
+                className="w-full px-8 py-4 font-semibold text-white transition-all duration-300 shadow-xl bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-500 rounded-2xl hover:shadow-2xl hover:bg-gradient-to-r hover:from-purple-400 hover:via-blue-400 hover:to-indigo-400 group"
               >
-                <span className="flex items-center justify-center">
-                  {isLoggingIn ? 'Logging in...' : 'Continue'}
-                  <FaArrowRight className="ml-3 transition-transform group-hover:translate-x-1" />
+                <span className="flex items-center justify-center tracking-wide">
+                  {isLoggingIn ? (
+                    <span className="flex items-center gap-3">
+                      <motion.span
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity }}
+                        className="block w-5 h-5 border-2 border-white rounded-full border-t-transparent"
+                      />
+                      Authenticating...
+                    </span>
+                  ) : (
+                    <>
+                      Continue Session
+                      <FaArrowRight className="ml-3 transition-transform group-hover:translate-x-1" />
+                    </>
+                  )}
                 </span>
               </motion.button>
   
-              {/* Divider */}
-              <div className="relative flex items-center py-6">
-                <div className="flex-grow border-t border-gray-300/50"></div>
-                <span className="flex-shrink mx-4 text-gray-500/80">or</span>
-                <div className="flex-grow border-t border-gray-300/50"></div>
-              </div>
-  
               {/* Additional Links */}
-              <div className="flex flex-col space-y-4 text-center">
+              <div className="flex flex-col items-center space-y-4 text-center">
                 <button
                   onClick={() => navigate('/signup')}
-                  className="font-medium transition-colors text-gray-600/90 hover:text-purple-600"
+                  className="font-medium transition-colors text-purple-200/80 hover:text-purple-100 group"
                 >
-                  Create new account
+                  New Faculty? 
+                  <span className="ml-2 text-transparent bg-gradient-to-r from-purple-300 to-blue-200 bg-clip-text group-hover:from-purple-100 group-hover:to-blue-50">
+                    Request Access
+                  </span>
                 </button>
-                <button className="text-sm transition-colors text-gray-500/80 hover:text-purple-600">
-                  Forgot password?
+                <button className="text-sm transition-colors text-purple-200/60 hover:text-purple-100">
+                  Security Assistance Required?
                 </button>
               </div>
             </form>

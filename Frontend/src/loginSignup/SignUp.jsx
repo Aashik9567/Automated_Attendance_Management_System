@@ -34,35 +34,57 @@ const SignUp = () => {
   } = useForm({
     resolver: zodResolver(schema)
   })
-  const submitHandle=async (data)=>{
-     
+  const submitHandle = async (data) => {
     try {
       setLoading(true);
+
+      // Make the API call
       const response = await axios.post("http://localhost:8080/api/v1/users/signup", {
         email: data.email,
         password: data.password,
         role: data.role,
-        fullName:data.fullName,
-        semester:data.semester
+        fullName: data.fullName,
+        semester: data.semester
       });
-  
-      nav("/login");
-      message.success(response?.data.message);
+
+      // Check if the response is valid
+      if (!response || !response.data) {
+        throw new Error("Invalid response from server");
+      }
+
+      // Navigate to login page on success
+      navigate("/login");
+      message.success(response.data.message || "Account created successfully!");
     } catch (error) {
-        message.error(error.response.data.message);
-  }
-  finally{
-    setLoading(false)
-  }
-  }
+      // Handle different types of errors
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        message.error(error.response.data.message || "Signup failed. Please try again.");
+      } else if (error.request) {
+        // The request was made but no response was received
+        message.error("No response from server. Please check your connection.");
+      } else {
+        // Something happened in setting up the request
+        message.error("An unexpected error occurred. Please try again.");
+      }
+      console.error("Signup error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   const fadeInUp = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
     transition: { duration: 0.5 }
   };
   return (
-    <div className="h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-200 via-indigo-300 to-white">
-      <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] bg-fixed"></div>
+<motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900"
+      >      <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] bg-fixed"></div>
       
       <div className="relative flex items-center justify-center min-h-screen p-4">
         <motion.div
@@ -71,7 +93,7 @@ const SignUp = () => {
           transition={{ duration: 0.5 }}
           className="w-full max-w-6xl"
         >
-          <div className="grid overflow-hidden bg-white shadow-2xl rounded-3xl md:grid-cols-2">
+          <div className="grid overflow-hidden text-transparent shadow-2xl bg-gradient-to-r from-purple-300 via-blue-200 to-indigo-100 rounded-3xl md:grid-cols-2">
             {/* Left Column - Form */}
             <div className="p-8 lg:p-12">
               <motion.div {...fadeInUp} className="mb-8">
@@ -280,8 +302,8 @@ const SignUp = () => {
           </div>
         </motion.div>
       </div>
-    </div>
-  );
+    </motion.div>
+    );
 };
 
 export default SignUp;

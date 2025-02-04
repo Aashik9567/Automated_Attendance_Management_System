@@ -20,7 +20,6 @@ const CameraCapture = ({ onCapture, onClose }) => {
                 setStream(mediaStream);
             } catch (err) {
                 message.error('Could not access camera');
-                console.error(err);
             }
         };
 
@@ -364,11 +363,10 @@ const HomePage = () => {
                 key: messageKey,
                 duration: 4
             });
-            console.error('Upload error:', err);
         } finally {
             setLoading(false);
         }
-        console.log(addAttendanceRecord)
+        
     };
     const handleSubjectCreated = (newSubject) => {
         setSubjects(prevSubjects => [...prevSubjects, newSubject]);

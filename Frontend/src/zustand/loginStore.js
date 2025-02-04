@@ -73,7 +73,7 @@ const useLoginStore = create(
         }),
         {
             name: 'auth-storage',
-            getStorage: () => localStorage,
+            Storage: () => localStorage,
         }
     )
 );
