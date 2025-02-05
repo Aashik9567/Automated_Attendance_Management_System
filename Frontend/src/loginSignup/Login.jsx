@@ -25,6 +25,7 @@ const Login = () => {
         isLogin: state.isLogin,
         loginUserData: state.loginUserData
     }));
+  
     
     const [isLoggingIn, setIsLoggingIn] = useState(false);
     const navigate = useNavigate();
@@ -48,7 +49,7 @@ const Login = () => {
     const submitHandle = async (formData) => {
         try {
             setIsLoggingIn(true);
-            const response = await axios.post('http://localhost:8080/api/v1/users/login', {
+            const response = await axios.post(`${loginUserData.baseURL}/users/login`, {
                 email: formData.email,
                 password: formData.password,
             });
@@ -81,7 +82,7 @@ const Login = () => {
 
     // Create a custom axios instance with interceptors
     const axiosInstance = axios.create({
-        baseURL: 'http://localhost:8080/api/v1',
+        baseURL: loginUserData?.baseURL,
         withCredentials: true
     });
 
@@ -110,7 +111,7 @@ const Login = () => {
                 try {
                     // Call the backend refresh token endpoint
                     const response = await axios.post(
-                        'http://localhost:8080/api/v1/users/refreshtoken',
+                        `${loginUserData.baseURL}/users/refreshtoken`,
                         { refreshToken: localStorage.getItem('refreshToken') },
                         { withCredentials: true }
                     );

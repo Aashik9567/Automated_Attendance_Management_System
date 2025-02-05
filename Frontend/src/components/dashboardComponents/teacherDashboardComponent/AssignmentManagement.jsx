@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Card, Button, Modal, Form, Input, Select, DatePicker, 
-  Table, Tag, message, Spin, Typography, Upload 
+  Card, Button, Modal, Form, Input, Select, DatePicker,  Table, Tag, message, Typography, Upload 
 } from 'antd';
 import { 
-  PlusOutlined, FileTextOutlined, CalendarOutlined,
-  UploadOutlined, DeleteOutlined, EditOutlined, CheckCircleOutlined,
-  CloseCircleOutlined, LoadingOutlined
+  PlusOutlined, UploadOutlined, DeleteOutlined, EditOutlined, CheckCircleOutlined,
 } from '@ant-design/icons';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion} from 'framer-motion';
 import axios from 'axios';
+import store from '../../../zustand/loginStore';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
 const AssignmentManagement = () => {
+  const { loginUserData } = store((state) => state);  
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [assignments, setAssignments] = useState([]);
@@ -29,7 +28,7 @@ const AssignmentManagement = () => {
 
   const fetchAssignments = async () => {
     try {
-      const res = await axios.get('http://localhost:8080/api/v1/assignments', {
+      const res = await axios.get(`${loginUserData.baseURL}/assignments`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
       });
       setAssignments(res.data.data);
@@ -42,7 +41,7 @@ const AssignmentManagement = () => {
 
   const fetchSubjects = async () => {
     try {
-      const res = await axios.get('http://localhost:8080/api/v1/subjects/getsubject', {
+      const res = await axios.get(`${loginUserData.baseURL}/subjects`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
       });
       setSubjects(res.data.data);
@@ -64,7 +63,7 @@ const AssignmentManagement = () => {
       });
 
       await axios.post(
-        'http://localhost:8080/api/v1/assignments',
+        `${loginUserData.baseURL}/assignments`,
         formData,
         {
           headers: { 

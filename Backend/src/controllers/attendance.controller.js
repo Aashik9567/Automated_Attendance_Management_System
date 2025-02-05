@@ -1,5 +1,18 @@
 import { Attendance } from '../models/attendance.model.js';
 import { StudentSubject } from '../models/studentSubject.model.js';
+import { Subject } from '../models/subject.model.js';
+import asyncHandler from '../utils/asyncHandler.js';
+
+export const getStudentAttendance = asyncHandler(async (req, res) => {
+    try {
+      const attendance = await Attendance.find({
+        'students.student': req.user._id
+      }).populate('subject', 'name');
+      res.status(200).json(attendance);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
 
 // Mark attendance for a class
 export const markAttendance = async (req, res) => {
@@ -59,20 +72,30 @@ export const markAttendance = async (req, res) => {
 };
 
 // Get attendance by subject
-export const getAttendanceBySubject = async (req, res) => {
-    try {
-        const { subjectId } = req.params;
-        const attendance = await Attendance.find({ subject: subjectId })
-            .populate('students.student', 'fullName')
-            .populate('teacher', 'fullName')
-            .sort({ date: -1 });
+export const getAttendanceBySubject = asyncHandler(async (req, res) => {
+    const { subjectId } = req.params;
+    const userId = req.user._id; // Get the authenticated user's ID
 
-        res.status(200).json(attendance);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
+    
+    // Verify the subject exists
+    const subject = await Subject.findById(subjectId);
+    if (!subject) {
+      return res.status(404).json({
+        success: false,
+        message: 'Subject not found'
+      });
     }
-};
-
+  
+    // Find all attendance records for this subject
+    const attendanceRecords = await Attendance.find({ 
+      subject: subjectId 
+    }).sort({ date: -1 });
+  
+    res.status(200).json({
+      success: true,
+      data: attendanceRecords
+    });
+  });
 
 
 

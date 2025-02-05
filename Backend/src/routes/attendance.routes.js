@@ -4,7 +4,8 @@ import {
     markAttendance,
     getAttendanceBySubject,
     updateAttendance,
-    deleteAttendance
+    deleteAttendance,
+    getStudentAttendance
 } from '../controllers/attendance.controller.js';
 import { authenticateUser } from '../middlewares/auth.middleware.js';
 
@@ -21,6 +22,8 @@ router.route("/update/:attendanceId")
 
 router.route("/delete/:attendanceId")
     .delete(authenticateUser, deleteAttendance);
+router.route("/student")
+    .get(authenticateUser, getStudentAttendance);    
 
 
 export default router;

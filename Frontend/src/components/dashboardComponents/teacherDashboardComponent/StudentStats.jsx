@@ -3,6 +3,7 @@ import { Card, Row, Col, Statistic, Progress, Table, Spin, message } from 'antd'
 import { Users, LineChart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import store from '../../../zustand/loginStore';
 
 const StudentStats = () => {
   const [stats, setStats] = useState({
@@ -12,17 +13,17 @@ const StudentStats = () => {
     totalSubjects: 0
   });
   const [loading, setLoading] = useState(true);
-
+  const { loginUserData } = store(state => state);
   const fetchData = async () => {
     try {
       // Fetch total students
-      const studentsRes = await axios.get('http://localhost:8080/api/v1/users/students', {
+      const studentsRes = await axios.get(`${loginUserData.baseURL}/users/students`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
       });
       const totalStudents = studentsRes.data.data.length;
 
       // Fetch teacher's subjects
-      const subjectsRes = await axios.get('http://localhost:8080/api/v1/subjects/getsubject', {
+      const subjectsRes = await axios.get(`${loginUserData.baseURL}/subjects`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
       });
       const subjects = subjectsRes.data.data;
@@ -33,7 +34,7 @@ const StudentStats = () => {
       let totalAttendanceRate = 0;
 
       for (const subject of subjects) {
-        const attendanceRes = await axios.get(`http://localhost:8080/api/v1/attendance/subject/${subject._id}`, {
+        const attendanceRes = await axios.get(`${loginUserData.baseURL}/attendance/subject/${subject._id}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
         });
         const attendanceRecords = attendanceRes.data;

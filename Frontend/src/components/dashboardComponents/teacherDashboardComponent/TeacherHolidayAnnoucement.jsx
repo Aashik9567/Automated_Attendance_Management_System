@@ -4,17 +4,18 @@ import { motion } from 'framer-motion';
 import dayjs from 'dayjs';
 import axios from 'axios';
 import { FaTimes, FaEdit, FaTrash } from 'react-icons/fa';
+import store from '../../../zustand/loginStore';
 
 const TeacherHolidayAnnouncement = () => {
   const [form] = Form.useForm();
   const [holidays, setHolidays] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editId, setEditId] = useState(null);
-
+  const { loginUserData } = store(state => state);
   const fetchHolidays = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get('http://localhost:8080/api/v1/holidays', {
+      const { data } = await axios.get(`${loginUserData.baseURL}/holidays`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`
         }
@@ -40,14 +41,14 @@ const TeacherHolidayAnnouncement = () => {
       };
 
       if (editId) {
-        await axios.put(`http://localhost:8080/api/v1/holidays/${editId}`, payload, {
+        await axios.put(`${loginUserData.baseURL}/holidays/${editId}`, payload, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`
           }
         });
         message.success('Holiday updated successfully!');
       } else {
-        await axios.post('http://localhost:8080/api/v1/holidays', payload, {
+        await axios.post(`${loginUserData.baseURL}/holidays`, payload, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`
           }
@@ -65,7 +66,7 @@ const TeacherHolidayAnnouncement = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/v1/holidays/${id}`, {
+      await axios.delete(`${loginUserData.baseURL}/holidays/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`
         }
@@ -81,55 +82,47 @@ const TeacherHolidayAnnouncement = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen p-6 bg-gradient-to-br from-blue-50/90 to-indigo-50/90"
+      className="min-h-screen p-8 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900"
     >
-      <div className="mx-auto space-y-6 max-w-7xl">
+      <div className="mx-auto space-y-8 max-w-7xl">
         {/* Announcement Form */}
         <motion.div
           initial={{ scale: 0.95 }}
           animate={{ scale: 1 }}
-          className="p-6 shadow-xl bg-white/90 backdrop-blur-sm rounded-2xl"
+          className="p-8 border shadow-2xl bg-white/5 backdrop-blur-xl rounded-3xl border-white/10"
         >
-          <h2 className="mb-6 text-2xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
+          <h2 className="mb-6 text-2xl font-bold text-transparent bg-gradient-to-r from-blue-400 to-purple-300 bg-clip-text">
             {editId ? 'Edit Holiday' : '🎉 Announce New Holiday'}
           </h2>
           
           <Form form={form} onFinish={handleSubmit} layout="vertical">
-            <Form.Item
-              name="title"
-              label="Holiday Title"
-              rules={[{ required: true }]}
-            >
-              <Input placeholder="Enter holiday name" className="h-12 rounded-xl" />
-            </Form.Item>
-
-            <Form.Item
-              name="dates"
-              label="Holiday Period"
-              rules={[{ required: true }]}
-            >
-              <DatePicker.RangePicker
-                className="w-full h-12 rounded-xl"
-                disabledDate={(current) => current && current < dayjs().startOf('day')}
+            <Form.Item name="title" rules={[{ required: true }]}>
+              <Input 
+                placeholder="Enter holiday name" 
+                className="h-12 text-orange-400 rounded-xl bg-white/5 border-white/10 placeholder:text-blue-600/60" 
               />
             </Form.Item>
 
-            <Form.Item
-              name="description"
-              label="Description"
-              rules={[{ required: true }]}
-            >
+            <Form.Item name="dates" rules={[{ required: true }]}>
+              <DatePicker.RangePicker
+                className="w-full h-12 rounded-xl bg-white/5 border-white/10 [&>.ant-picker-input>input]:text-blue-700"
+                disabledDate={(current) => current && current < dayjs().startOf('day')}
+                suffixIcon={<span className="text-blue-600">📅</span>}
+              />
+            </Form.Item>
+
+            <Form.Item name="description" rules={[{ required: true }]}>
               <Input.TextArea
                 rows={4}
                 placeholder="Add holiday details..."
-                className="rounded-xl"
+                className="text-blue-200 rounded-xl bg-white/5 border-white/10 placeholder:text-blue-600/60"
               />
             </Form.Item>
 
             <Button
               type="primary"
               htmlType="submit"
-              className="w-full h-12 text-lg font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              className="w-full h-12 text-lg font-semibold transition-all rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 hover:shadow-blue-glow"
             >
               {editId ? 'Update Holiday' : 'Publish Announcement'}
             </Button>
@@ -138,53 +131,76 @@ const TeacherHolidayAnnouncement = () => {
 
         {/* Holidays List */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+>
+  {holidays.map((holiday) => (
+    <motion.div
+      key={holiday._id}
+      whileHover={{ y: -4 }}
+      className="relative p-6 transition-all border shadow-2xl bg-white/5 backdrop-blur-xl rounded-3xl border-white/10 group hover:border-white/20"
+    >
+      {/* Action Buttons */}
+      <div className="absolute flex gap-2 transition-opacity opacity-0 top-5 right-5 group-hover:opacity-100">
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            setEditId(holiday._id);
+            form.setFieldsValue({
+              title: holiday.title,
+              description: holiday.description,
+              dates: [dayjs(holiday.startDate), dayjs(holiday.endDate)]
+            });
+          }}
+          className="p-2 text-blue-400 transition-all rounded-lg bg-white/5 hover:bg-white/10 hover:text-purple-400 backdrop-blur-sm"
         >
-          {holidays.map((holiday) => (
-            <motion.div
-              key={holiday._id}
-              whileHover={{ scale: 1.02 }}
-              className="relative p-6 shadow-xl bg-white/90 backdrop-blur-sm rounded-2xl"
-            >
-              <div className="absolute flex gap-2 top-4 right-4">
-                <button 
-                  onClick={() => {
-                    setEditId(holiday._id);
-                    form.setFieldsValue({
-                      title: holiday.title,
-                      description: holiday.description,
-                      dates: [dayjs(holiday.startDate), dayjs(holiday.endDate)]
-                    });
-                  }}
-                  className="text-blue-600 hover:text-blue-800"
-                >
-                  <FaEdit size={18} />
-                </button>
-                <button 
-                  onClick={() => handleDelete(holiday._id)}
-                  className="text-red-600 hover:text-red-800"
-                >
-                  <FaTrash size={18} />
-                </button>
-              </div>
-              
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold text-blue-600">{holiday.title}</h3>
-                <span className="px-3 py-1 text-sm text-blue-800 bg-blue-100 rounded-full">
-                  {dayjs(holiday.endDate).diff(holiday.startDate, 'day') + 1} days
-                </span>
-              </div>
-              <p className="mb-4 text-gray-600">{holiday.description}</p>
-              <div className="flex justify-between text-sm text-gray-500">
-                <span>📅 {dayjs(holiday.startDate).format('MMM D')}</span>
-                <span>➔</span>
-                <span>📅 {dayjs(holiday.endDate).format('MMM D')}</span>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+          <FaEdit size={16} />
+        </button>
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDelete(holiday._id);
+          }}
+          className="p-2 text-red-400 transition-all rounded-lg bg-white/5 hover:bg-white/10 hover:text-red-500 backdrop-blur-sm"
+        >
+          <FaTrash size={16} />
+        </button>
+      </div>
+
+      {/* Card Content */}
+      <div className="space-y-4">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="text-xl font-semibold text-transparent bg-gradient-to-r from-blue-300 to-purple-200 bg-clip-text">
+            {holiday.title}
+          </h3>
+          <span className="px-3 py-1 text-sm text-blue-300 align-bottom shrink-0 bg-white/5 backdrop-blur-sm">
+            {dayjs(holiday.endDate).diff(holiday.startDate, 'day') + 1} days
+          </span>
+        </div>
+
+        {/* Description */}
+        <p className="text-blue-300/80 line-clamp-3">{holiday.description}</p>
+
+        {/* Date Range */}
+        <div className="pt-4 mt-4 border-t border-white/10">
+          <div className="flex items-center justify-between text-sm text-blue-400">
+            <div className="flex items-center gap-2">
+              <span className="text-purple-300">📅</span>
+              {dayjs(holiday.startDate).format('MMM D')}
+            </div>
+            <span className="mx-2 text-purple-300">➔</span>
+            <div className="flex items-center gap-2">
+              <span className="text-purple-300">📅</span>
+              {dayjs(holiday.endDate).format('MMM D')}
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  ))}
+</motion.div>
       </div>
     </motion.div>
   );

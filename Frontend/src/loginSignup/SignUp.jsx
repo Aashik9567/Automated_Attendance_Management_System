@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from 'axios';
 import { message } from 'antd';
 import { motion } from 'framer-motion';
+import store from '../zustand/loginStore';
 import { FaUser, FaLock, FaEnvelope, FaBook, FaArrowRight, FaGraduationCap, FaChalkboardTeacher, FaUserGraduate, FaKey } from 'react-icons/fa';
 
 const schema=z.object({
@@ -26,6 +27,7 @@ const schema=z.object({
 })
 const SignUp = () => {
   const [loading, setLoading] = useState(false);
+  const { loginUserData } = store((state) => state);
   const navigate=useNavigate();
   const {
     register,
@@ -39,7 +41,7 @@ const SignUp = () => {
       setLoading(true);
 
       // Make the API call
-      const response = await axios.post("http://localhost:8080/api/v1/users/signup", {
+      const response = await axios.post(`${loginUserData.baseURL}/users/signup`, {
         email: data.email,
         password: data.password,
         role: data.role,

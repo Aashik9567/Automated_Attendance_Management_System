@@ -3,15 +3,15 @@ import { motion } from 'framer-motion';
 import dayjs from 'dayjs';
 import axios from 'axios';
 import { message } from 'antd';
-
+import store from '../../../zustand/loginStore';
 const Holiday = () => {
   const [holidays, setHolidays] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const { loginUserData } = store((state) => state);
   const fetchHolidays = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get('http://localhost:8080/api/v1/holidays', {
+      const { data } = await axios.get(`${loginUserData.baseURL}/holidays`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`
         }

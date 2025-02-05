@@ -100,7 +100,7 @@ const StudentCalendar = () => {
         <div className="grid gap-8 md:grid-cols-[2fr,1fr]">
           <Card 
             className="shadow-lg"
-            bodyStyle={{ padding: '1.5rem' }}
+            style={{ padding: '1.5rem' }}
           >
             <div className="flex flex-col pb-4 mb-6 space-y-4 border-b sm:flex-row sm:justify-between sm:items-center">
               <div className="flex items-center space-x-3">

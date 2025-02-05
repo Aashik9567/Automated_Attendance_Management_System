@@ -5,6 +5,7 @@ import { message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { ReactTyped } from 'react-typed';
 import { motion, AnimatePresence } from 'framer-motion';
+import store from '../../../zustand/loginStore';
 
 import StudentStats from './StudentStats';
 import useAttendanceStore from "../../../zustand/attendanceStore.js";
@@ -94,7 +95,7 @@ const SubjectSetup = ({ onSubjectCreated }) => {
         e.preventDefault();
         try {
             const response = await axios.post(
-                'http://localhost:8080/api/v1/subjects/createsubject',
+                `${loginUserData.baseURL}/subjects`,
                 subjectData,
                 {
                     headers: {
@@ -187,6 +188,7 @@ const SubjectSetup = ({ onSubjectCreated }) => {
     );
 };
 const HomePage = () => {
+    const {loginUserData }= store(state => state);
     const { addAttendanceRecord } = useAttendanceStore();
     const navigate = useNavigate();
     const [subjects, setSubjects] = useState([]);
@@ -203,7 +205,7 @@ const HomePage = () => {
             try {
                 const accessToken = localStorage.getItem('accessToken');
 
-                const response = await axios.get('http://localhost:8080/api/v1/subjects/getsubject', {
+                const response = await axios.get(`${loginUserData.baseURL}/subjects`, {
                     headers: {
                         'Authorization': `Bearer ${accessToken}`
                     }

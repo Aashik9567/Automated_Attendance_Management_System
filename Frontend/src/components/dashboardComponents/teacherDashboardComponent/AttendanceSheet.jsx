@@ -18,27 +18,15 @@ import {
   CloseCircleOutlined ,
   SyncOutlined
 } from '@ant-design/icons';
+import store from '../../../zustand/loginStore';
 import useAttendanceStore from '/Users/aashiqmahato/Documents/Codes/Attendance Management System/Frontend/src/zustand/attendanceStore.js';
 import { motion } from 'framer-motion';
 // Create axios instance with default config
-const api = axios.create({
-  baseURL: 'http://localhost:8080/api/v1',
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
 
-// Add request interceptor to include token
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
 
 const AttendanceSheet = () => {
   const [subjects, setSubjects] = useState([]);
+  const {loginUserData }= store(state => state);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [attendanceDate, setAttendanceDate] = useState(moment());
   const [attendanceData, setAttendanceData] = useState([]);
@@ -46,7 +34,21 @@ const AttendanceSheet = () => {
   const [loading, setLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const { attendanceRecords, addAttendanceRecord } = useAttendanceStore();
-
+  const api = axios.create({
+    baseURL: loginUserData.baseURL,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+  
+  // Add request interceptor to include token
+  api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
   // Responsive check
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -58,7 +60,7 @@ const AttendanceSheet = () => {
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
-        const response = await api.get('/subjects/getsubject');
+        const response = await api.get('/subjects');
         if (response.data?.data) {
           setSubjects(response.data.data);
         }
