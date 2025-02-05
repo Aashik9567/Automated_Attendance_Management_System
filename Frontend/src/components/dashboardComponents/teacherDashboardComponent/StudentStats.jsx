@@ -16,57 +16,87 @@ const StudentStats = () => {
   const { loginUserData } = store(state => state);
   const fetchData = async () => {
     try {
+      console.log("Fetching data...");
+      console.log("Base URL:", loginUserData.baseURL);
+  
       // Fetch total students
       const studentsRes = await axios.get(`${loginUserData.baseURL}/users/students`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
       });
+      console.log("Students Response:", studentsRes.status, studentsRes.data);
       const totalStudents = studentsRes.data.data.length;
-
-      // Fetch teacher's subjects
+  
+      // Fetch subjects
       const subjectsRes = await axios.get(`${loginUserData.baseURL}/subjects`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
       });
+      console.log("Subjects Response:", subjectsRes.status, subjectsRes.data);
       const subjects = subjectsRes.data.data;
       const totalSubjects = subjects.length;
-
-      // Process each subject's attendance
+  
+      // Process attendance for each subject
       const attendanceBySubject = [];
       let totalAttendanceRate = 0;
-
+  
       for (const subject of subjects) {
-        const attendanceRes = await axios.get(`${loginUserData.baseURL}/attendance/subject/${subject._id}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
-        });
-        const attendanceRecords = attendanceRes.data;
-
-        const studentPresence = {};
-        attendanceRecords.forEach(record => {
-          record.students.forEach(student => {
-            if (!studentPresence[student.student]) {
-              studentPresence[student.student] = { present: 0, total: 0 };
+        try {
+          console.log(`Fetching attendance for subject: ${subject.name} (${subject._id})`);
+          const attendanceRes = await axios.get(
+            `${loginUserData.baseURL}/attendance/subject/${subject._id}`,
+            {
+              headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
             }
-            studentPresence[student.student].total += 1;
-            if (student.status === 'present') {
-              studentPresence[student.student].present += 1;
-            }
+          );
+          console.log(
+            `Attendance Response for ${subject.name}:`,
+            attendanceRes.status,
+            attendanceRes.data
+          );
+  
+          // Depending on your backend response structure, adjust here.
+          // If your API wraps data in a "data" property, use that.
+          const attendanceRecords = attendanceRes.data.data || attendanceRes.data;
+  
+          // Calculate per-student attendance within the subject
+          const studentPresence = {};
+          attendanceRecords.forEach(record => {
+            record.students.forEach(student => {
+              if (!studentPresence[student.student]) {
+                studentPresence[student.student] = { present: 0, total: 0 };
+              }
+              studentPresence[student.student].total += 1;
+              if (student.status === 'present') {
+                studentPresence[student.student].present += 1;
+              }
+            });
           });
-        });
-
-        const rates = Object.values(studentPresence).map(s => (s.present / s.total) * 100);
-        const averageRate = rates.length > 0 ? rates.reduce((a, b) => a + b, 0) / rates.length : 0;
-        totalAttendanceRate += averageRate;
-
-        attendanceBySubject.push({
-          subjectName: subject.name,
-          subjectCode: subject.code,
-          attendanceRate: averageRate,
-          totalClasses: attendanceRecords.length
-        });
+  
+          // Compute average attendance rate for this subject
+          const rates = Object.values(studentPresence).map(
+            s => (s.present / s.total) * 100
+          );
+          const averageRate =
+            rates.length > 0 ? rates.reduce((a, b) => a + b, 0) / rates.length : 0;
+          totalAttendanceRate += averageRate;
+  
+          attendanceBySubject.push({
+            subjectName: subject.name,
+            subjectCode: subject.code,
+            attendanceRate: averageRate,
+            totalClasses: attendanceRecords.length
+          });
+        } catch (error) {
+          console.error(
+            `Error fetching attendance for ${subject.name}:`,
+            error.response?.status,
+            error.response?.data
+          );
+        }
       }
-
-      // Calculate overall average attendance
+  
+      // Calculate overall average attendance across subjects
       const averageAttendance = totalSubjects > 0 ? totalAttendanceRate / totalSubjects : 0;
-
+  
       setStats({
         totalStudents,
         averageAttendance,
@@ -75,10 +105,12 @@ const StudentStats = () => {
       });
       setLoading(false);
     } catch (error) {
-      message.error('Failed to fetch data');
+      console.error("Fetch error:", error.response?.status, error.response?.data);
+      message.error("Failed to fetch data");
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     fetchData();
