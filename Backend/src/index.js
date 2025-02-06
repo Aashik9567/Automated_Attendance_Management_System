@@ -1,47 +1,33 @@
-// index.js
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import connectDb from "./database/db.js";
 dotenv.config();
+
 const app = express();
 
-// CORS configuration
+// ✅ CORS Configuration
 const corsOptions = {
-  origin: "*", // Add all your frontend URLs
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  optionsSuccessStatus: 200
+  origin: ['http://localhost:5173', 'http://localhost:3000', 'https://aams-frontend.onrender.com'], // Allow frontend
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Allowed methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+  credentials: true, // Allow cookies
+  optionsSuccessStatus: 200,
 };
 
-// Apply CORS configuration
+// ✅ Apply CORS Middleware (First!)
 app.use(cors(corsOptions));
 
-// Middleware
+// ✅ Ensure preflight requests are handled properly
+app.options('*', cors(corsOptions));
+
+// ✅ Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Add headers middleware for additional CORS handling
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Origin', req.headers.origin);
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    return res.status(200).json({
-      body: "OK"
-    });
-  }
-  
-  next();
-});
-
-// Routes import and use statements remain the same
+// ✅ Import & Use Routes
 import userRoutes from "./routes/user.routes.js";
 import subjectRoutes from "./routes/subject.routes.js";
 import attendanceRoutes from "./routes/attendance.routes.js";
@@ -54,11 +40,11 @@ app.use("/api/v1/attendance", attendanceRoutes);
 app.use("/api/v1/assignments", assignmentRoutes);
 app.use("/api/v1/holidays", holidayRoutes);
 
-// Database connection and server start
+// ✅ Connect to Database & Start Server
 connectDb()
   .then(() => {
     app.listen(process.env.PORT || 8080, () => {
       console.log(`Server running on port ${process.env.PORT}`);
     });
   })
-  .catch((error) => console.error("mongodb connection failed!!", error));
+  .catch((error) => console.error("MongoDB connection failed!", error));
