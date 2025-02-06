@@ -13,3 +13,12 @@
   .hover\:shadow-blue-glow:hover {
     animation: glow 1.5s infinite;
   }
+@media (max-width: 640px) {
+    .camera-container {
+      height: 85vh !important;
+    }
+    .camera-controls {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }

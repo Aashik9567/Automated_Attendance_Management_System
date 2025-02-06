@@ -12,13 +12,33 @@ import useAttendanceStore from "../../../zustand/attendanceStore.js";
 const CameraCapture = ({ onCapture, onClose }) => {
     const videoRef = useRef(null);
     const [stream, setStream] = useState(null);
+    const [devices, setDevices] = useState([]);
+    const [currentDeviceId, setCurrentDeviceId] = useState('');
 
     useEffect(() => {
-        const startCamera = async () => {
+        const startCamera = async (deviceId) => {
             try {
-                const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const constraints = {
+                    video: {
+                        facingMode: deviceId ? undefined : 'user',
+                        deviceId: deviceId ? { exact: deviceId } : undefined
+                    }
+                };
+
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+
+                const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
                 videoRef.current.srcObject = mediaStream;
                 setStream(mediaStream);
+
+                if (!deviceId) {
+                    const mediaDevices = await navigator.mediaDevices.enumerateDevices();
+                    const videoDevices = mediaDevices.filter(d => d.kind === 'videoinput');
+                    setDevices(videoDevices);
+                    setCurrentDeviceId(mediaStream.getVideoTracks()[0].getSettings().deviceId);
+                }
             } catch (err) {
                 message.error('Could not access camera');
             }
@@ -33,45 +53,65 @@ const CameraCapture = ({ onCapture, onClose }) => {
         };
     }, []);
 
+    const switchCamera = async () => {
+        if (devices.length < 2) return;
+        
+        const currentIndex = devices.findIndex(d => d.deviceId === currentDeviceId);
+        const newDevice = devices[(currentIndex + 1) % devices.length];
+        setCurrentDeviceId(newDevice.deviceId);
+        startCamera(newDevice.deviceId);
+    };
+
     const captureImage = () => {
         const canvas = document.createElement('canvas');
-        canvas.width = videoRef.current.videoWidth;
-        canvas.height = videoRef.current.videoHeight;
-        canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
+        const video = videoRef.current;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
 
         canvas.toBlob(blob => {
             const file = new File([blob], 'captured-image.jpg', { type: 'image/jpeg' });
             onCapture(file);
-
-            // Stop camera stream
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
+            if (stream) stream.getTracks().forEach(track => track.stop());
         }, 'image/jpeg');
     };
 
     return (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm">
-            <div className="relative w-full max-w-md aspect-video">
+            <div className="relative w-full h-[70vh] max-w-2xl">
                 <video
                     ref={videoRef}
                     autoPlay
+                    playsInline
                     className="object-cover w-full h-full rounded-xl"
                 />
+                <div className="absolute flex gap-4 top-4 right-4">
+                    <button
+                        onClick={onClose}
+                        className="p-2 transition-all rounded-full bg-white/20 hover:bg-white/40"
+                    >
+                        <X className="w-5 h-5 text-white" />
+                    </button>
+                    {devices.length > 1 && (
+                        <button
+                            onClick={switchCamera}
+                            className="p-2 transition-all rounded-full bg-white/20 hover:bg-white/40"
+                        >
+                            <RotateCw className="w-5 h-5 text-white" />
+                        </button>
+                    )}
+                </div>
+            </div>
+            
+            <div className="flex gap-4 mt-6">
                 <button
-                    onClick={onClose}
-                    className="absolute p-2 transition-all rounded-full top-4 right-4 bg-white/20 hover:bg-white/40"
+                    onClick={captureImage}
+                    className="flex items-center gap-2 px-6 py-3 text-white transition-all bg-blue-600 rounded-xl hover:bg-blue-700"
                 >
-                    <X className="text-white" />
+                    <Camera className="w-5 h-5" />
+                    Capture Photo
                 </button>
             </div>
-            <button
-                onClick={captureImage}
-                className="flex items-center gap-2 px-8 py-4 mt-6 text-white transition-all bg-blue-600 rounded-xl hover:bg-blue-700"
-            >
-                <Camera className="w-5 h-5" />
-                Capture Photo
-            </button>
         </div>
     );
 };
