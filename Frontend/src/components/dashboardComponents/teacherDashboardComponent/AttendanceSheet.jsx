@@ -19,7 +19,7 @@ import {
   SyncOutlined
 } from '@ant-design/icons';
 import store from '../../../zustand/loginStore';
-import useAttendanceStore from '/Users/aashiqmahato/Documents/Codes/Attendance Management System/Frontend/src/zustand/attendanceStore.js';
+import useAttendanceStore from '../../../zustand/attendanceStore.js';
 import { motion } from 'framer-motion';
 // Create axios instance with default config
 
