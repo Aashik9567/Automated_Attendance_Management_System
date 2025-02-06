@@ -9,7 +9,7 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: ['http://localhost:5173', 'http://localhost:3000','https://aams-frontend.onrender.com'], // Add all your frontend URLs
+  origin: "*", // Add all your frontend URLs
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
