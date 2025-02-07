@@ -92,29 +92,6 @@ const StudentAttendance = () => {
       console.error('Error fetching attendance data:', error);
     }
   };
-
-  const pieData = [
-    { type: 'Present', value: attendanceData.filter(a => a.status === 'present').length },
-    { type: 'Absent', value: attendanceData.filter(a => a.status === 'absent').length },
-  ];
-
- // Updated pie chart configuration
- const pieConfig = {
-  data: pieData,
-  angleField: 'value',
-  colorField: 'type',
-  radius: 0.8,
-  color: ['#52c41a', '#ff4d4f'],
-  interactions: [{ type: 'element-active' }],
-  label: {
-    content: '{name}\n{percentage}',
-    style: {
-      fill: '#fff',
-      fontSize: 14,
-    },
-  },
-};
-
   
   // Modified bar chart configuration
   const barConfig = {
@@ -271,18 +248,6 @@ const StudentAttendance = () => {
 
         {/* Data Visualization Section */}
         <div className="grid gap-4 mb-4 md:gap-6 md:mb-8 md:grid-cols-2">
-          {/* Pie Chart with Glassmorphism */}
-          <motion.div
-            whileHover={{ scale: 1.01 }}
-            className="relative p-3 overflow-hidden md:p-6 rounded-xl"
-            style={glassStyle}
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <PieChartOutlined className="text-base text-blue-600 md:text-xl" />
-              <Text strong className="text-sm md:text-lg">Attendance Distribution</Text>
-            </div>
-            <Pie {...pieConfig} height={screens.xs ? 200 : screens.md ? 300 : 250} />
-          </motion.div>
 
           {/* Bar Chart with Glassmorphism */}
           <motion.div
