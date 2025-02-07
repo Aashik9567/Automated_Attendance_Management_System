@@ -223,7 +223,7 @@ const StudentAttendance = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen p-2 md:p-6 bg-gradient-to-br from-blue-400/20 to-purple-500/20"
+      className="min-h-screen p-2 md:p-6 bg-gradient-to-br from-blue-400/20 to-purple-500/20 rounded-xl"
     >
       <div className="mx-auto max-w-7xl">
         {/* Animated Header with Glassmorphism */}

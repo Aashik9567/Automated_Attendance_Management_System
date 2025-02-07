@@ -117,74 +117,116 @@ const StudentStats = () => {
   }, []);
 
   const subjectColumns = [
-    { title: 'Subject', dataIndex: 'subjectName', key: 'subjectName' },
-    { title: 'Code', dataIndex: 'subjectCode', key: 'subjectCode' },
+    { 
+      title: 'Subject', 
+      dataIndex: 'subjectName', 
+      key: 'subjectName',
+      render: (text) => (
+        <span className="text-xs font-medium sm:text-sm md:text-base">{text}</span>
+      )
+    },
+    { 
+      title: 'Code', 
+      dataIndex: 'subjectCode', 
+      key: 'subjectCode',
+      render: (text) => (
+        <span className="text-xs sm:text-sm md:text-base">{text}</span>
+      ),
+      responsive: ['sm']
+    },
     {
       title: 'Attendance Rate',
       dataIndex: 'attendanceRate',
       key: 'attendanceRate',
       render: rate => (
-        <Progress 
-          percent={Number(rate.toFixed(2))} 
-          size="small" 
-          status={rate < 75 ? 'exception' : 'success'}
-        />
+        <div className="w-[100px] sm:w-[150px] md:w-[200px]">
+          <Progress 
+            percent={Number(rate.toFixed(2))} 
+            size="small" 
+            status={rate < 75 ? 'exception' : 'success'}
+            className="text-xs sm:text-sm md:text-base"
+          />
+        </div>
       )
     },
-    { title: 'Total Classes', dataIndex: 'totalClasses', key: 'totalClasses' }
+    { 
+      title: 'Total Classes', 
+      dataIndex: 'totalClasses', 
+      key: 'totalClasses',
+      render: (text) => (
+        <span className="text-xs sm:text-sm md:text-base">{text}</span>
+      ),
+      responsive: ['md']
+    }
   ];
 
-  if (loading) return <Spin size="large" className="flex justify-center mt-8" />;
+  if (loading) return (
+    <div className="flex justify-center items-center min-h-[300px]">
+      <Spin size="large" />
+    </div>
+  );
 
   return (
-    <div className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-2">
-            <motion.div 
-                whileHover={{ scale: 1.02 }}
-                className="p-6 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl"
-            >
-                <div className="flex items-center justify-between">
-                    <div>
-                        <p className="text-sm font-medium text-blue-100">Total Students</p>
-                        <p className="mt-2 text-3xl font-bold text-white">{stats.totalStudents}</p>
-                    </div>
-                    <div className="p-3 bg-white/10 rounded-xl">
-                        <Users className="w-8 h-8 text-white" />
-                    </div>
-                </div>
-            </motion.div>
+    <div className="p-2 space-y-4 sm:space-y-6 sm:p-4 md:p-6">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 md:gap-6">
+        <motion.div 
+          whileHover={{ scale: 1.02 }}
+          className="p-4 rounded-lg sm:p-5 md:p-6 bg-gradient-to-br from-blue-600 to-indigo-700 sm:rounded-xl md:rounded-2xl"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-blue-100 sm:text-sm md:text-base">
+                Total Students
+              </p>
+              <p className="mt-1 text-xl font-bold text-white sm:mt-2 sm:text-2xl md:text-3xl">
+                {stats.totalStudents}
+              </p>
+            </div>
+            <div className="p-2 rounded-lg sm:p-3 bg-white/10 sm:rounded-xl">
+              <Users className="w-6 h-6 text-white sm:w-7 sm:h-7 md:w-8 md:h-8" />
+            </div>
+          </div>
+        </motion.div>
 
-            <motion.div 
-                whileHover={{ scale: 1.02 }}
-                className="p-6 bg-gradient-to-br from-green-600 to-emerald-700 rounded-2xl"
-            >
-                <div className="flex items-center justify-between">
-                    <div>
-                        <p className="text-sm font-medium text-green-100">Avg Attendance</p>
-                        <p className="mt-2 text-3xl font-bold text-white">
-                            {stats.averageAttendance.toFixed(2)}%
-                        </p>
-                    </div>
-                    <div className="p-3 bg-white/10 rounded-xl">
-                        <LineChart className="w-8 h-8 text-white" />
-                    </div>
-                </div>
-            </motion.div>
-        </div>
+        <motion.div 
+          whileHover={{ scale: 1.02 }}
+          className="p-4 rounded-lg sm:p-5 md:p-6 bg-gradient-to-br from-green-600 to-emerald-700 sm:rounded-xl md:rounded-2xl"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-green-100 sm:text-sm md:text-base">
+                Avg Attendance
+              </p>
+              <p className="mt-1 text-xl font-bold text-white sm:mt-2 sm:text-2xl md:text-3xl">
+                {stats.averageAttendance.toFixed(2)}%
+              </p>
+            </div>
+            <div className="p-2 rounded-lg sm:p-3 bg-white/10 sm:rounded-xl">
+              <LineChart className="w-6 h-6 text-white sm:w-7 sm:h-7 md:w-8 md:h-8" />
+            </div>
+          </div>
+        </motion.div>
+      </div>
 
-        <div className="p-6 bg-white shadow-sm rounded-2xl">
-            <h4 className="mb-4 text-xl font-semibold text-gray-800">Subject Performance</h4>
-            <Table
-                columns={subjectColumns}
-                dataSource={stats.attendanceBySubject}
-                rowKey="subjectCode"
-                pagination={false}
-                rowClassName="hover:bg-gray-50 transition-colors"
-                className="overflow-hidden rounded-lg"
-            />
+      <div className="p-3 bg-white rounded-lg shadow-sm sm:p-4 md:p-6 sm:rounded-xl md:rounded-2xl">
+        <h4 className="mb-2 text-base font-semibold text-gray-800 sm:mb-3 md:mb-4 sm:text-lg md:text-xl">
+          Subject Performance
+        </h4>
+        <div className="-mx-3 overflow-x-auto sm:-mx-4">
+          <Table
+            columns={subjectColumns}
+            dataSource={stats.attendanceBySubject}
+            rowKey="subjectCode"
+            pagination={false}
+            rowClassName="hover:bg-gray-50 transition-colors"
+            className="min-w-full"
+            scroll={{ x: 'max-content' }}
+            size={window.innerWidth < 640 ? 'small' : 'middle'}
+          />
         </div>
+      </div>
     </div>
-);
+  );
 };
 
 export default StudentStats;

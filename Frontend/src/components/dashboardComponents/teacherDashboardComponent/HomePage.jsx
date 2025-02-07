@@ -68,8 +68,8 @@ const HomePage = () => {
     }
 
     return (
-        <div className="min-h-screen p-8 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
-            <div className="grid grid-cols-1 gap-8 mx-auto max-w-7xl lg:grid-cols-2">
+        <div className="min-h-screen p-6 rounded-xl bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+            <div className="grid grid-cols-1 gap-6 mx-auto max-w-7xl lg:grid-cols-2">
                 {/* Image Upload Component */}
                 <ImageUploadForAttendance 
                     subjects={subjects}
@@ -81,7 +81,7 @@ const HomePage = () => {
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="p-8 border shadow-2xl bg-white/5 backdrop-blur-xl rounded-3xl border-white/10"
+                        className="p-6 border shadow-2xl bg-white/5 backdrop-blur-xl rounded-3xl border-white/10"
                     >
                         <h3 className="mb-8 text-2xl font-bold text-transparent bg-gradient-to-r from-blue-400 to-purple-300 bg-clip-text">
                             Academic Dashboard
@@ -126,7 +126,7 @@ const HomePage = () => {
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="p-8 border shadow-2xl bg-white/5 backdrop-blur-xl rounded-3xl border-white/10"
+                        className="p-4 border shadow-2xl bg-white/5 backdrop-blur-xl rounded-3xl border-white/10"
                     >
                         <h3 className="mb-6 text-2xl font-bold text-transparent bg-gradient-to-r from-emerald-400 to-cyan-300 bg-clip-text">
                             Student Insights

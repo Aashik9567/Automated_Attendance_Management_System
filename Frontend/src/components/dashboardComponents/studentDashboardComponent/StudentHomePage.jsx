@@ -101,7 +101,7 @@ const StudentHomePage = () => {
     }
 
     return (
-        <div className="min-h-screen p-8 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+        <div className="min-h-screen p-8 rounded-xl bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
             <div className="grid grid-cols-1 gap-8 mx-auto max-w-7xl lg:grid-cols-2">
                 {/* Main Performance Dashboard */}
                 <motion.div

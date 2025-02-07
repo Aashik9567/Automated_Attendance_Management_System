@@ -132,29 +132,36 @@ const TeacherDashboard = () => {
           </header>
           <div className="p-1">
             <motion.header
-              className="px-4 py-8 mx-1 my-1 shadow-2xl bg-gradient-to-br from-indigo-600 to-purple-500 sm:px-8 rounded-[1rem] backdrop-blur-sm bg-opacity-90 border border-white/20"
+              className="px-3 py-4 mx-1 my-1 shadow-2xl bg-gradient-to-br from-indigo-600 to-purple-500 
+    sm:px-6 md:px-8 md:py-8 rounded-[0.75rem] sm:rounded-[1rem] backdrop-blur-sm bg-opacity-90 
+    border border-white/20"
               initial={{ opacity: 0, y: -50, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.6, type: 'spring' }}
             >
               <div className="max-w-6xl mx-auto">
-                <h2 className="mb-2 text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-purple-100">
-                  {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
-                  <span className="ml-4 text-3xl">👩🏫</span>
+                <h2 className="flex items-center gap-2 mb-2 text-2xl font-bold text-transparent sm:text-3xl md:text-4xl lg:text-5xl bg-clip-text bg-gradient-to-r from-white to-purple-100">
+                  <span className="truncate">
+                    {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+                  </span>
+                  <span className="flex-shrink-0 text-xl sm:text-2xl md:text-3xl">👩🏫</span>
                 </h2>
-                <motion.p
-                  className={`text-lg font-medium text-purple-100/90 ${activeTab === 'Home' ? 'block' : 'hidden'
-                    }`}
+                <motion.div
+                  className={`space-y-1 ${activeTab === 'Home' ? 'block' : 'hidden'}`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: activeTab === 'Home' ? 1 : 0 }}
                   transition={{ delay: 0.3 }}
                 >
-                  Shaping young minds, one lesson at a time<br />
-                  <span className="text-sm font-normal">Welcome back, Prof. {loginUserData.fullName}</span>
-                </motion.p>
+                  <p className="text-sm font-medium sm:text-base md:text-lg text-purple-100/90">
+                    Shaping young minds, one lesson at a time
+                  </p>
+                  <p className="text-xs font-normal sm:text-sm text-purple-100/80">
+                    Welcome back, Prof. {loginUserData?.fullName}
+                  </p>
+                </motion.div>
               </div>
             </motion.header>
-            <Outlet context={{ changeTab }} />
+            <Outlet className="rounded-xl" context={{ changeTab }} />
           </div>
         </main>
 

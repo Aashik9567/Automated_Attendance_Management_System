@@ -247,7 +247,7 @@ const StudentAssignmentViewer = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen p-4 md:p-6 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900"
+      className="min-h-screen p-4 md:p-6 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 rounded-xl"
     >
       <Card className="border shadow-xl rounded-xl backdrop-blur-lg bg-white/5 border-white/10">
         <motion.div
