@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaUserCheck, FaChartLine, FaDatabase, FaShieldAlt, FaRocket,FaFacebook, FaTimes } from 'react-icons/fa';
+import { FaUserCheck, FaChartLine, FaDatabase, FaShieldAlt, FaRocket, FaFacebook, FaTimes } from 'react-icons/fa';
 import logo from '../../assets/Logo.svg';
 import { Link } from 'react-router-dom';
 import { ReactTyped } from "react-typed";
@@ -9,19 +9,24 @@ const LandingPage = () => {
     <div className="min-h-screen text-white bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-black/30 backdrop-blur-md">
-        <nav className="container flex items-center justify-between px-4 py-4 mx-auto">
-          <div className="flex items-center space-x-3">
-            <img className="w-[60px] h-[60px] rounded-full" src={logo} alt="logo" />
-            <span className="text-2xl font-bold text-transparent bg-gradient-to-r from-blue-400 to-purple-300 bg-clip-text">
+        <nav className="container flex flex-wrap items-center justify-between px-4 py-4 mx-auto">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <img className="w-10 h-10 sm:w-[60px] sm:h-[60px] rounded-full" src={logo} alt="logo" />
+            <span className="text-xl font-bold text-transparent sm:text-2xl bg-gradient-to-r from-blue-400 to-purple-300 bg-clip-text">
               AttendEase
             </span>
           </div>
-          
-          <div className="flex items-center space-x-4">
-            <Link to="/teacherdashboard" className="px-6 py-2 font-medium transition-all duration-300 rounded-full bg-white/10 hover:bg-white/20 hover:shadow-glow">
+          <div className="flex items-center mt-2 space-x-2 sm:space-x-4 sm:mt-0">
+            <Link
+              to="/teacherdashboard"
+              className="px-4 py-2 text-xs font-medium transition-all duration-300 rounded-full sm:text-base bg-white/10 hover:bg-white/20 hover:shadow-glow"
+            >
               Educator Portal
             </Link>
-            <Link to="/login" className="px-6 py-2 font-medium text-purple-900 transition-all duration-300 bg-purple-300 rounded-lg hover:bg-purple-400 hover:shadow-glow">
+            <Link
+              to="/login"
+              className="px-4 py-2 text-xs font-medium text-purple-900 transition-all duration-300 bg-purple-300 rounded-lg sm:text-base hover:bg-purple-400 hover:shadow-glow"
+            >
               Login
             </Link>
           </div>
@@ -40,7 +45,7 @@ const LandingPage = () => {
             />
           </h1>
           <p className="max-w-2xl mx-auto mb-8 text-lg text-gray-200 sm:text-xl">
-            Revolutionizing academic attendance management through cutting-edge AI-powered facial recognition, 
+            Revolutionizing academic attendance management through cutting-edge AI-powered facial recognition,
             ensuring 99.6% accuracy with real-time processing and secure cloud integration.
           </p>
           <div className="flex justify-center space-x-4">
@@ -59,7 +64,7 @@ const LandingPage = () => {
         <h2 className="mb-16 text-3xl font-bold text-center sm:text-4xl">Core Technologies</h2>
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <FeatureCard
-            icon={<FaUserCheck className="w-12 h-12"/>}
+            icon={<FaUserCheck className="w-12 h-12" />}
             title="Real-Time Detection"
             description="YOLOv8-powered face detection with multi-angle recognition capabilities"
           />
@@ -108,7 +113,7 @@ const LandingPage = () => {
             </div>
             <div>
               <h4 className="mb-4 font-semibold">Contact</h4>
-              <p className="text-gray-400">IOE Engineering Campus<br/>Kathmandu, Nepal<br/>aashik.077bei002@acem.edu.np</p>
+              <p className="text-gray-400">IOE Engineering Campus<br />Kathmandu, Nepal<br />aashik.077bei002@acem.edu.np</p>
             </div>
           </div>
           <div className="pt-8 mt-8 text-center border-t border-white/10">
