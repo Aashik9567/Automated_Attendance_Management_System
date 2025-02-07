@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Card, Button, Modal, Form, Input, Select, DatePicker, Table, Tag, message, Typography, Upload ,Grid
-} from 'antd';
-import { 
-  PlusOutlined, UploadOutlined, DeleteOutlined, EditOutlined, CheckCircleOutlined,
-} from '@ant-design/icons';
+import { Card, Button, Modal, Form, Input, Select, DatePicker, Table, Tag, message, Typography, Upload ,Grid} from 'antd';
+import { PlusOutlined, UploadOutlined, DeleteOutlined, EditOutlined} from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import dayjs from 'dayjs';

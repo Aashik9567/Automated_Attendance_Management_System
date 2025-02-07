@@ -16,45 +16,26 @@ const StudentStats = () => {
   const { loginUserData } = store(state => state);
   const fetchData = async () => {
     try {
-      console.log("Fetching data...");
-      console.log("Base URL:", loginUserData.baseURL);
-  
-      // Fetch total students
       const studentsRes = await axios.get(`${loginUserData.baseURL}/users/students`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
       });
-      console.log("Students Response:", studentsRes.status, studentsRes.data);
       const totalStudents = studentsRes.data.data.length;
-  
-      // Fetch subjects
       const subjectsRes = await axios.get(`${loginUserData.baseURL}/subjects`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
       });
-      console.log("Subjects Response:", subjectsRes.status, subjectsRes.data);
       const subjects = subjectsRes.data.data;
       const totalSubjects = subjects.length;
-  
-      // Process attendance for each subject
       const attendanceBySubject = [];
       let totalAttendanceRate = 0;
   
       for (const subject of subjects) {
         try {
-          console.log(`Fetching attendance for subject: ${subject.name} (${subject._id})`);
           const attendanceRes = await axios.get(
             `${loginUserData.baseURL}/attendance/subject/${subject._id}`,
             {
               headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
             }
           );
-          console.log(
-            `Attendance Response for ${subject.name}:`,
-            attendanceRes.status,
-            attendanceRes.data
-          );
-  
-          // Depending on your backend response structure, adjust here.
-          // If your API wraps data in a "data" property, use that.
           const attendanceRecords = attendanceRes.data.data || attendanceRes.data;
   
           // Calculate per-student attendance within the subject
