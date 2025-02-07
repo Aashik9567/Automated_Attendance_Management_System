@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Users, BookOpen, AlertCircle } from 'lucide-react';
+import { Users, BookOpen } from 'lucide-react';
+import axios from "axios";
+import { message } from "antd";
 import { useNavigate } from "react-router-dom";
+import { ReactTyped } from 'react-typed';
 import { motion } from 'framer-motion';
 import store from '../../../zustand/loginStore';
-import StudentStats from './StudentStats';
 import useAttendanceStore from "../../../zustand/attendanceStore.js";
-import SubjectSetup from './SubjectSetup';
+
+import StudentStats from './StudentStats';
 import ImageUploadForAttendance from './ImageUploadForAttendance';
+import SubjectSetup from './SubjectSetup';
 
 const HomePage = () => {
     const { loginUserData } = store(state => state);
@@ -20,23 +24,32 @@ const HomePage = () => {
         const fetchSubjects = async () => {
             try {
                 const accessToken = localStorage.getItem('accessToken');
+
                 const response = await axios.get(`${loginUserData.baseURL}/subjects`, {
-                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
                 });
 
-                setSubjects(response.data.data || []);
+                // Ensure we're setting an array
+                const fetchedSubjects = response.data.data || [];
+                setSubjects(fetchedSubjects);
                 setError(null);
             } catch (error) {
                 setSubjects([]);
                 setError(error.response?.data?.message || 'Failed to fetch subjects');
-                if (error.response?.status === 401) navigate('/login');
+
+                // Optional: Redirect to login if unauthorized
+                if (error.response?.status === 401) {
+                    navigate('/login');
+                }
             } finally {
                 setLoading(false);
             }
         };
 
         fetchSubjects();
-    }, [navigate]);
+    }, [navigate, loginUserData.baseURL]);
 
     const handleSubjectCreated = (newSubject) => {
         setSubjects(prevSubjects => [...prevSubjects, newSubject]);
@@ -57,7 +70,7 @@ const HomePage = () => {
     return (
         <div className="min-h-screen p-8 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
             <div className="grid grid-cols-1 gap-8 mx-auto max-w-7xl lg:grid-cols-2">
-                {/* Upload Section */}
+                {/* Image Upload Component */}
                 <ImageUploadForAttendance 
                     subjects={subjects}
                     addAttendanceRecord={addAttendanceRecord}
@@ -73,6 +86,7 @@ const HomePage = () => {
                         <h3 className="mb-8 text-2xl font-bold text-transparent bg-gradient-to-r from-blue-400 to-purple-300 bg-clip-text">
                             Academic Dashboard
                         </h3>
+
                         <div className="space-y-6">
                             <motion.button
                                 whileHover={{ y: -2 }}

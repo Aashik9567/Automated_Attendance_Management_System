@@ -16,7 +16,7 @@ export const createSubject = asyncHandler(async (req, res) => {
     await subject.save();
 
     // Get all students and create their subject enrollments
-    const students = await User.find({ role: "STUDENT" });
+    const students = await User.find({ role: "Student" });
     
     // Create StudentSubject entries for all students
     await StudentSubject.insertMany(

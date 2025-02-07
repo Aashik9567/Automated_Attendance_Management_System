@@ -20,7 +20,7 @@ const TeacherDashboard = () => {
   const handleLogout = async () => {
     try {
       const accessToken = localStorage.getItem('accessToken');
-      const response = await axios.post(`${loginUserData.baseURL}/v1/users/logout`, {}, {
+      const response = await axios.post(`${loginUserData.baseURL}/users/logout`, {}, {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }
