@@ -106,10 +106,9 @@ const ImageUploadForAttendance = ({ subjects, addAttendanceRecord }) => {
         handleFile(file);
     };
 
+    // Modified: We removed the revoking of the URL to ensure the preview remains persistent.
     const handleImageLoad = () => {
-        if (imagePreviewUrl) {
-            URL.revokeObjectURL(imagePreviewUrl);
-        }
+        // No longer revoking the object URL so the preview stays visible.
     };
 
     const handleUpload = async () => {
@@ -243,9 +242,9 @@ const ImageUploadForAttendance = ({ subjects, addAttendanceRecord }) => {
                             />
                             <button
                                 onClick={() => {
-                                setImagePreviewUrl(null);
-                                setImage(null);
-                                setResults(null);
+                                    setImagePreviewUrl(null);
+                                    setImage(null);
+                                    setResults(null);
                                 }}
                                 className="absolute p-2 transition-all rounded-full bg-black/50 top-2 right-2 hover:bg-black/70"
                             >
@@ -336,7 +335,7 @@ const ImageUploadForAttendance = ({ subjects, addAttendanceRecord }) => {
                             </h3>
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between p-4 rounded-lg bg-black/20">
-                                    <span className="text-blue-300">Total Detections</span>
+                                    <span className="text-blue-100">Total Detections</span>
                                     <span className="text-2xl font-bold text-emerald-400">
                                         {results.faces_detected}
                                     </span>
@@ -350,8 +349,8 @@ const ImageUploadForAttendance = ({ subjects, addAttendanceRecord }) => {
                                     >
                                         <div className="flex items-center justify-between">
                                             <div>
-                                                <h4 className="font-medium text-blue-200">{face.name}</h4>
-                                                <p className="text-sm text-blue-300/80">
+                                                <h4 className="font-medium text-white">{face.name}</h4>
+                                                <p className="text-sm text-blue-100/80">
                                                     Confidence: {(face.confidence * 100).toFixed(1)}%
                                                 </p>
                                             </div>
