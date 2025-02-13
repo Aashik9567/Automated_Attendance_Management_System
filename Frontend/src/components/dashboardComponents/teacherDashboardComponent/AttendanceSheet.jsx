@@ -109,7 +109,7 @@ const loadStudents = async () => {
                  rs.name.toLowerCase().trim() === student.name.toLowerCase().trim()
           );
           if (recognizedStudent) {
-            student.present = recognizedStudent.confidence >= 0.75;
+            student.present = recognizedStudent.confidence >= 0.70;
             student.confidence = recognizedStudent.confidence;
           }
         });
