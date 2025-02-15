@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Users, BookOpen } from 'lucide-react';
 import axios from "axios";
-import { message } from "antd";
 import { useNavigate } from "react-router-dom";
-import { ReactTyped } from 'react-typed';
 import { motion } from 'framer-motion';
 import store from '../../../zustand/loginStore';
 import useAttendanceStore from "../../../zustand/attendanceStore.js";
@@ -139,5 +137,4 @@ const HomePage = () => {
         </div>
     );
 };
-
 export default HomePage;

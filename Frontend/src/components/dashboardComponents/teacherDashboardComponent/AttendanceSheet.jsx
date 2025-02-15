@@ -15,18 +15,16 @@ import {
   CalendarOutlined, 
   BookOutlined, 
   CheckCircleOutlined,
-  CloseCircleOutlined ,
+  CloseCircleOutlined,
   SyncOutlined
 } from '@ant-design/icons';
 import store from '../../../zustand/loginStore';
 import useAttendanceStore from '../../../zustand/attendanceStore.js';
 import { motion } from 'framer-motion';
-// Create axios instance with default config
-
 
 const AttendanceSheet = () => {
   const [subjects, setSubjects] = useState([]);
-  const {loginUserData }= store(state => state);
+  const { loginUserData } = store(state => state);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [attendanceDate, setAttendanceDate] = useState(moment());
   const [attendanceData, setAttendanceData] = useState([]);
@@ -34,6 +32,7 @@ const AttendanceSheet = () => {
   const [loading, setLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const { attendanceRecords, addAttendanceRecord } = useAttendanceStore();
+  
   const api = axios.create({
     baseURL: loginUserData.baseURL,
     headers: {
@@ -49,6 +48,7 @@ const AttendanceSheet = () => {
     }
     return config;
   });
+
   // Responsive check
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -79,12 +79,12 @@ const AttendanceSheet = () => {
     }
   }, [selectedSubject, attendanceRecords]);
 
-const loadStudents = async () => {
+  const loadStudents = async () => {
     setLoading(true);
     try {
       const response = await api.get('/users/students');
       
-      // Add null checks and validation
+      // Find the latest record for this subject
       const latestRecord = attendanceRecords
         .filter(record => 
           record && 
@@ -101,7 +101,8 @@ const loadStudents = async () => {
         present: false,
         confidence: 0
       }));
-  // Update with recognition data if available
+      
+      // Update with recognition data if available
       if (latestRecord && Array.isArray(latestRecord.students)) {
         studentsWithAttendance.forEach(student => {
           const recognizedStudent = latestRecord.students.find(
@@ -127,7 +128,6 @@ const loadStudents = async () => {
       setLoading(false);
     }
   };
-
 
   const handleAttendanceSubmit = async () => {
     try {
@@ -247,185 +247,114 @@ const loadStudents = async () => {
     }
   ];
 
+  // Calculate summary data
+  const totalStudents = attendanceData.length;
+  const totalPresent = attendanceData.filter(student => student.present).length;
+  const totalAbsent = totalStudents - totalPresent;
+
   return (
     <div className="min-h-screen p-4 rounded-xl md:p-8 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
-    <motion.div 
-      initial={{ opacity: 0 }} 
-      animate={{ opacity: 1 }} 
-      className="mx-auto space-y-8 max-w-7xl"
-    >
-      {/* Header Section */}
-      <motion.div
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="relative p-8 overflow-hidden border shadow-2xl bg-white/5 backdrop-blur-xl rounded-3xl border-white/10"
+      <motion.div 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        className="mx-auto space-y-8 max-w-7xl"
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20" />
-        
-        <div className="relative">
-          <div className="flex items-center mb-6">
-            <motion.div
-              animate={{ rotate: [0, 10, -10, 0] }}
-              transition={{ repeat: Infinity, duration: 4 }}
-              className="mr-4"
-            >
-              <CalendarOutlined className="text-3xl text-purple-400" />
-            </motion.div>
-            <h1 className="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-400 to-purple-300 bg-clip-text">
-              <ReactTyped
-                strings={["Attendance Management Portal"]}
-                typeSpeed={40}
-                showCursor={false}
-              />
-            </h1>
+        {/* Header Section */}
+        <motion.div
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="relative p-8 overflow-hidden border shadow-2xl bg-white/5 backdrop-blur-xl rounded-3xl border-white/10"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20" />
+          <div className="relative">
+            <div className="flex items-center mb-6">
+              <motion.div
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ repeat: Infinity, duration: 4 }}
+                className="mr-4"
+              >
+                <CalendarOutlined className="text-3xl text-purple-400" />
+              </motion.div>
+              <h1 className="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-400 to-purple-300 bg-clip-text">
+                <ReactTyped
+                  strings={["Attendance Management Portal"]}
+                  typeSpeed={40}
+                  showCursor={false}
+                />
+              </h1>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <motion.div whileHover={{ scale: 1.02 }} className="space-y-2">
+                <label className="block font-medium text-blue-200">Subject</label>
+                <Select
+                  placeholder="Select Subject"
+                  className="w-full"
+                  onChange={value => setSelectedSubject(value)}
+                  options={subjects.map(subject => ({
+                    value: subject._id,
+                    label: isMobile ? subject.name : `${subject.name} (${subject.code})`
+                  }))}
+                  popupClassName="bg-slate-200 border-white/10"
+                />
+              </motion.div>
+
+              <motion.div whileHover={{ scale: 1.02 }} className="space-y-2">
+                <label className="block font-medium text-blue-200">Date</label>
+                <DatePicker
+                  className="w-full"
+                  value={attendanceDate}
+                  onChange={date => setAttendanceDate(date)}
+                />
+              </motion.div>
+            </div>
           </div>
+        </motion.div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <motion.div whileHover={{ scale: 1.02 }} className="space-y-2">
-              <label className="block font-medium text-blue-200">Subject</label>
-              <Select
-                placeholder="Select Subject"
-                className="w-full"
-                onChange={value => setSelectedSubject(value)}
-                options={subjects.map(subject => ({
-                  value: subject._id,
-                  label: isMobile ? subject.name : `${subject.name} (${subject.code})`
-                }))}
-                popupClassName="bg-slate-200 border-white/10"
-              />
-            </motion.div>
+        {/* Attendance Table */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="overflow-hidden border shadow-2xl bg-white/5 backdrop-blur-xl rounded-3xl border-white/10"
+        >
+          <Table
+            columns={columns}
+            dataSource={attendanceData}
+            loading={loading}
+            rowKey="id"
+            className="custom-dark-table"
+            rowClassName="hover:bg-white/5 transition-colors"
+            pagination={{
+              className: 'custom-dark-pagination',
+              position: ['bottomRight']
+            }}
+          />
+        </motion.div>
 
-            <motion.div whileHover={{ scale: 1.02 }} className="space-y-2">
-              <label className="block font-medium text-blue-200">Date</label>
-              <DatePicker
-                className="w-full"
-                value={attendanceDate}
-                onChange={date => setAttendanceDate(date)}
-              />
-            </motion.div>
+        {/* Summary Section */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="grid grid-cols-1 gap-4 md:grid-cols-3"
+        >
+          <div className="p-4 text-center bg-white rounded-lg shadow-lg bg-opacity-10 backdrop-blur-xl">
+            <h3 className="text-xl font-semibold text-white">Total Students</h3>
+            <p className="mt-2 text-2xl text-blue-200">{totalStudents}</p>
           </div>
-        </div>
-      </motion.div>
+          <div className="p-4 text-center bg-white rounded-lg shadow-lg bg-opacity-10 backdrop-blur-xl">
+            <h3 className="text-xl font-semibold text-white">Present</h3>
+            <p className="mt-2 text-2xl text-green-400">{totalPresent}</p>
+          </div>
+          <div className="p-4 text-center bg-white rounded-lg shadow-lg bg-opacity-10 backdrop-blur-xl">
+            <h3 className="text-xl font-semibold text-white">Absent</h3>
+            <p className="mt-2 text-2xl text-red-400">{totalAbsent}</p>
+          </div>
+        </motion.div>
 
-      {/* Attendance Table */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="overflow-hidden border shadow-2xl bg-white/5 backdrop-blur-xl rounded-3xl border-white/10"
-      >
-        <Table
-          columns={[
-            {
-              title: 'Student',
-              key: 'mobile-view',
-              responsive: ['xs'],
-              render: (_, record) => (
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <span className="font-medium">
-                      <UserOutlined className="mr-2 text-blue-500" />
-                      {record.name.split(' ')[0]} {/* Show first name only */}
-                    </span>
-                    <span className="text-xs text-gray-700">
-                      Sem {record.semester}
-                    </span>
-                  </div>
-                  <Tag 
-                    icon={record.present ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
-                    color={record.present ? 'green' : 'red'}
-                    className="ml-2"
-                  >
-                    {isMobile ? '' : record.present ? 'Present' : 'Absent'}
-                  </Tag>
-                </div>
-              )
-            },
-            {
-              title: 'Name',
-              dataIndex: 'name',
-              key: 'name',
-              responsive: ['md'],
-              render: (name, record) => (
-                <div className="flex items-center">
-                  <UserOutlined className="mr-2 text-blue-500" />
-                  {name}
-                  {recognizedStudents.some(rs => 
-                    rs.name.toLowerCase() === name.toLowerCase()
-                  ) && (
-                    <Tag color="blue" className="hidden ml-2 md:inline">
-                      {(record.confidence * 100).toFixed(2)}%
-                    </Tag>
-                  )}
-                </div>
-              )
-            },
-            {
-              title: 'Semester',
-              dataIndex: 'semester',
-              key: 'semester',
-              responsive: ['md'],
-              render: (semester) => (
-                <div className="flex items-center">
-                  <BookOutlined className="mr-2 text-green-500" />
-                  {semester}
-                </div>
-              )
-            },
-            {
-              title: 'Status',
-              dataIndex: 'present',
-              key: 'status',
-              responsive: ['md'],
-              render: (present) => (
-                <Tag 
-                  icon={present ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
-                  color={present ? 'green' : 'red'}
-                >
-                  {present ? 'Present' : 'Absent'}
-                </Tag>
-              )
-            },
-            {
-              title: 'Actions',
-              key: 'actions',
-              render: (_, record) => (
-                <Button 
-                  onClick={() => {
-                    setAttendanceData(prev => 
-                      prev.map(student => 
-                        student.id === record.id 
-                          ? { ...student, present: !student.present } 
-                          : student
-                      )
-                    );
-                  }}
-                  type="link"
-                  className="p-0"
-                >
-                  {isMobile ? (
-                    <SyncOutlined className="text-blue-600" />
-                  ) : (
-                    <span className="text-blue-600">Toggle</span>
-                  )}
-                </Button>
-              )
-            }
-          ]}
-          dataSource={attendanceData}
-          loading={loading}
-          rowKey="id"
-          className="custom-dark-table"
-          rowClassName="hover:bg-white/5 transition-colors"
-          pagination={{
-            className: 'custom-dark-pagination',
-            position: ['bottomRight']
-          }}
-        />
-      </motion.div>
-
-      {/* Submit Button */}
-      <motion.div
+        {/* Submit Button */}
+        <motion.div
           className="flex justify-end"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
