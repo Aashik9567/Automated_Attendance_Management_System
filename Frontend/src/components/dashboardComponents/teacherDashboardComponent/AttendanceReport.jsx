@@ -3,7 +3,7 @@ import { Typography, Row, Col, Select, Spin, message } from 'antd';
 import { Column, Pie } from '@ant-design/plots';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { Users, Calendar, TrendingUp, AlertCircle,ChevronDown } from 'lucide-react';
+import { Users, Calendar, TrendingUp, AlertCircle, ChevronDown } from 'lucide-react';
 import store from '../../../zustand/loginStore';
 
 const { Title, Text } = Typography;
@@ -23,7 +23,6 @@ const AttendanceReport = () => {
     totalAbsent: 0,
   });
 
-  // Keeping the original fetch functionality
   const fetchData = async () => {
     try {
       const subjectsRes = await axios.get(`${loginUserData.baseURL}/subjects`, {
@@ -95,17 +94,17 @@ const AttendanceReport = () => {
 
   const StatsCard = ({ icon, title, value, color }) => (
     <motion.div
-      whileHover={{ y: -4 }}
-      className="relative h-full p-6 overflow-hidden border shadow-2xl bg-white/5 backdrop-blur-xl rounded-2xl border-white/10"
+      whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+      className="relative h-full p-6 overflow-hidden bg-transparent border shadow-none rounded-3xl backdrop-blur-xl border-blue-400/20"
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-20" />
-      <div className="relative flex items-center justify-between">
-        <div className={`p-3 rounded-lg bg-gradient-to-br ${color}`}>
+      <div className="absolute inset-0 bg-gradient-radial from-sky-500/10 to-purple-600/10 opacity-20 rounded-3xl" />
+      <div className="relative z-10 flex items-center justify-between">
+        <div className={`p-3 rounded-3xl bg-gradient-to-br ${color}`}>
           {icon}
         </div>
         <div className="text-right">
           <Text className="!text-sm !text-blue-300 block mb-1">{title}</Text>
-          <Title level={3} className="!m-0 !text-transparent bg-gradient-to-r from-blue-400 to-purple-300 bg-clip-text">
+          <Title level={3} className="!m-0 text-sky-600 animate-pulse">
             {value}
           </Title>
         </div>
@@ -113,8 +112,6 @@ const AttendanceReport = () => {
     </motion.div>
   );
 
-
-  // Enhanced chart configurations
   const chartConfigs = {
     bar: {
       data: attendanceData,
@@ -124,33 +121,35 @@ const AttendanceReport = () => {
       color: ({ presentCount }) => {
         const maxPresent = Math.max(...attendanceData.map((d) => d.presentCount), 1);
         const ratio = presentCount / maxPresent;
-        return `l(270) 0:#3b82f6 1:#8b5cf6${ratio}`;
+        return `l(270) 0:${ratio > .7 ? '#3b82f6' : '#a5b4fc'} 1:${ratio > .7 ? '#8b5cf6' : '#d2b4f2'}`;
       },
       columnStyle: { 
-        radius: [8, 8, 0, 0],
-        shadowColor: 'rgba(0,0,0,0.05)',
-        shadowBlur: 10
+        radius: [12, 12, 0, 0],
+        shadowColor: 'rgba(79,70,229,0.08)',
+        shadowBlur: 18
       },
       label: {
         position: 'top',
         style: { 
-          fill: '#64748b',
+          fill: '#d4d4d4',
           fontSize: 12,
           fontWeight: 500 
         },
       },
       xAxis: {
+        line: { style: { fill: 'none', stroke: 'rgba(255,255,255,0.05)' } },
         label: {
           style: { 
-            fill: '#64748b',
+            fill: '#9ca3af',
             fontSize: 12
           }
         }
       },
       yAxis: {
+        grid: { line: { style: { dashArray: '2,2', strokeOpacity: 0.2 } } },
         label: {
           style: { 
-            fill: '#64748b',
+            fill: '#9ca3af',
             fontSize: 12
           }
         }
@@ -158,67 +157,64 @@ const AttendanceReport = () => {
     },
     pie: {
       data: [
-        { type: 'Present', value: overallStats.totalPresent },
-        { type: 'Absent', value: overallStats.totalAbsent },
+        { type: 'Present', value: overallStats.totalPresent, color: '#3b82f6' },
+        { type: 'Absent', value: overallStats.totalAbsent, color: '#f87171' }
       ],
       angleField: 'value',
       colorField: 'type',
-      color: ['#4ade80', '#f87171'],
-      innerRadius: 0.7,
+      innerRadius: 0.6,
+      pieStyle: {
+        lineWidth: 0,
+        stroke: 'transparent'
+      },
       label: {
-        content: '{percentage}',
+        type: 'spider',
+        position: 'outer',
+        content: '{value}',
         style: { 
-          fontSize: 14,
-          fontWeight: 500
-        },
+          fontSize: 12,
+          fontWeight: 500,
+          fill: '#d4d4d4',
+          textShadow: '0 1px 1px #222'
+        }
       },
       legend: {
         position: 'bottom',
         itemName: {
           style: { 
-            fill: '#64748b',
-            fontSize: 12
+            fill: '#d4d4d4',
+            fontSize: 10
           }
         }
       },
       statistic: {
         title: {
           style: {
-            fontSize: '14px',
+            fontSize: '10px',
             lineHeight: '1.2',
-            color: '#64748b'
+            color: '#64748b',
+            textShadow: '0 0 1px #111',
           },
-          content: 'Attendance'
+          content: ({ type }) => ` ${type === 'Present' ? '✅' : '❌'} ${type}`
         },
         content: {
           style: {
-            fontSize: '24px',
-            lineHeight: '1',
-            color: '#3b82f6'
+            fontSize: '14px',
+            fontWeight: 800,
+            color: '#e4e4e4',
+            textShadow: '0 0 2px #333'
           }
         }
       },
-      interactions: [{ type: 'element-active' }],
+      interactions: [{ type: 'element-single-selected' }],
     },
   };
-  chartConfigs.bar.color = '#3b82f6';
-  chartConfigs.bar.columnStyle = {
-    radius: [8, 8, 0, 0],
-    shadowColor: 'rgba(59, 130, 246, 0.2)',
-    shadowBlur: 12
-  };
-
-  chartConfigs.pie.color = ['#3b82f6', '#8b5cf6'];
 
   if (loading) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex items-center justify-center min-h-screen"
-      >
-        <Spin size="large" className="[&>.ant-spin-dot]:!size-10" />
-      </motion.div>
+      <div className="flex justify-center items-center min-h-[300px]">
+            <Spin size="large" />
+          </div>
     );
   }
 
@@ -227,44 +223,54 @@ const AttendanceReport = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="min-h-screen p-8 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900"
+      className="min-h-screen p-8 bg-gradient-to-br from-slate-600 via-blue-600 to-indigo-700"
     >
       <div className="mx-auto space-y-8 max-w-7xl">
-        {/* Header Section */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="p-8 border shadow-2xl bg-white/5 backdrop-blur-xl rounded-3xl border-white/10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative p-8 border shadow-2xl bg-gradient-radial from-white/5 to-slate-700 backdrop-blur-lg rounded-3xl border-white/10 glass-card"
         >
-          <Title level={2} className="!mb-6 !text-transparent bg-gradient-to-r from-blue-400 to-purple-300 bg-clip-text">
+          <Title level={2} className="!mb-6 gradient-text-8">
             📊 Attendance Analytics
           </Title>
           <Select
-            className="w-full md:w-96 [&>.ant-select-selector]:!bg-white/5 [&>.ant-select-selector]:!border-white/10 [&>.ant-select-selection-item]:!text-white"
-            placeholder="Select Subject"
+            className="w-full md:w-96 [&>span.select-selector]:!bg-transparent [&>span.select-selector]:!border-sky-700 
+                       [&>span.select-selector]:!text-sky-300 [&>span.select-selector]:!hover:border-sky-500
+                       [&>span.select-item]:!font-semibold [&>span.select-item]:!text-sky-400"
+            placeholder="🔍 Select Subject"
             value={selectedSubject}
             onChange={handleSubjectChange}
             size="large"
-            suffixIcon={<ChevronDown className="text-blue-300" />}
+            suffixIcon={<ChevronDown className="text-sky-300 hover:text-sky-500" />}
+            popupClassName="bg-slate-800 border-sky-700 
+                           shadow-sky-700/40 text-sky-300 divide-sky-500"
+            notFoundContent={<div className="text-sky-300">No subjects</div>}
           >
             {subjects.map((s) => (
-              <Select.Option key={s._id} value={s._id}>
-                <span className="font-medium text-blue-200">
-                  {s.name} <span className="ml-2 opacity-70">({s.code})</span>
-                </span>
+              <Select.Option key={s._id} value={s._id} 
+                             className="hover:bg-sky-900/60 active:bg-indigo-900/60">
+                <div className="flex items-center space-x-3">
+                  <Calendar size={18} className="text-sky-400" />
+                  <span className="font-medium text-sky-300">
+                    {s.name} <span className="ml-2 opacity-70">({s.code})</span>
+                  </span>
+                </div>
               </Select.Option>
             ))}
           </Select>
+          <div className="absolute p-2 rounded-full right-6 top-6 bg-gradient-radial from-sky-600 via-sky-600/20 to-transparent animate-rotate-right-slow">
+            <Users size={32} className="text-sky-100" />
+          </div>
         </motion.div>
 
-        {/* Stats Grid */}
         <Row gutter={[24, 24]}>
           <Col xs={24} sm={12} lg={6}>
             <StatsCard
               icon={<Calendar className="w-6 h-6 text-white" />}
               title="Total Days"
               value={overallStats.totalDays}
-              color="from-blue-600 to-purple-500"
+              color="from-sky-400 to-blue-400"
             />
           </Col>
           <Col xs={24} sm={12} lg={6}>
@@ -272,15 +278,15 @@ const AttendanceReport = () => {
               icon={<Users className="w-6 h-6 text-white" />}
               title="Average Attendance"
               value={`${overallStats.avgAttendance}%`}
-              color="from-emerald-600 to-cyan-500"
+              color="from-lime-400 via-lime-400/60 to-sky-400/30"
             />
           </Col>
           <Col xs={24} sm={12} lg={6}>
             <StatsCard
               icon={<TrendingUp className="w-6 h-6 text-white" />}
-              title="Highest Attendance"
+              title="Best Attendance Day"
               value={overallStats.highestAttendance}
-              color="from-green-600 to-teal-500"
+              color="from-teal-600 to-emerald-400"
             />
           </Col>
           <Col xs={24} sm={12} lg={6}>
@@ -288,36 +294,37 @@ const AttendanceReport = () => {
               icon={<AlertCircle className="w-6 h-6 text-white" />}
               title="Lowest Attendance"
               value={overallStats.lowestAttendance}
-              color="from-red-600 to-pink-500"
+              color="from-red-600 to-pink-600"
             />
           </Col>
         </Row>
 
-        {/* Charts Section */}
         <Row gutter={[24, 24]}>
           <Col xs={24} lg={14}>
             <motion.div
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
-              className="p-6 border shadow-2xl bg-white/5 backdrop-blur-xl rounded-3xl border-white/10"
+              className="p-6 border shadow-2xl bg-gradient-radial from-sky-500/20 to-transparent rounded-3xl backdrop-blur-3xl border-sky-800/50 glass-card"
+              style={{ backgroundBlendMode: 'luminosity' }}
             >
-              <Title level={4} className="!mb-4 !text-transparent bg-gradient-to-r from-blue-400 to-purple-300 bg-clip-text">
+              <Title level={4} className="!mb-4 !text-transparent gradient-text-5">
                 📈 Daily Attendance Trend
               </Title>
-              <Column {...chartConfigs.bar} height={300} />
+              <Column {...chartConfigs.bar} height={250} />
             </motion.div>
           </Col>
 
           <Col xs={24} lg={10}>
             <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              className="p-6 border shadow-2xl bg-white/5 backdrop-blur-xl rounded-3xl border-white/10"
+              initial={{ scale: 0.95, filter: 'saturate(50%)' }}
+              animate={{ scale: 1, filter: 'saturate(100%)' }}
+              className="p-6 border shadow-2xl bg-gradient-radial from-emerald-300/20 to-transparent rounded-3xl backdrop-blur-3xl border-emerald-800/50 glass-card"
+              style={{ backgroundBlendMode: 'color' }}
             >
-              <Title level={4} className="!mb-4 !text-transparent bg-gradient-to-r from-emerald-400 to-cyan-300 bg-clip-text">
+              <Title level={4} className="!mb-4 !text-transparent gradient-text-3">
                 🎯 Attendance Distribution
               </Title>
-              <Pie {...chartConfigs.pie} height={300} />
+              <Pie {...chartConfigs.pie} height={250} />
             </motion.div>
           </Col>
         </Row>

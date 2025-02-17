@@ -333,25 +333,35 @@ const AttendanceSheet = () => {
         </motion.div>
 
         {/* Summary Section */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="grid grid-cols-1 gap-4 md:grid-cols-3"
-        >
-          <div className="p-4 text-center bg-white rounded-lg shadow-lg bg-opacity-10 backdrop-blur-xl">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="p-6 border shadow-md bg-white/5 backdrop-blur-3xl rounded-3xl border-white/10">
+            <div className="flex items-center gap-4">
+              <UserOutlined className="text-3xl text-blue-500" />
+              <div>
             <h3 className="text-xl font-semibold text-white">Total Students</h3>
             <p className="mt-2 text-2xl text-blue-200">{totalStudents}</p>
           </div>
-          <div className="p-4 text-center bg-white rounded-lg shadow-lg bg-opacity-10 backdrop-blur-xl">
+         </div>
+       </div>
+       <div className="p-6 border shadow-md bg-white/5 backdrop-blur-3xl rounded-3xl border-white/10">
+            <div className="flex items-center gap-4">
+              <CheckCircleOutlined className="text-3xl text-green-500" />
+              <div>
             <h3 className="text-xl font-semibold text-white">Present</h3>
             <p className="mt-2 text-2xl text-green-400">{totalPresent}</p>
           </div>
-          <div className="p-4 text-center bg-white rounded-lg shadow-lg bg-opacity-10 backdrop-blur-xl">
+        </div>
+      </div>
+      <div className="p-6 border shadow-md bg-white/5 backdrop-blur-3xl rounded-3xl border-white/10">
+            <div className="flex items-center gap-4">
+              <CloseCircleOutlined className="text-3xl text-red-500" />
+              <div>
             <h3 className="text-xl font-semibold text-white">Absent</h3>
             <p className="mt-2 text-2xl text-red-400">{totalAbsent}</p>
+            </div>
+            </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Submit Button */}
         <motion.div

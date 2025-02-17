@@ -343,11 +343,6 @@ const styles = `
   }
 `;
 
-// Add styles to document
-if (typeof document !== 'undefined') {
-  const styleSheet = document.createElement('style');
-  styleSheet.innerText = styles;
-  document.head.appendChild(styleSheet);
-}
+
 
 export default AssignmentManagement;
