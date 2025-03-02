@@ -22,3 +22,173 @@
       gap: 1rem;
     }
   }
+.attendance-table .ant-table {
+  background: transparent !important;
+  color: white !important;
+}
+
+.attendance-table .ant-table-thead > tr > th {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: rgb(191, 219, 254) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  font-weight: 600;
+}
+
+.attendance-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.3s ease;
+}
+
+.attendance-table .ant-table-tbody > tr:hover > td {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.attendance-table .ant-empty-description {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.attendance-table .ant-table-placeholder:hover > td {
+  background-color: transparent !important;
+}
+
+/* Custom pagination styling */
+.custom-pagination.ant-pagination .ant-pagination-item a {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.custom-pagination.ant-pagination .ant-pagination-item-active {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.custom-pagination.ant-pagination .ant-pagination-item-active a {
+  color: white !important;
+}
+
+.custom-pagination .ant-pagination-prev .ant-pagination-item-link,
+.custom-pagination .ant-pagination-next .ant-pagination-item-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  background: transparent !important;
+}
+
+/* Custom Select and DatePicker styling */
+.ant-select-dropdown.dark-theme {
+  background-color: #1e293b !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.ant-select-dropdown.dark-theme .ant-select-item {
+  color: white !important;
+}
+
+.ant-select-dropdown.dark-theme .ant-select-item-option-active,
+.ant-select-dropdown.dark-theme .ant-select-item-option-selected {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+/* For DatePicker popup */
+.ant-picker-dropdown .ant-picker-panel-container {
+  background-color: #1e293b !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.ant-picker-dropdown .ant-picker-content th,
+.ant-picker-dropdown .ant-picker-content td {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-picker-dropdown .ant-picker-header {
+  color: rgba(255, 255, 255, 0.85) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.ant-picker-dropdown .ant-picker-header button {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* Enhance focus states for accessibility */
+.ant-btn:focus,
+.ant-select:focus,
+.ant-picker:focus {
+  outline: 2px solid rgba(59, 130, 246, 0.5) !important;
+  outline-offset: 2px !important;
+}
+
+/* Style for input elements */
+.ant-picker,
+.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+.ant-select-selection-item {
+  color: white !important;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .attendance-table .ant-table {
+    font-size: 14px !important;
+  }
+  
+  .attendance-table .ant-table-container {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+  }
+}
+/* Custom table styling */
+.attendance-table .ant-table {
+  background: transparent !important;
+  color: white !important;
+}
+
+.attendance-table .ant-table-thead > tr > th {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: rgb(191, 219, 254) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  font-weight: 600;
+}
+
+.attendance-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.3s ease;
+}
+
+.attendance-table .ant-table-tbody > tr:hover > td {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.attendance-table .ant-empty-description {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.attendance-table .ant-table-placeholder:hover > td {
+  background-color: transparent !important;
+}
+
+/* Custom pagination styling */
+.custom-pagination.ant-pagination .ant-pagination-item a {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.custom-pagination.ant-pagination .ant-pagination-item-active {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.custom-pagination.ant-pagination .ant-pagination-item-active a {
+  color: white !important;
+}
+
+.custom-pagination .ant-pagination-prev .ant-pagination-item-link,
+.custom-pagination .ant-pagination-next .ant-pagination-item-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  background: transparent !important;
+}
+
+/* Custom Select and DatePicker styling */
+.ant-select-dropdown.dark-theme {
+  background-color: #1e293b !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
