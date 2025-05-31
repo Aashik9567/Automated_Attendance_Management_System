@@ -42,7 +42,7 @@
    ```bash
    npm start
    ```
-   > _Or specify how to serve the frontend files if it's a static-site._
+
 
 ## Usage
 
@@ -52,21 +52,18 @@
 
 ## Screenshots
 
-> _Add screenshots or GIFs demonstrating the features and UI of the application._
+<img width="1416" alt="SCR-20250426-mzlr" src="https://github.com/user-attachments/assets/4e8a4ef1-2e49-4f78-8442-1be664c5beaf" />
+
 
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for suggestions or improvements.
 
-## License
 
-> _Specify your project's license here. For example:_
-This project is licensed under the [MIT License](LICENSE).
 
 ## Acknowledgements
 
 - Special thanks to all contributors and open-source resources used in this project.
 
 ---
-
-_This README was generated automatically. Please update the backend, database, and usage details as per your project’s actual implementation._
+ Please update the backend, database, and usage details as per your project’s actual implementation._
