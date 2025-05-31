@@ -53,6 +53,12 @@
 ## Screenshots
 
 <img width="1416" alt="SCR-20250426-mzlr" src="https://github.com/user-attachments/assets/4e8a4ef1-2e49-4f78-8442-1be664c5beaf" />
+![SCR-20250426-myob](https://github.com/user-attachments/assets/634bcbce-3fef-431c-999c-f16907f8d234)
+![SCR-20250426-myuh](https://github.com/user-attachments/assets/2056d478-afcc-44fa-afe7-827bfe4d3e2e)
+![SCR-20250426-mzfz](https://github.com/user-attachments/assets/7431b102-6781-4267-81f8-2a6054eece57)
+
+
+
 
 
 ## Contributing
