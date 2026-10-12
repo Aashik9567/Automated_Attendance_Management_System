@@ -51,7 +51,8 @@ Take one photo of the class: AttendEase detects every face, recognizes enrolled 
 
 ### Admin
 
-- Sees every account and creates teacher accounts. Public sign-up is for students only.
+- Creates accounts of any role, resets passwords, deletes accounts, and sees each person's activity (classes recorded or attended, assignments, last sign-in).
+- Assigns subjects to teachers and creates subjects for them. Public sign-up is for students only.
 - The admin account ("admin") is created on first start from `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
 
 ### Everyone
@@ -224,8 +225,8 @@ All routes are under `/api/v1`. Protected routes need a `Bearer` access token. E
 | Area | Endpoints |
 | --- | --- |
 | Users | `POST /users/signup` (students only), `POST /users/login`, `POST /users/logout`, `POST /users/refreshtoken`, `PATCH /users/update-profile`, `PATCH /users/change-password`, `POST /users/avatar`, `GET /users/students` (teacher, admin) |
-| Admin | `GET /users`, `POST /users/teachers`, `DELETE /users/:id` |
-| Subjects | `GET/POST /subjects`, `GET /subjects/:id` |
+| Admin | `GET /users`, `POST /users` (any role), `GET /users/:id/activity`, `PATCH /users/:id/password` (reset), `DELETE /users/:id`, `PATCH /subjects/:id/teacher` (reassign) |
+| Subjects | `GET/POST /subjects` (admins see and create all), `GET /subjects/:id` |
 | Attendance | `POST /attendance/recognize`, `POST /attendance/markattendance`, `GET /attendance/subject/:subjectId`, `DELETE /attendance/delete/:attendanceId` (the subject's teacher), `GET /attendance/student` (own records) |
 | Assignments | `GET/POST /assignments`, `GET/PUT/PATCH/DELETE /assignments/:id`, `POST /assignments/:id/submit`, `PATCH /assignments/:id/submissions/:submissionId/grade` |
 | Holidays | `GET/POST /holidays`, `GET/PUT/DELETE /holidays/:id` |

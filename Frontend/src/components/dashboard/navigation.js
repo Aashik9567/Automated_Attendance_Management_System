@@ -1,4 +1,4 @@
-import { BarChart3, CalendarDays, CalendarRange, ClipboardList, LayoutGrid, ScanFace, Settings, UserCheck, Users } from "lucide-react";
+import { BarChart3, BookOpen, CalendarDays, CalendarRange, ClipboardList, LayoutGrid, ScanFace, Settings, UserCheck, Users } from "lucide-react";
 
 // Paths match the routes in Webroutes.jsx. `mobile: true` items appear in the
 // bottom tab bar; the rest live under "More".
@@ -32,7 +32,10 @@ export const navigation = {
   Admin: {
     base: "/admindashboard",
     workspace: "Admin",
-    items: [{ name: "Accounts", path: "/admindashboard", icon: Users, color: "rose", mobile: true }],
+    items: [
+      { name: "Accounts", path: "/admindashboard", icon: Users, color: "rose", mobile: true },
+      { name: "Subjects", path: "/admindashboard/subjects", icon: BookOpen, color: "indigo", mobile: true },
+    ],
     settingsPath: "/admindashboard/settings",
   },
 };

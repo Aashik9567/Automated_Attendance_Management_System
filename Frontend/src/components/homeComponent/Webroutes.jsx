@@ -22,6 +22,7 @@ const AttendanceReport = page(() => import("../dashboardComponents/teacherDashbo
 const TeacherHolidayAnnouncement = page(() => import("../dashboardComponents/teacherDashboardComponent/TeacherHolidayAnnoucement.jsx"));
 const Settings = page(() => import("../dashboardComponents/teacherDashboardComponent/Settings"));
 const AdminDashboard = page(() => import("../dashboardComponents/adminDashboardComponent/AdminDashboard.jsx"));
+const AdminSubjects = page(() => import("../dashboardComponents/adminDashboardComponent/AdminSubjects.jsx"));
 const AdminAccounts = page(() => import("../dashboardComponents/adminDashboardComponent/AdminAccounts.jsx"));
 
 const Webroutes = () => (
@@ -77,6 +78,7 @@ const Webroutes = () => (
           }
         >
           <Route index element={<AdminAccounts />} />
+          <Route path="subjects" element={<AdminSubjects />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
