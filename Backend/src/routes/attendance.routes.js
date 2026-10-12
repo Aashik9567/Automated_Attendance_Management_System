@@ -2,7 +2,6 @@ import express from 'express';
 import {
     markAttendance,
     getAttendanceBySubject,
-    updateAttendance,
     deleteAttendance,
     getStudentAttendance,
     recognizeAttendancePhoto
@@ -12,24 +11,15 @@ import { restrictTo } from '../middlewares/roleCheck.middleware.js';
 import { imageUpload } from '../middlewares/fileUpload.middleware.js';
 
 const router = express.Router();
+router.use(authenticateUser);
 
-// Recording and changing attendance is for teachers only.
-router.route("/markattendance")
-    .post(authenticateUser, restrictTo('Teacher'), markAttendance);
+// Teachers record and read attendance for their own subjects.
+router.post("/markattendance", restrictTo('Teacher'), markAttendance);
+router.post("/recognize", restrictTo('Teacher'), imageUpload.single('file'), recognizeAttendancePhoto);
+router.get("/subject/:subjectId", restrictTo('Teacher'), getAttendanceBySubject);
+router.delete("/delete/:attendanceId", restrictTo('Teacher'), deleteAttendance);
 
-router.route("/recognize")
-    .post(authenticateUser, restrictTo('Teacher'), imageUpload.single('file'), recognizeAttendancePhoto);
-
-router.route("/subject/:subjectId")
-    .get(authenticateUser, getAttendanceBySubject);
-
-router.route("/update/:attendanceId")
-    .put(authenticateUser, restrictTo('Teacher'), updateAttendance);
-
-router.route("/delete/:attendanceId")
-    .delete(authenticateUser, restrictTo('Teacher'), deleteAttendance);
-
-router.route("/student")
-    .get(authenticateUser, getStudentAttendance);
+// Students read their own attendance.
+router.get("/student", restrictTo('Student'), getStudentAttendance);
 
 export default router;

@@ -1,236 +1,135 @@
-//assignment.controller.js
 import asyncHandler from "../utils/asyncHandler.js";
 import { apiError } from "../utils/errorHandler.js";
 import { Assignment } from "../models/assignment.model.js";
 import apiResponse from "../utils/apiResponse.js";
-import { uploadToCloudinary } from '../middlewares/fileUpload.middleware.js';
+import { uploadToCloudinary } from "../middlewares/fileUpload.middleware.js";
+import { findOwnedSubject } from "../utils/findOwnedSubject.js";
 
-const createAssignment = async (req, res) => {
-    try {
-        if (!req.user) {
-            throw new apiError(401, "User not authenticated");
-        }
+const uploadAll = async (files = [], folder) =>
+    (await Promise.all(files.map((file) => uploadToCloudinary(file.buffer, folder)))).map((r) => r.secure_url);
 
-        if (req.user.role !== "Teacher") {
-            throw new apiError(403, "Only teachers can create assignments");
-        }
-
-        const files = req.files;
-        let attachments = [];
-
-        if (files && files.length > 0) {
-            const uploadPromises = files.map(file => 
-                uploadToCloudinary(file.buffer)
-            );
-            
-            const cloudinaryResponses = await Promise.all(uploadPromises);
-            attachments = cloudinaryResponses.map(response => response.secure_url);
-        }
-
-        // 🔥 Ensure the teacher field is included
-        const assignment = new Assignment({
-            ...req.body,
-            attachments,
-            teacher: req.user._id // ✅ Assign teacher from authenticated user
-        });
-
-        await assignment.save();
-        res.status(201).json(assignment);
-    } catch (error) {
-        console.error("Error in createAssignment:", error);
-        res.status(400).json({ 
-            success: false,
-            message: "Error creating assignment",
-            error: error.message 
-        });
-    }
+// Students see only their own submission, never classmates' files or grades.
+const forViewer = (assignment, user) => {
+    if (user.role !== "Student") return assignment;
+    const plain = assignment.toObject();
+    plain.submissions = plain.submissions.filter((s) => String(s.student?._id ?? s.student) === String(user._id));
+    return plain;
 };
 
-const submitAssignment = async (req, res) => {
-    try {
-        const file = req.files?.[0];
-        if (!file) {
-            return res.status(400).json({ success: false, message: "Please attach a file to submit" });
-        }
+// User text used as a search pattern must not act as a regex.
+const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-        // Upload to cloudinary
-        const cloudinaryResponse = await uploadToCloudinary(file.buffer, 'submissions');
-        
-        // Update assignment with submission
-        // Route is /:id/submit — this previously read req.params.assignmentId
-        // (always undefined), so submissions were silently never saved.
-        const assignment = await Assignment.findByIdAndUpdate(
-            req.params.id,
-            {
-                $push: {
-                    submissions: {
-                        student: req.user._id,
-                        submissionUrl: cloudinaryResponse.secure_url,
-                        submittedAt: new Date()
-                    }
-                }
-            },
-            { new: true }
-        );
-
-        if (!assignment) {
-            return res.status(404).json({ success: false, message: "Assignment not found" });
-        }
-
-        res.status(200).json({
-            success: true,
-            data: assignment
-        });
-    } catch (error) {
-        console.error("Error in submitAssignment:", error);
-        res.status(400).json({
-            success: false,
-            message: "Error submitting assignment",
-            error: error.message
-        });
-    }
+const assertOwner = (assignment, user, action) => {
+    if (!assignment.teacher.equals(user._id)) throw new apiError(403, `Unauthorized to ${action} this assignment`);
 };
-// Get all assignments (with filters)
+
+const createAssignment = asyncHandler(async (req, res) => {
+    const { title, description, subject, dueDate } = req.body;
+    await findOwnedSubject(subject, req.user);
+    const assignment = await Assignment.create({
+        title,
+        description,
+        subject,
+        dueDate,
+        attachments: await uploadAll(req.files),
+        teacher: req.user._id,
+    });
+    res.status(201).json(assignment);
+});
+
+const submitAssignment = asyncHandler(async (req, res) => {
+    const file = req.files?.[0];
+    if (!file) throw new apiError(400, "Please attach a file to submit");
+    if (!(await Assignment.exists({ _id: req.params.id }))) throw new apiError(404, "Assignment not found");
+
+    const [submissionUrl] = await uploadAll([file], "submissions");
+    const assignment = await Assignment.findByIdAndUpdate(
+        req.params.id,
+        { $push: { submissions: { student: req.user._id, submissionUrl, submittedAt: new Date() } } },
+        { new: true }
+    );
+    res.status(200).json({ success: true, data: forViewer(assignment, req.user) });
+});
+
+// Teachers see their own assignments; students see all of them.
 const getAssignments = asyncHandler(async (req, res) => {
     const { subject, search } = req.query;
     const query = {};
-
-    // Add filters if provided
-    if (subject) query.subject = subject;
-    if (search) {
-        query.title = { $regex: search, $options: 'i' };
-    }
-
-    // If user is a student, show all assignments
-    // If user is a teacher, show only their assignments
-    if (req.user.role === 'Teacher') {
-        query.teacher = req.user._id;
-    }
+    if (typeof subject === "string" && subject) query.subject = subject;
+    if (typeof search === "string" && search) query.title = { $regex: escapeRegex(search), $options: "i" };
+    if (req.user.role === "Teacher") query.teacher = req.user._id;
 
     const assignments = await Assignment.find(query)
-        .populate('subject', 'name code')
-        .populate('teacher', 'fullName')
+        .populate("subject", "name code")
+        .populate("teacher", "fullName")
         .sort({ createdAt: -1 });
 
     return res.status(200).json(
-        new apiResponse(200, "Assignments fetched successfully", assignments)
+        new apiResponse(200, "Assignments fetched successfully", assignments.map((a) => forViewer(a, req.user)))
     );
 });
 
-// Get single assignment
 const getAssignmentById = asyncHandler(async (req, res) => {
-    const { id } = req.params;
+    const assignment = await Assignment.findById(req.params.id)
+        .populate("subject", "name code")
+        .populate("teacher", "fullName")
+        .populate("submissions.student", "fullName");
+    if (!assignment) throw new apiError(404, "Assignment not found");
 
-    const assignment = await Assignment.findById(id)
-        .populate('subject', 'name code')
-        .populate('teacher', 'fullName')
-        .populate('submissions.student', 'fullName');
-
-    if (!assignment) {
-        throw new apiError(404, "Assignment not found");
-    }
-
-    return res.status(200).json(
-        new apiResponse(200, "Assignment fetched successfully", assignment)
-    );
+    return res.status(200).json(new apiResponse(200, "Assignment fetched successfully", forViewer(assignment, req.user)));
 });
 
-// Update assignment
 const updateAssignment = asyncHandler(async (req, res) => {
-    const { id } = req.params;
     const { title, description, subject, dueDate } = req.body;
-
-    const assignment = await Assignment.findById(id);
-
-    if (!assignment) {
-        throw new apiError(404, "Assignment not found");
-    }
-
-    // Verify teacher owns this assignment
-    if (assignment.teacher.toString() !== req.user._id.toString()) {
-        throw new apiError(403, "Unauthorized to update this assignment");
-    }
-
-    // Files are kept in memory by multer (no file.path), so upload them like createAssignment does.
-    const uploaded = await Promise.all((req.files || []).map(file => uploadToCloudinary(file.buffer)));
-    const newAttachments = uploaded.map(response => response.secure_url);
-    const attachments = [...assignment.attachments, ...newAttachments];
+    const assignment = await Assignment.findById(req.params.id);
+    if (!assignment) throw new apiError(404, "Assignment not found");
+    assertOwner(assignment, req.user, "update");
+    if (subject) await findOwnedSubject(subject, req.user);
 
     const updatedAssignment = await Assignment.findByIdAndUpdate(
-        id,
+        req.params.id,
         {
             $set: {
                 title: title || assignment.title,
                 description: description || assignment.description,
                 subject: subject || assignment.subject,
                 dueDate: dueDate || assignment.dueDate,
-                attachments
-            }
+                attachments: [...assignment.attachments, ...(await uploadAll(req.files))],
+            },
         },
-        { new: true }
-    ).populate('subject', 'name code');
+        { new: true, runValidators: true }
+    ).populate("subject", "name code");
 
-    return res.status(200).json(
-        new apiResponse(200, "Assignment updated successfully", updatedAssignment)
-    );
+    return res.status(200).json(new apiResponse(200, "Assignment updated successfully", updatedAssignment));
 });
 
-// Delete assignment
 const deleteAssignment = asyncHandler(async (req, res) => {
-    const { id } = req.params;
-
-    const assignment = await Assignment.findById(id);
-
-    if (!assignment) {
-        throw new apiError(404, "Assignment not found");
-    }
-
-    // Verify teacher owns this assignment
-    if (assignment.teacher.toString() !== req.user._id.toString()) {
-        throw new apiError(403, "Unauthorized to delete this assignment");
-    }
-
-    await Assignment.findByIdAndDelete(id);
-
-    return res.status(200).json(
-        new apiResponse(200, "Assignment deleted successfully", null)
-    );
+    const assignment = await Assignment.findById(req.params.id);
+    if (!assignment) throw new apiError(404, "Assignment not found");
+    assertOwner(assignment, req.user, "delete");
+    await assignment.deleteOne();
+    return res.status(200).json(new apiResponse(200, "Assignment deleted successfully", null));
 });
 
-// Grade submission (for teachers)
 const gradeSubmission = asyncHandler(async (req, res) => {
     const { id, submissionId } = req.params;
     const { grade, feedback } = req.body;
-
-    if (grade === undefined || grade === null || grade === "" || Number(grade) < 0 || Number(grade) > 100) {
+    const score = Number(grade);
+    if (grade === undefined || grade === null || grade === "" || Number.isNaN(score) || score < 0 || score > 100) {
         throw new apiError(400, "Valid grade is required");
     }
 
     const assignment = await Assignment.findById(id);
+    if (!assignment) throw new apiError(404, "Assignment not found");
+    assertOwner(assignment, req.user, "grade");
 
-    if (!assignment) {
-        throw new apiError(404, "Assignment not found");
-    }
-
-    // Verify teacher owns this assignment
-    if (assignment.teacher.toString() !== req.user._id.toString()) {
-        throw new apiError(403, "Unauthorized to grade this assignment");
-    }
-
-    // Find and update submission
     const submission = assignment.submissions.id(submissionId);
-    if (!submission) {
-        throw new apiError(404, "Submission not found");
-    }
-
-    submission.grade = grade;
-    submission.feedback = feedback;
-
+    if (!submission) throw new apiError(404, "Submission not found");
+    submission.grade = score;
+    submission.feedback = typeof feedback === "string" ? feedback : undefined;
     await assignment.save();
 
-    return res.status(200).json(
-        new apiResponse(200, "Submission graded successfully", assignment)
-    );
+    return res.status(200).json(new apiResponse(200, "Submission graded successfully", assignment));
 });
 
 export {
@@ -240,5 +139,5 @@ export {
     updateAssignment,
     deleteAssignment,
     submitAssignment,
-    gradeSubmission
+    gradeSubmission,
 };

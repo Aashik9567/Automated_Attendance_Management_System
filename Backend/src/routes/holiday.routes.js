@@ -6,19 +6,18 @@ import {
   updateHoliday,
   deleteHoliday
 } from '../controllers/holiday.controller.js';
-import { authenticateUser, authorizeRoles } from '../middlewares/auth.middleware.js';
+import { authenticateUser } from '../middlewares/auth.middleware.js';
+import { restrictTo } from '../middlewares/roleCheck.middleware.js';
 
 const router = express.Router();
 
-// authenticateUser routes (require authentication)
 router.use(authenticateUser);
 
 router.get('/', getAllHolidays);
 router.get('/:id', getHolidayById);
 
-
 // Teacher-only routes
-router.use(authorizeRoles('Teacher'));
+router.use(restrictTo('Teacher'));
 
 router.post('/', createHoliday);
 router.put('/:id', updateHoliday);

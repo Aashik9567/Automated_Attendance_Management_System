@@ -28,11 +28,8 @@ const holidaySchema = new mongoose.Schema({
 
 // Validate end date is after start date
 holidaySchema.pre('validate', function(next) {
-  if (this.startDate >= this.endDate) {
-    next(new Error('End date must be after start date'));
-  } else {
-    next();
-  }
+  if (this.startDate >= this.endDate) this.invalidate('endDate', 'End date must be after start date');
+  next();
 });
 
 export const Holiday = mongoose.model('Holiday', holidaySchema);

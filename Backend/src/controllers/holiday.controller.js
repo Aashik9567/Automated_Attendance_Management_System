@@ -1,118 +1,40 @@
 import { Holiday } from '../models/holiday.model.js';
+import asyncHandler from '../utils/asyncHandler.js';
+import { apiError } from '../utils/errorHandler.js';
 
-export const createHoliday = async (req, res) => {
-  try {
-    const { title, description, startDate, endDate } = req.body;
-    
-    const holiday = await Holiday.create({
-      title,
-      description,
-      startDate,
-      endDate,
-      createdBy: req.user._id
-    });
+// Only these fields come from the request; createdBy is always the signed-in teacher.
+const pickHoliday = ({ title, description, startDate, endDate }) => ({ title, description, startDate, endDate });
 
-    res.status(201).json({
-      success: true,
-      data: holiday
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: error.message
-    });
+export const createHoliday = asyncHandler(async (req, res) => {
+  const holiday = await Holiday.create({ ...pickHoliday(req.body), createdBy: req.user._id });
+  res.status(201).json({ success: true, data: holiday });
+});
+
+export const getAllHolidays = asyncHandler(async (req, res) => {
+  const holidays = await Holiday.find().populate('createdBy', 'fullName role').sort('-createdAt');
+  res.status(200).json({ success: true, count: holidays.length, data: holidays });
+});
+
+export const getHolidayById = asyncHandler(async (req, res) => {
+  const holiday = await Holiday.findById(req.params.id).populate('createdBy', 'fullName role');
+  if (!holiday) throw new apiError(404, 'Holiday not found');
+  res.status(200).json({ success: true, data: holiday });
+});
+
+export const updateHoliday = asyncHandler(async (req, res) => {
+  const holiday = await Holiday.findById(req.params.id);
+  if (!holiday) throw new apiError(404, 'Holiday not found');
+
+  // save() (not findByIdAndUpdate) so the end-after-start check runs on edits too.
+  for (const [key, value] of Object.entries(pickHoliday(req.body))) {
+    if (value !== undefined) holiday[key] = value;
   }
-};
+  await holiday.save();
+  res.status(200).json({ success: true, data: holiday });
+});
 
-export const getAllHolidays = async (req, res) => {
-  try {
-    const holidays = await Holiday.find()
-      .populate('createdBy', 'fullName role')
-      .sort('-createdAt');
-
-    res.status(200).json({
-      success: true,
-      count: holidays.length,
-      data: holidays
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: 'Server Error'
-    });
-  }
-};
-
-export const getHolidayById = async (req, res) => {
-  try {
-    const holiday = await Holiday.findById(req.params.id)
-      .populate('createdBy', 'fullName role');
-
-    if (!holiday) {
-      return res.status(404).json({
-        success: false,
-        error: 'Holiday not found'
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: holiday
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: 'Server Error'
-    });
-  }
-};
-
-export const updateHoliday = async (req, res) => {
-  try {
-    const holiday = await Holiday.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-
-    if (!holiday) {
-      return res.status(404).json({
-        success: false,
-        error: 'Holiday not found'
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: holiday
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: error.message
-    });
-  }
-};
-
-export const deleteHoliday = async (req, res) => {
-  try {
-    const holiday = await Holiday.findByIdAndDelete(req.params.id);
-
-    if (!holiday) {
-      return res.status(404).json({
-        success: false,
-        error: 'Holiday not found'
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: {}
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: 'Server Error'
-    });
-  }
-};
+export const deleteHoliday = asyncHandler(async (req, res) => {
+  const holiday = await Holiday.findByIdAndDelete(req.params.id);
+  if (!holiday) throw new apiError(404, 'Holiday not found');
+  res.status(200).json({ success: true, data: {} });
+});

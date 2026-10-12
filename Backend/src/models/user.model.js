@@ -8,7 +8,8 @@ const userSchema = new mongoose.Schema({
     },
     semester: {
         type: Number,
-        required: true,
+        // Admins aren't tied to a semester.
+        required: function () { return this.role !== "Admin"; },
         validate: {
           validator: (value) => value >= 1 && value <= 8,
           message: 'Semester must be between 1 and 8'
@@ -26,7 +27,7 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         required: true,
-        enum:["Teacher","Student"]
+        enum:["Admin","Teacher","Student"]
     },
     avatar:{
         type:String,//cloudinary url

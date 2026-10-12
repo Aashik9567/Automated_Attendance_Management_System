@@ -3,7 +3,6 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import connectDb from "./database/db.js";
 import { faceServiceHealth, startFaceService } from "./services/faceService.js";
@@ -12,8 +11,11 @@ import subjectRoutes from "./routes/subject.routes.js";
 import attendanceRoutes from "./routes/attendance.routes.js";
 import assignmentRoutes from "./routes/assignment.routes.js";
 import holidayRoutes from "./routes/holiday.routes.js";
+import { ensureAdminAccount } from "./controllers/user.controller.js";
 
 const app = express();
+// Render sits behind one proxy; needed for per-client rate limiting.
+app.set("trust proxy", 1);
 
 // Allowed frontends: local dev + CORS_ORIGIN (comma-separated) from the env.
 const allowedOrigins = [
@@ -39,7 +41,6 @@ app.options("*", cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 // Liveness/readiness for hosting health checks and debugging.
 app.get("/api/v1/health", async (req, res) => {
@@ -71,7 +72,8 @@ app.use((err, req, res, next) => {
 const PORT = Number(process.env.PORT) || 8080;
 
 connectDb()
-  .then(() => {
+  .then(async () => {
+    await ensureAdminAccount().catch((error) => console.error("Could not create the admin account:", error.message));
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });

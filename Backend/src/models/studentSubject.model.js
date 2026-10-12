@@ -14,14 +14,6 @@ const studentSubjectSchema = new mongoose.Schema({
     semester: {
       type: Number,
       required: true
-    },
-    totalClasses: {
-      type: Number,
-      default: 0
-    },
-    attendedClasses: {
-      type: Number,
-      default: 0
     }
   }, { timestamps: true });
 export const StudentSubject = mongoose.model('StudentSubject', studentSubjectSchema);
