@@ -10,9 +10,12 @@ import {
     refreshAccessToken,
     signupUser,
     updateProfile,
+    changePassword,
+    updateAvatar,
 } from "../controllers/user.controller.js";
 import { authenticateUser } from "../middlewares/auth.middleware.js";
 import { restrictTo } from "../middlewares/roleCheck.middleware.js";
+import { imageUpload } from "../middlewares/fileUpload.middleware.js";
 
 // Slows down password guessing: 10 attempts per minute per address.
 const authLimiter = rateLimit({
@@ -29,6 +32,8 @@ router.post("/login", authLimiter, loginUser);
 router.post("/logout", authenticateUser, logoutUser);
 router.post("/refreshtoken", refreshAccessToken);
 router.patch("/update-profile", authenticateUser, updateProfile);
+router.patch("/change-password", authLimiter, authenticateUser, changePassword);
+router.post("/avatar", authenticateUser, imageUpload.single("avatar"), updateAvatar);
 router.get("/students", authenticateUser, restrictTo("Teacher", "Admin"), getAllStudents);
 
 // Admin only

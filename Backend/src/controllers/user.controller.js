@@ -6,6 +6,7 @@ import { StudentSubject } from "../models/studentSubject.model.js";
 import { Attendance } from "../models/attendance.model.js";
 import { Assignment } from "../models/assignment.model.js";
 import apiResponse from "../utils/apiResponse.js";
+import { uploadToCloudinary } from "../middlewares/fileUpload.middleware.js";
 import jwt from "jsonwebtoken";
 
 const MIN_PASSWORD_LENGTH = 8;
@@ -138,6 +139,25 @@ const updateProfile = asyncHandler(async (req, res) => {
     return res.status(200).json(new apiResponse(200, "Profile updated successfully", updatedUser));
 });
 
+const changePassword = asyncHandler(async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    checkPassword(newPassword);
+    const user = await User.findById(req.user._id);
+    if (typeof currentPassword !== "string" || !(await user.isPasswordCorrect(currentPassword))) {
+        throw new apiError(400, "Current password is incorrect");
+    }
+    user.password = newPassword; // hashed by the model on save
+    await user.save();
+    res.status(200).json(new apiResponse(200, "Password changed", null));
+});
+
+const updateAvatar = asyncHandler(async (req, res) => {
+    if (!req.file) throw new apiError(400, "Please choose a photo");
+    const { secure_url } = await uploadToCloudinary(req.file.buffer, "avatars");
+    const user = await User.findByIdAndUpdate(req.user._id, { avatar: secure_url }, { new: true }).select(SAFE_FIELDS);
+    res.status(200).json(new apiResponse(200, "Photo updated", user));
+});
+
 // Admin: every account, newest first.
 const listUsers = asyncHandler(async (req, res) => {
     const users = await User.find().select(SAFE_FIELDS).sort({ createdAt: -1 });
@@ -198,6 +218,8 @@ export {
     logoutUser,
     refreshAccessToken,
     updateProfile,
+    changePassword,
+    updateAvatar,
     getAllStudents,
     listUsers,
     createTeacher,

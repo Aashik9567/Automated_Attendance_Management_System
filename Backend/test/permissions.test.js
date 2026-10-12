@@ -7,7 +7,7 @@ import { Subject } from "../src/models/subject.model.js";
 import { Attendance } from "../src/models/attendance.model.js";
 import { Assignment } from "../src/models/assignment.model.js";
 import { StudentSubject } from "../src/models/studentSubject.model.js";
-import { signupUser, deleteUser } from "../src/controllers/user.controller.js";
+import { signupUser, deleteUser, changePassword } from "../src/controllers/user.controller.js";
 import { User } from "../src/models/user.model.js";
 import { markAttendance, getAttendanceBySubject, getStudentAttendance } from "../src/controllers/attendance.controller.js";
 import { getAssignments } from "../src/controllers/assignment.controller.js";
@@ -100,6 +100,12 @@ test("deleting a student removes them from attendance and submissions", async ()
   const res = await run(deleteUser, { user: { _id: id(), role: "Admin" }, params: { id: studentId } });
   assert.equal(res.statusCode, 200);
   assert.deepEqual(pulls, [studentId, studentId]);
+});
+
+test("changing password requires the current password", async () => {
+  stub(User, "findById", async () => ({ isPasswordCorrect: async () => false, save: () => assert.fail("must not save") }));
+  const res = await run(changePassword, { user: student, body: { currentPassword: "wrong", newPassword: "new-password-1" } });
+  assert.equal(res.statusCode, 400);
 });
 
 test("assignment search treats regex characters as plain text", async () => {
