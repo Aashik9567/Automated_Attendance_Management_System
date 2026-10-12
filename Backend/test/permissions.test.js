@@ -7,7 +7,7 @@ import { Subject } from "../src/models/subject.model.js";
 import { Attendance } from "../src/models/attendance.model.js";
 import { Assignment } from "../src/models/assignment.model.js";
 import { StudentSubject } from "../src/models/studentSubject.model.js";
-import { signupUser, deleteUser, changePassword } from "../src/controllers/user.controller.js";
+import { signupUser, deleteUser, changePassword, createAccount, resetPassword } from "../src/controllers/user.controller.js";
 import { User } from "../src/models/user.model.js";
 import { markAttendance, getAttendanceBySubject, getStudentAttendance } from "../src/controllers/attendance.controller.js";
 import { getAssignments } from "../src/controllers/assignment.controller.js";
@@ -106,6 +106,22 @@ test("changing password requires the current password", async () => {
   stub(User, "findById", async () => ({ isPasswordCorrect: async () => false, save: () => assert.fail("must not save") }));
   const res = await run(changePassword, { user: student, body: { currentPassword: "wrong", newPassword: "new-password-1" } });
   assert.equal(res.statusCode, 400);
+});
+
+test("admins can only create Student, Teacher or Admin accounts", async () => {
+  const res = await run(createAccount, { user: { _id: id(), role: "Admin" }, body: { role: "Superuser", fullName: "X", email: "x@x.edu", password: "password123", semester: 1 } });
+  assert.equal(res.statusCode, 400);
+});
+
+test("admin password reset enforces the minimum and signs the user out", async () => {
+  const short = await run(resetPassword, { user: { _id: id(), role: "Admin" }, params: { id: id() }, body: { password: "short" } });
+  assert.equal(short.statusCode, 400);
+  const target = { fullName: "Sam", password: "old", refreshToken: "token", save: async () => {} };
+  stub(User, "findById", async () => target);
+  const ok = await run(resetPassword, { user: { _id: id(), role: "Admin" }, params: { id: id() }, body: { password: "new-password-1" } });
+  assert.equal(ok.statusCode, 200);
+  assert.equal(target.password, "new-password-1");
+  assert.equal(target.refreshToken, undefined);
 });
 
 test("assignment search treats regex characters as plain text", async () => {

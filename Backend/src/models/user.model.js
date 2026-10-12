@@ -32,7 +32,8 @@ const userSchema = new mongoose.Schema({
     avatar:{
         type:String,//cloudinary url
       },
-      refreshToken:String
+      refreshToken:String,
+      lastLoginAt: Date
 }, {timestamps: true});
 userSchema.pre("save",async function(next){
     if(!this.isModified("password")) return next()

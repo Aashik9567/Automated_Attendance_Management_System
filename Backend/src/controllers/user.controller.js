@@ -75,20 +75,21 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     return res.status(200).json(new apiResponse(200, "Access token refreshed", tokens));
 });
 
+// Students are enrolled in every subject of their semester.
+const enrollStudent = async (student) => {
+    const subjects = await Subject.find({ semester: student.semester }).select("_id");
+    if (subjects.length) {
+        await StudentSubject.insertMany(subjects.map((s) => ({ student: student._id, subject: s._id, semester: student.semester })));
+    }
+};
+
 // Public sign-up creates student accounts only; teachers are added by an admin.
 const signupUser = asyncHandler(async (req, res) => {
     if (req.body.role && req.body.role !== "Student") {
         throw new apiError(403, "Teacher accounts are created by an admin");
     }
     const createdUser = await createUser({ ...req.body, role: "Student" });
-
-    // Students who join after a subject was created still need enrolling.
-    const subjects = await Subject.find({ semester: createdUser.semester }).select("_id");
-    if (subjects.length) {
-        await StudentSubject.insertMany(
-            subjects.map((s) => ({ student: createdUser._id, subject: s._id, semester: createdUser.semester }))
-        );
-    }
+    await enrollStudent(createdUser);
 
     return res.status(201).json(new apiResponse(201, "Account created successfully", createdUser));
 });
@@ -105,6 +106,7 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
+    await User.updateOne({ _id: user._id }, { lastLoginAt: new Date() });
     const loginUser = await User.findById(user._id).select(SAFE_FIELDS);
     return res
         .status(200)
@@ -164,10 +166,80 @@ const listUsers = asyncHandler(async (req, res) => {
     res.status(200).json(new apiResponse(200, "Users fetched successfully", users));
 });
 
-// Admin: create a teacher account.
-const createTeacher = asyncHandler(async (req, res) => {
-    const teacher = await createUser({ ...req.body, role: "Teacher" });
-    res.status(201).json(new apiResponse(201, "Teacher account created", teacher));
+const ROLES = ["Student", "Teacher", "Admin"];
+
+// Admin: create an account of any role.
+const createAccount = asyncHandler(async (req, res) => {
+    const role = ROLES.includes(req.body.role) ? req.body.role : null;
+    if (!role) throw new apiError(400, "Choose Student, Teacher or Admin");
+    const user = await createUser({ ...req.body, role });
+    if (role === "Student") await enrollStudent(user);
+    res.status(201).json(new apiResponse(201, `${role} account created`, user));
+});
+
+// Admin: set a new password for someone who forgot theirs. Signs them out
+// everywhere so old sessions stop working.
+const resetPassword = asyncHandler(async (req, res) => {
+    checkPassword(req.body.password);
+    const user = await User.findById(req.params.id);
+    if (!user) throw new apiError(404, "User not found");
+    user.password = req.body.password; // hashed by the model on save
+    user.refreshToken = undefined;
+    await user.save();
+    res.status(200).json(new apiResponse(200, `Password reset for ${user.fullName}`, null));
+});
+
+const MAX_EVENTS = 40;
+
+// Admin: what a person has done, built from the records the app already keeps.
+const getUserActivity = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id).select(SAFE_FIELDS).lean();
+    if (!user) throw new apiError(404, "User not found");
+
+    const events = [{ type: "joined", date: user.createdAt, text: "Account created" }];
+    if (user.lastLoginAt) events.push({ type: "signin", date: user.lastLoginAt, text: "Last signed in" });
+    let summary = {};
+    let subjects = [];
+
+    if (user.role === "Teacher") {
+        const [subjectDocs, sessions, assignments] = await Promise.all([
+            Subject.find({ teacher: user._id }).select("name code semester").lean(),
+            Attendance.find({ teacher: user._id }).select("date subject students.status").populate("subject", "name").sort({ date: -1 }).lean(),
+            Assignment.find({ teacher: user._id }).select("title createdAt dueDate submissions.student subject").populate("subject", "name").sort({ createdAt: -1 }).lean(),
+        ]);
+        subjects = subjectDocs;
+        summary = { subjects: subjectDocs.length, sessions: sessions.length, assignments: assignments.length };
+        for (const s of sessions) {
+            const present = s.students.filter((x) => x.status === "present").length;
+            events.push({ type: "attendance", date: s.date, text: `Recorded attendance for ${s.subject?.name || "a subject"}`, detail: `${present}/${s.students.length} present` });
+        }
+        for (const a of assignments) {
+            events.push({ type: "assignment", date: a.createdAt, text: `Created assignment "${a.title}"`, detail: `${a.submissions.length} submissions` });
+        }
+    } else if (user.role === "Student") {
+        const [records, submitted] = await Promise.all([
+            Attendance.find({ "students.student": user._id }, { date: 1, subject: 1, students: { $elemMatch: { student: user._id } } })
+                .populate("subject", "name")
+                .sort({ date: -1 })
+                .lean(),
+            Assignment.find({ "submissions.student": user._id }).select("title submissions").lean(),
+        ]);
+        const present = records.filter((r) => r.students[0]?.status === "present").length;
+        summary = { classes: records.length, present, submissions: submitted.length };
+        for (const r of records) {
+            const status = r.students[0]?.status;
+            events.push({ type: status === "present" ? "present" : "absent", date: r.date, text: `${status === "present" ? "Attended" : "Missed"} ${r.subject?.name || "a class"}` });
+        }
+        for (const a of submitted) {
+            const mine = a.submissions.filter((s) => String(s.student) === String(user._id));
+            for (const s of mine) {
+                events.push({ type: "submission", date: s.submittedAt, text: `Submitted "${a.title}"`, detail: s.grade != null ? `Grade ${s.grade}` : "Not graded yet" });
+            }
+        }
+    }
+
+    events.sort((a, b) => new Date(b.date) - new Date(a.date));
+    res.status(200).json(new apiResponse(200, "Activity fetched", { user, summary, subjects, events: events.slice(0, MAX_EVENTS) }));
 });
 
 // Admin: delete an account and everything that only makes sense with it.
@@ -222,7 +294,9 @@ export {
     updateAvatar,
     getAllStudents,
     listUsers,
-    createTeacher,
+    createAccount,
+    getUserActivity,
+    resetPassword,
     deleteUser,
     ensureAdminAccount,
 };

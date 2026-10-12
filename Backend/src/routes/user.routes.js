@@ -1,7 +1,9 @@
 import { Router } from "express";
 import rateLimit from "express-rate-limit";
 import {
-    createTeacher,
+    createAccount,
+    getUserActivity,
+    resetPassword,
     deleteUser,
     getAllStudents,
     listUsers,
@@ -38,7 +40,9 @@ router.get("/students", authenticateUser, restrictTo("Teacher", "Admin"), getAll
 
 // Admin only
 router.get("/", authenticateUser, restrictTo("Admin"), listUsers);
-router.post("/teachers", authenticateUser, restrictTo("Admin"), createTeacher);
+router.post("/", authenticateUser, restrictTo("Admin"), createAccount);
+router.get("/:id/activity", authenticateUser, restrictTo("Admin"), getUserActivity);
+router.patch("/:id/password", authenticateUser, restrictTo("Admin"), resetPassword);
 router.delete("/:id", authenticateUser, restrictTo("Admin"), deleteUser);
 
 export default router;
