@@ -9,6 +9,8 @@ import PageHeader from "../../ui/PageHeader";
 import Button from "../../ui/Button";
 import Avatar from "../../ui/Avatar";
 import Field, { inputClass } from "../../ui/Field";
+import Select from "../../ui/Select";
+import { SEMESTER_OPTIONS } from "../../../lib/format";
 import SegmentedControl from "../../ui/SegmentedControl";
 import { Card, CardHeader } from "../../ui/Card";
 import { colors as palette } from "../../ui/colors";
@@ -107,13 +109,7 @@ const ProfileSection = ({ user, updateUserProfile }) => {
         {!isAdmin && (
           <Field label="Semester">
             {(p) => (
-              <select {...p} required value={semester} onChange={(e) => setSemester(e.target.value)} className={inputClass}>
-                {Array.from({ length: 8 }, (_, i) => (
-                  <option key={i + 1} value={String(i + 1)}>
-                    Semester {i + 1}
-                  </option>
-                ))}
-              </select>
+              <Select {...p} required value={semester} onChange={setSemester} options={SEMESTER_OPTIONS} />
             )}
           </Field>
         )}

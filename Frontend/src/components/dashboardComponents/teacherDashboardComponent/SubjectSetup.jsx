@@ -5,6 +5,8 @@ import api from "../../../lib/api";
 import Button from "../../ui/Button";
 import { Card } from "../../ui/Card";
 import Field, { inputClass } from "../../ui/Field";
+import Select from "../../ui/Select";
+import { SEMESTER_OPTIONS } from "../../../lib/format";
 
 // First-run state for teachers with no subjects yet.
 const SubjectSetup = ({ onSubjectCreated }) => {
@@ -70,16 +72,14 @@ const SubjectSetup = ({ onSubjectCreated }) => {
           <div className="grid grid-cols-2 gap-4">
             <Field label="Semester">
               {(p) => (
-                <select {...p} name="semester" value={subjectData.semester} onChange={handleInputChange} required className={inputClass}>
-                  <option value="" disabled>
-                    Select
-                  </option>
-                  {Array.from({ length: 8 }, (_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      Semester {i + 1}
-                    </option>
-                  ))}
-                </select>
+                <Select
+                  {...p}
+                  required
+                  placeholder="Select"
+                  value={subjectData.semester}
+                  onChange={(semester) => setSubjectData((prev) => ({ ...prev, semester }))}
+                  options={SEMESTER_OPTIONS}
+                />
               )}
             </Field>
             <Field label="Credit hours">

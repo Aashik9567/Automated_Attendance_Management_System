@@ -134,3 +134,11 @@
     background-color: rgb(var(--surface)) !important;
   }
 }
+
+/* Pop-up menus (ui/Select): solid instead of frosted when transparency is reduced. */
+@media (prefers-reduced-transparency: reduce) {
+  .select-menu {
+    background: rgb(var(--surface));
+    backdrop-filter: none;
+  }
+}

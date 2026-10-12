@@ -11,6 +11,9 @@ export { dayjs };
 // previous dashboards used for success vs. exception states.
 export const ATTENDANCE_THRESHOLD = 75;
 
+// Options for the shared ui/Select; values are strings, convert with Number() when saving.
+export const SEMESTER_OPTIONS = Array.from({ length: 8 }, (_, i) => ({ value: String(i + 1), label: `Semester ${i + 1}` }));
+
 export const greeting = (date = new Date()) => {
   const h = date.getHours();
   if (h < 12) return "Good morning";

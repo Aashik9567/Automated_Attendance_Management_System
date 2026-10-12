@@ -3,10 +3,6 @@ import { useId } from "react";
 export const inputClass =
   "focus-ring h-11 w-full rounded-xl border border-line bg-surface px-3.5 text-sm text-ink placeholder:text-ink-3 transition-colors hover:border-brand/40 focus-visible:border-brand/60 focus-visible:ring-offset-0";
 
-// Compact select for table toolbars (filters).
-export const filterClass =
-  "focus-ring h-9 rounded-xl border border-line bg-surface px-3 text-[13px] text-ink-2 transition-colors hover:border-brand/40";
-
 // Label + control + optional hint, wired up for screen readers.
 const Field = ({ label, hint, children }) => {
   const id = useId();

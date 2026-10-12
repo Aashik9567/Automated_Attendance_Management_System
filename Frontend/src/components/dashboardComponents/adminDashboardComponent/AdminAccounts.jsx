@@ -3,12 +3,13 @@ import { Modal, message } from "antd";
 import { Eye, KeyRound, Trash2, UserPlus, Users } from "lucide-react";
 import api from "../../../lib/api";
 import useAsync from "../../../lib/useAsync";
-import { dayjs } from "../../../lib/format";
+import { dayjs, SEMESTER_OPTIONS } from "../../../lib/format";
 import Avatar from "../../ui/Avatar";
 import Button from "../../ui/Button";
 import { Card, CardHeader } from "../../ui/Card";
 import DataTable from "../../ui/DataTable";
-import Field, { filterClass, inputClass } from "../../ui/Field";
+import Field, { inputClass } from "../../ui/Field";
+import Select from "../../ui/Select";
 import PageHeader from "../../ui/PageHeader";
 import SidePanel from "../../ui/SidePanel";
 import StatusBadge from "../../ui/StatusBadge";
@@ -275,19 +276,14 @@ const AdminAccounts = () => {
                       { value: "Admin", label: "Admins" },
                     ]}
                   />
-                  <select
+                  <Select
+                    size="sm"
+                    className="w-40"
                     aria-label="Filter by semester"
                     value={semesterFilter}
-                    onChange={(e) => setSemesterFilter(e.target.value)}
-                    className={filterClass}
-                  >
-                    <option value="all">All semesters</option>
-                    {Array.from({ length: 8 }, (_, i) => (
-                      <option key={i + 1} value={String(i + 1)}>
-                        Semester {i + 1}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setSemesterFilter}
+                    options={[{ value: "all", label: "All semesters" }, ...SEMESTER_OPTIONS]}
+                  />
                 </>
               }
               initialSort={{ key: "joined", dir: "desc" }}
@@ -435,22 +431,14 @@ const AdminAccounts = () => {
               }
             >
               {(p) => (
-                <select
+                <Select
                   {...p}
                   required
+                  placeholder="Select semester"
                   value={form.semester}
-                  onChange={set("semester")}
-                  className={inputClass}
-                >
-                  <option value="" disabled>
-                    Select semester
-                  </option>
-                  {Array.from({ length: 8 }, (_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      Semester {i + 1}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(semester) => setForm((f) => ({ ...f, semester }))}
+                  options={SEMESTER_OPTIONS}
+                />
               )}
             </Field>
           )}

@@ -7,7 +7,9 @@ import AsyncContent from "../../ui/AsyncContent";
 import Button from "../../ui/Button";
 import { Card, CardHeader } from "../../ui/Card";
 import DataTable from "../../ui/DataTable";
-import Field, { filterClass, inputClass } from "../../ui/Field";
+import Field, { inputClass } from "../../ui/Field";
+import Select from "../../ui/Select";
+import { SEMESTER_OPTIONS } from "../../../lib/format";
 import PageHeader from "../../ui/PageHeader";
 import SidePanel from "../../ui/SidePanel";
 import { EmptyState } from "../../ui/States";
@@ -20,7 +22,6 @@ const EMPTY_FORM = {
   creditHours: "3",
   teacher: "",
 };
-const SEMESTERS = Array.from({ length: 8 }, (_, i) => i + 1);
 
 const loadData = async () => {
   const [subjects, users] = await Promise.all([
@@ -33,22 +34,13 @@ const loadData = async () => {
   };
 };
 
-const TeacherSelect = ({ teachers, value, onChange, ...props }) => (
-  <select
-    value={value}
-    onChange={(e) => onChange(e.target.value)}
-    className={inputClass}
+const TeacherSelect = ({ teachers, ...props }) => (
+  <Select
+    placeholder="Choose a teacher"
+    searchable={teachers.length > 6}
+    options={teachers.map((t) => ({ value: t._id, label: t.fullName, description: t.email }))}
     {...props}
-  >
-    <option value="" disabled>
-      Choose a teacher
-    </option>
-    {teachers.map((t) => (
-      <option key={t._id} value={t._id}>
-        {t.fullName} ({t.email})
-      </option>
-    ))}
-  </select>
+  />
 );
 
 const AdminSubjects = () => {
@@ -197,32 +189,22 @@ const AdminSubjects = () => {
               rows={shown}
               toolbar={
                 <>
-                  <select
+                  <Select
+                    size="sm"
+                    className="w-40"
                     aria-label="Filter by semester"
                     value={semesterFilter}
-                    onChange={(e) => setSemesterFilter(e.target.value)}
-                    className={filterClass}
-                  >
-                    <option value="all">All semesters</option>
-                    {SEMESTERS.map((n) => (
-                      <option key={n} value={String(n)}>
-                        Semester {n}
-                      </option>
-                    ))}
-                  </select>
-                  <select
+                    onChange={setSemesterFilter}
+                    options={[{ value: "all", label: "All semesters" }, ...SEMESTER_OPTIONS]}
+                  />
+                  <Select
+                    size="sm"
+                    className="w-48"
                     aria-label="Filter by teacher"
                     value={teacherFilter}
-                    onChange={(e) => setTeacherFilter(e.target.value)}
-                    className={filterClass}
-                  >
-                    <option value="all">All teachers</option>
-                    {data.teachers.map((t) => (
-                      <option key={t._id} value={t._id}>
-                        {t.fullName}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setTeacherFilter}
+                    options={[{ value: "all", label: "All teachers" }, ...data.teachers.map((t) => ({ value: t._id, label: t.fullName }))]}
+                  />
                 </>
               }
               initialSort={{ key: "semester", dir: "asc" }}
@@ -318,22 +300,14 @@ const AdminSubjects = () => {
           </div>
           <Field label="Semester">
             {(p) => (
-              <select
+              <Select
                 {...p}
                 required
+                placeholder="Select semester"
                 value={form.semester}
-                onChange={set("semester")}
-                className={inputClass}
-              >
-                <option value="" disabled>
-                  Select semester
-                </option>
-                {SEMESTERS.map((n) => (
-                  <option key={n} value={n}>
-                    Semester {n}
-                  </option>
-                ))}
-              </select>
+                onChange={(semester) => setForm((f) => ({ ...f, semester }))}
+                options={SEMESTER_OPTIONS}
+              />
             )}
           </Field>
           <Field

@@ -40,7 +40,7 @@ const buildAntdTheme = (mode) => {
       colorFillAlter: p.surface2,
       borderRadius: 10,
       borderRadiusLG: 16,
-      controlHeight: 38,
+      controlHeight: 40,
       fontSize: 14,
       fontFamily: '"Geist Variable", Geist, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
       boxShadowSecondary: "0 12px 32px -8px rgb(15 23 42 / 0.16), 0 4px 8px -4px rgb(15 23 42 / 0.06)",

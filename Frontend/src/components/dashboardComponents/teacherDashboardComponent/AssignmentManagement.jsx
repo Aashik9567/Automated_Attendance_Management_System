@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { colorFor, colors as palette } from "../../ui/colors";
-import { DatePicker, Form, Input, Modal, Select, Upload, message } from "antd";
+import { DatePicker, Form, Input, Modal, Upload, message } from "antd";
+import Select from "../../ui/Select";
 import { ClipboardList, Paperclip, Pencil, Plus, Trash2 } from "lucide-react";
 import dayjs from "dayjs";
 import api, { fetchSubjects } from "../../../lib/api";
@@ -225,8 +226,9 @@ const AssignmentManagement = () => {
           </Form.Item>
           <Form.Item name="subject" label={label("Subject")} rules={[{ required: true, message: "Please select a subject" }]}>
             <Select
+              size="control"
               placeholder="Select subject"
-              options={subjects.map((s) => ({ value: s._id, label: titleCase(s.name) }))}
+              options={subjects.map((s) => ({ value: s._id, label: titleCase(s.name), description: s.code }))}
               loading={subjectsState.loading}
             />
           </Form.Item>
