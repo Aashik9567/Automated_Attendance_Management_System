@@ -238,3 +238,17 @@ The app is deployed on [Render](https://render.com):
 - **Frontend:** static site. Build command `npm install && npm run build`, publish directory `dist`, with `VITE_API_BASE_URL` set to the backend URL.
 - **Backend:** web service. Build command `npm install`, start command `npm start`, with the environment variables above.
 - **Face service:** runs inside the backend locally. For hosting, deploy it separately with `Backend/face-service/Dockerfile` and set `FACE_SERVICE_URL` (and `FACE_SERVICE_KEY`) on the backend.
+
+### Reducing cold starts (free Render plan)
+
+Render's free web services go to sleep after about 15 minutes without traffic, so the first request afterwards is slow. A free [UptimeRobot](https://uptimerobot.com) monitor can ping the backend often enough to keep it awake most of the time.
+
+`GET /health` is built for this: no sign-in, no database or face-service work, and it answers `200` with `{ "success": true, "message": "OK", "timestamp": "..." }`. (`/api/v1/health` is the detailed check and is heavier.)
+
+1. Sign in to UptimeRobot and choose **New monitor**.
+2. **Monitor type:** HTTP(s).
+3. **URL:** `https://automated-attendance-management-system-484c.onrender.com/health`
+4. **Monitoring interval:** 5 minutes (the shortest on the free plan).
+5. Save. Within a few minutes the monitor turns green ("Up"). Open it to see response times and any downtime.
+
+This reduces cold starts but doesn't guarantee there are none: Render can still restart or move the service. A service that never sleeps uses about 730 of the 750 free instance hours per month, so it's the only free web service you can keep awake this way.

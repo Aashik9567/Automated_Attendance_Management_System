@@ -12,6 +12,7 @@ import attendanceRoutes from "./routes/attendance.routes.js";
 import assignmentRoutes from "./routes/assignment.routes.js";
 import holidayRoutes from "./routes/holiday.routes.js";
 import { ensureAdminAccount } from "./controllers/user.controller.js";
+import { healthCheck } from "./controllers/health.controller.js";
 
 const app = express();
 // Render sits behind one proxy; needed for per-client rate limiting.
@@ -41,6 +42,9 @@ app.options("*", cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Lightweight ping for uptime monitors; no auth, no database.
+app.get("/health", healthCheck);
 
 // Liveness/readiness for hosting health checks and debugging.
 app.get("/api/v1/health", async (req, res) => {

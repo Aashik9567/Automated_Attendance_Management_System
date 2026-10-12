@@ -12,6 +12,7 @@ import { User } from "../src/models/user.model.js";
 import { markAttendance, getAttendanceBySubject, getStudentAttendance } from "../src/controllers/attendance.controller.js";
 import { getAssignments } from "../src/controllers/assignment.controller.js";
 import { restrictTo } from "../src/middlewares/roleCheck.middleware.js";
+import { healthCheck } from "../src/controllers/health.controller.js";
 
 const id = () => new mongoose.Types.ObjectId();
 const teacher = { _id: id(), role: "Teacher" };
@@ -107,4 +108,12 @@ test("assignment search treats regex characters as plain text", async () => {
   const res = await run(getAssignments, { user: teacher, query: { search: "lab[1" } });
   assert.equal(res.statusCode, 200);
   assert.equal(filter.title.$regex, "lab\\[1");
+});
+
+test("health check answers 200 without touching the database", async () => {
+  stub(User, "findById", () => assert.fail("must not query"));
+  const res = await run(healthCheck, {});
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.success, true);
+  assert.ok(!Number.isNaN(Date.parse(res.body.timestamp)));
 });
