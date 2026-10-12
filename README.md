@@ -49,6 +49,11 @@ Take one photo of the class: AttendEase detects every face, recognizes enrolled 
 - **Assignments:** upcoming deadlines with due-soon status.
 - **Calendar:** Bikram Sambat (BS) and Gregorian (AD) views with a switch, showing holidays and assignment deadlines.
 
+### Admin
+
+- Sees every account and creates teacher accounts. Public sign-up is for students only.
+- The admin account ("admin") is created on first start from `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
+
 ### Everyone
 
 - Role-based dashboards (teacher / student) with JWT authentication and refresh tokens.
@@ -194,6 +199,7 @@ See [`Backend/face-service/README.md`](Backend/face-service/README.md) for detai
 | Variable | Description |
 | --- | --- |
 | `PORT` | API port (default `8080`) |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Creates the admin account ("admin") on first start; the admin adds teacher accounts |
 | `MONGODB_URL` | MongoDB connection string |
 | `CORS_ORIGIN` | Extra allowed frontend origins, comma-separated |
 | `ACCESS_TOKEN_SECRET`, `ACCESS_TOKEN_EXPIRY` | JWT access token settings |
@@ -213,13 +219,14 @@ See [`Backend/face-service/README.md`](Backend/face-service/README.md) for detai
 
 ## API overview
 
-All routes are under `/api/v1`. Protected routes need a `Bearer` access token.
+All routes are under `/api/v1`. Protected routes need a `Bearer` access token. Errors always look like `{ "success": false, "message": "..." }`. Login and sign-up allow 10 attempts per minute.
 
 | Area | Endpoints |
 | --- | --- |
-| Users | `POST /users/signup`, `POST /users/login`, `POST /users/logout`, `POST /users/refreshtoken`, `PATCH /users/update-profile`, `GET /users/students` |
+| Users | `POST /users/signup` (students only), `POST /users/login`, `POST /users/logout`, `POST /users/refreshtoken`, `PATCH /users/update-profile`, `GET /users/students` (teacher, admin) |
+| Admin | `GET /users`, `POST /users/teachers` |
 | Subjects | `GET/POST /subjects`, `GET /subjects/:id` |
-| Attendance | `POST /attendance/recognize`, `POST /attendance/markattendance`, `GET /attendance/subject/:subjectId`, `GET /attendance/student`, `PUT /attendance/update/:attendanceId`, `DELETE /attendance/delete/:attendanceId` |
+| Attendance | `POST /attendance/recognize`, `POST /attendance/markattendance`, `GET /attendance/subject/:subjectId`, `DELETE /attendance/delete/:attendanceId` (the subject's teacher), `GET /attendance/student` (own records) |
 | Assignments | `GET/POST /assignments`, `GET/PUT/PATCH/DELETE /assignments/:id`, `POST /assignments/:id/submit`, `PATCH /assignments/:id/submissions/:submissionId/grade` |
 | Holidays | `GET/POST /holidays`, `GET/PUT/DELETE /holidays/:id` |
 | Health | `GET /health` |
