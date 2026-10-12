@@ -3,6 +3,8 @@ import { apiError } from "../utils/errorHandler.js";
 import { User } from "../models/user.model.js";
 import { Subject } from "../models/subject.model.js";
 import { StudentSubject } from "../models/studentSubject.model.js";
+import { Attendance } from "../models/attendance.model.js";
+import { Assignment } from "../models/assignment.model.js";
 import apiResponse from "../utils/apiResponse.js";
 import jwt from "jsonwebtoken";
 
@@ -148,6 +150,34 @@ const createTeacher = asyncHandler(async (req, res) => {
     res.status(201).json(new apiResponse(201, "Teacher account created", teacher));
 });
 
+// Admin: delete an account and everything that only makes sense with it.
+// Students: enrollments, attendance entries and submissions. Teachers: their
+// subjects with all attendance, assignments and enrollments. Admins can't be
+// deleted, so the app always keeps one.
+const deleteUser = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id);
+    if (!user) throw new apiError(404, "User not found");
+    if (user.role === "Admin") throw new apiError(403, "Admin accounts can't be deleted");
+
+    if (user.role === "Student") {
+        await Promise.all([
+            StudentSubject.deleteMany({ student: user._id }),
+            Attendance.updateMany({ "students.student": user._id }, { $pull: { students: { student: user._id } } }),
+            Assignment.updateMany({ "submissions.student": user._id }, { $pull: { submissions: { student: user._id } } }),
+        ]);
+    } else {
+        const subjectIds = (await Subject.find({ teacher: user._id }).select("_id")).map((s) => s._id);
+        await Promise.all([
+            Attendance.deleteMany({ $or: [{ subject: { $in: subjectIds } }, { teacher: user._id }] }),
+            Assignment.deleteMany({ $or: [{ subject: { $in: subjectIds } }, { teacher: user._id }] }),
+            StudentSubject.deleteMany({ subject: { $in: subjectIds } }),
+            Subject.deleteMany({ _id: { $in: subjectIds } }),
+        ]);
+    }
+    await user.deleteOne();
+    res.status(200).json(new apiResponse(200, `${user.fullName}'s account was deleted`, { _id: user._id }));
+});
+
 // Creates the admin account ("admin") from ADMIN_EMAIL / ADMIN_PASSWORD the
 // first time the server starts with them set. The password is never in code.
 const ensureAdminAccount = async () => {
@@ -171,5 +201,6 @@ export {
     getAllStudents,
     listUsers,
     createTeacher,
+    deleteUser,
     ensureAdminAccount,
 };

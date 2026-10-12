@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { message } from "antd";
-import { UserPlus, Users } from "lucide-react";
+import { Modal, message } from "antd";
+import { Trash2, UserPlus, Users } from "lucide-react";
 import api from "../../../lib/api";
 import useAsync from "../../../lib/useAsync";
 import { dayjs } from "../../../lib/format";
@@ -19,7 +19,13 @@ import { colors as palette } from "../../ui/colors";
 const ROLE_COLOR = { Admin: "rose", Teacher: "indigo", Student: "emerald" };
 const EMPTY_FORM = { fullName: "", email: "", semester: "", password: "" };
 
-const columns = [
+// What else goes away with the account (mirrors DELETE /users/:id).
+const DELETE_NOTE = {
+  Student: "Their enrollments, attendance entries and assignment submissions will be removed.",
+  Teacher: "Their subjects will be removed, along with all attendance records, assignments and student enrollments for those subjects.",
+};
+
+const baseColumns = [
   {
     key: "name",
     header: "Name",
@@ -44,6 +50,42 @@ const AdminAccounts = () => {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+  const [toDelete, setToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const deleteAccount = async () => {
+    setDeleting(true);
+    try {
+      const { data } = await api.delete(`/users/${toDelete._id}`);
+      setData((list) => list.filter((u) => u._id !== toDelete._id));
+      message.success(data.message);
+      setToDelete(null);
+    } catch (err) {
+      message.error(err.response?.data?.message || "Couldn't delete the account");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const columns = [
+    ...baseColumns,
+    {
+      key: "actions",
+      header: <span className="sr-only">Actions</span>,
+      align: "right",
+      render: (u) =>
+        u.role !== "Admin" && (
+          <Button
+            size="icon-sm"
+            variant="ghost"
+            icon={Trash2}
+            aria-label={`Delete ${u.fullName}`}
+            onClick={() => setToDelete(u)}
+            className="hover:!bg-danger/10 hover:!text-danger"
+          />
+        ),
+    },
+  ];
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
 
@@ -98,6 +140,19 @@ const AdminAccounts = () => {
           </Card>
         )}
       </AsyncContent>
+
+      <Modal title="Delete account?" open={!!toDelete} onCancel={() => setToDelete(null)} footer={null} width={440}>
+        <p className="text-sm text-ink-2">
+          {toDelete?.fullName} ({toDelete?.email}) will no longer be able to sign in. {DELETE_NOTE[toDelete?.role]} This can&apos;t be
+          undone.
+        </p>
+        <div className="mt-6 flex justify-end gap-2">
+          <Button onClick={() => setToDelete(null)}>Cancel</Button>
+          <Button variant="danger" icon={Trash2} loading={deleting} onClick={deleteAccount}>
+            Delete account
+          </Button>
+        </div>
+      </Modal>
 
       <SidePanel
         open={open}

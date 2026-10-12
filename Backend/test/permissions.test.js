@@ -6,7 +6,9 @@ import mongoose from "mongoose";
 import { Subject } from "../src/models/subject.model.js";
 import { Attendance } from "../src/models/attendance.model.js";
 import { Assignment } from "../src/models/assignment.model.js";
-import { signupUser } from "../src/controllers/user.controller.js";
+import { StudentSubject } from "../src/models/studentSubject.model.js";
+import { signupUser, deleteUser } from "../src/controllers/user.controller.js";
+import { User } from "../src/models/user.model.js";
 import { markAttendance, getAttendanceBySubject, getStudentAttendance } from "../src/controllers/attendance.controller.js";
 import { getAssignments } from "../src/controllers/assignment.controller.js";
 import { restrictTo } from "../src/middlewares/roleCheck.middleware.js";
@@ -79,6 +81,24 @@ test("students only see their own assignment submissions", async () => {
   stub(Assignment, "find", () => ({ populate() { return this; }, sort: async () => [doc] }));
   const res = await run(getAssignments, { user: student });
   assert.deepEqual(res.body.data[0].submissions, [mine]);
+});
+
+test("admin accounts cannot be deleted", async () => {
+  stub(User, "findById", async () => ({ _id: id(), role: "Admin", deleteOne: () => assert.fail("must not delete") }));
+  const res = await run(deleteUser, { user: { _id: id(), role: "Admin" }, params: { id: id() } });
+  assert.equal(res.statusCode, 403);
+});
+
+test("deleting a student removes them from attendance and submissions", async () => {
+  const studentId = id();
+  const pulls = [];
+  stub(User, "findById", async () => ({ _id: studentId, role: "Student", fullName: "Sam", deleteOne: async () => {} }));
+  stub(StudentSubject, "deleteMany", async () => {});
+  stub(Attendance, "updateMany", async (filter, update) => pulls.push(update.$pull.students.student));
+  stub(Assignment, "updateMany", async (filter, update) => pulls.push(update.$pull.submissions.student));
+  const res = await run(deleteUser, { user: { _id: id(), role: "Admin" }, params: { id: studentId } });
+  assert.equal(res.statusCode, 200);
+  assert.deepEqual(pulls, [studentId, studentId]);
 });
 
 test("assignment search treats regex characters as plain text", async () => {
