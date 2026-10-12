@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import LandingPage from "./LandingPage";
 import Login from "../../loginSignup/Login.jsx";
 import SignUp from "../../loginSignup/SignUp.jsx";
@@ -7,6 +7,7 @@ import ProtectedRouter from "../../zustand/ProtectedRouter";
 
 // Dashboards load on demand, so the public pages don't download them.
 const page = (load) => lazy(load);
+const AboutPage = page(() => import("./AboutPage"));
 const StudentDashboard = page(() => import("../dashboardComponents/studentDashboardComponent/StudentDashboard"));
 const StudentHomePage = page(() => import("../dashboardComponents/studentDashboardComponent/StudentHomePage.jsx"));
 const StudentCalendar = page(() => import("../dashboardComponents/studentDashboardComponent/StudentCalendar.jsx"));
@@ -31,6 +32,9 @@ const Webroutes = () => (
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/about" element={<AboutPage />} />
+        {/* Old link kept working. */}
+        <Route path="/aboutus" element={<Navigate to="/about" replace />} />
 
         <Route
           path="/studentdashboard"

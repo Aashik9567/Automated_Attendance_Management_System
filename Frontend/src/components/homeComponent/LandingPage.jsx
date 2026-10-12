@@ -16,10 +16,10 @@ import calendarDark from "../../assets/landing/calendar-dark.jpeg";
 import { useTheme } from "../../theme/ThemeProvider";
 
 const NAV = [
-  { href: "#how-it-works", label: "How it works" },
-  { href: "#teachers", label: "For teachers" },
-  { href: "#students", label: "For students" },
-  { href: "#privacy", label: "Privacy" },
+  { href: "/#how-it-works", label: "How it works" },
+  { href: "/#teachers", label: "For teachers" },
+  { href: "/#students", label: "For students" },
+  { href: "/#privacy", label: "Privacy" },
 ];
 
 const STEPS = [
@@ -54,7 +54,7 @@ const STUDENT_POINTS = [
 ];
 
 // Fade up once when scrolled into view; static for reduced-motion users.
-const Reveal = ({ children, className = "", delay = 0 }) => {
+export const Reveal = ({ children, className = "", delay = 0 }) => {
   const reduce = useReducedMotion();
   return (
     <motion.div
@@ -87,7 +87,7 @@ const Screenshot = ({ src, dark, alt, eager = false }) => {
   );
 };
 
-const PrimaryLink = ({ to, children }) => (
+export const PrimaryLink = ({ to, children }) => (
   <Link
     to={to}
     className="focus-ring inline-flex h-11 items-center gap-2 rounded-full bg-ink px-6 text-[15px] font-medium text-canvas transition-[background-color,transform] duration-150 hover:bg-ink/85 active:scale-[0.97]"
@@ -96,7 +96,7 @@ const PrimaryLink = ({ to, children }) => (
   </Link>
 );
 
-const TextLink = ({ to, children }) => (
+export const TextLink = ({ to, children }) => (
   <Link
     to={to}
     className="focus-ring group inline-flex items-center gap-0.5 rounded text-[15px] font-medium text-brand hover:underline"
@@ -109,7 +109,7 @@ const TextLink = ({ to, children }) => (
   </Link>
 );
 
-const PointList = ({ items }) => (
+export const PointList = ({ items }) => (
   <ul className="mt-8 space-y-3">
     {items.map((item) => (
       <li key={item} className="flex gap-3 text-[15px] leading-6 text-ink-2">
@@ -124,13 +124,13 @@ const PointList = ({ items }) => (
   </ul>
 );
 
-const Eyebrow = ({ children }) => (
+export const Eyebrow = ({ children }) => (
   <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-brand">
     {children}
   </p>
 );
 
-const SectionTitle = ({ children, className = "" }) => (
+export const SectionTitle = ({ children, className = "" }) => (
   <h2
     className={`text-balance text-[2rem] font-semibold leading-[1.1] tracking-[-0.025em] text-ink sm:text-[2.75rem] ${className}`}
   >
@@ -138,15 +138,15 @@ const SectionTitle = ({ children, className = "" }) => (
   </h2>
 );
 
-const Header = () => (
+export const Header = () => (
   <header className="sticky top-0 z-50 border-b border-line/70 bg-surface/75 backdrop-blur-xl backdrop-saturate-150">
     <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-6 px-4 sm:px-6">
-      <a href="#top" className="focus-ring flex items-center gap-2 rounded-lg">
+      <Link to="/" className="focus-ring flex items-center gap-2 rounded-lg">
         <img src={logo} alt="" className="h-7 w-7" />
         <span className="text-[15px] font-semibold tracking-tight text-ink">
           AttendEase
         </span>
-      </a>
+      </Link>
       <nav
         aria-label="Page sections"
         className="hidden items-center gap-7 md:flex"
@@ -358,7 +358,7 @@ const ClosingCta = () => (
   </section>
 );
 
-const Footer = () => (
+export const Footer = () => (
   <footer className="border-t border-line px-4 py-10 sm:px-6">
     <div className="mx-auto flex max-w-6xl flex-col gap-6 text-[13px] text-ink-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-2">
@@ -366,6 +366,9 @@ const Footer = () => (
         <span>© {new Date().getFullYear()} AttendEase</span>
       </div>
       <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-2">
+        <Link to="/about" className="focus-ring rounded hover:text-ink">
+          About
+        </Link>
         <Link to="/login" className="focus-ring rounded hover:text-ink">
           Sign in
         </Link>

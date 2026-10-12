@@ -223,7 +223,7 @@ All routes are under `/api/v1`. Protected routes need a `Bearer` access token. E
 
 | Area | Endpoints |
 | --- | --- |
-| Users | `POST /users/signup` (students only), `POST /users/login`, `POST /users/logout`, `POST /users/refreshtoken`, `PATCH /users/update-profile`, `GET /users/students` (teacher, admin) |
+| Users | `POST /users/signup` (students only), `POST /users/login`, `POST /users/logout`, `POST /users/refreshtoken`, `PATCH /users/update-profile`, `PATCH /users/change-password`, `POST /users/avatar`, `GET /users/students` (teacher, admin) |
 | Admin | `GET /users`, `POST /users/teachers`, `DELETE /users/:id` |
 | Subjects | `GET/POST /subjects`, `GET /subjects/:id` |
 | Attendance | `POST /attendance/recognize`, `POST /attendance/markattendance`, `GET /attendance/subject/:subjectId`, `DELETE /attendance/delete/:attendanceId` (the subject's teacher), `GET /attendance/student` (own records) |
