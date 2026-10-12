@@ -70,12 +70,9 @@ export const ThemeProvider = ({ children }) => {
   const resolved = preference === "system" ? (systemDark ? "dark" : "light") : preference;
 
   // The class lives on <html> so antd portals (modals, dropdowns) also get
-  // the right tokens. It is removed when the dashboard unmounts, keeping the
-  // public pages unaffected.
+  // the right tokens. One setting covers the public pages and the dashboards.
   useEffect(() => {
-    const root = document.documentElement;
-    root.classList.toggle("dark", resolved === "dark");
-    return () => root.classList.remove("dark");
+    document.documentElement.classList.toggle("dark", resolved === "dark");
   }, [resolved]);
 
   const antdConfig = useMemo(() => buildAntdTheme(resolved), [resolved]);

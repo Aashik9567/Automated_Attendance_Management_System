@@ -38,7 +38,7 @@ const TeacherHolidayAnnouncement = () => {
       form.resetFields();
       holidaysState.reload({ silent: true });
     } catch (error) {
-      message.error(error.response?.data?.error || "Operation failed");
+      message.error(error.response?.data?.message || "Operation failed");
     } finally {
       setSaving(false);
     }
@@ -51,7 +51,7 @@ const TeacherHolidayAnnouncement = () => {
       if (editId === id) cancelEdit();
       holidaysState.reload({ silent: true });
     } catch (error) {
-      message.error(error.response?.data?.error || "Delete failed");
+      message.error(error.response?.data?.message || "Delete failed");
     }
   };
 

@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import store from './loginStore';
+import { homePath } from '../components/dashboard/navigation';
 
 const ProtectedRouter = ({ children, allowedRoles }) => {
     const location = useLocation();
@@ -15,10 +16,7 @@ const ProtectedRouter = ({ children, allowedRoles }) => {
 
     // Check role permissions
     if (!allowedRoles.includes(loginUserData.role)) {
-        const redirectPath = loginUserData.role === 'Teacher' 
-            ? '/teacherdashboard' 
-            : '/studentdashboard';
-        return <Navigate to={redirectPath} replace />;
+        return <Navigate to={homePath(loginUserData.role)} replace />;
     }
 
     return children;

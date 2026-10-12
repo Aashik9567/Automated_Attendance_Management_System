@@ -27,6 +27,7 @@
 
 /* Role accent: avatar ring, role chip, hero gradient. */
 [data-role="Student"] { --accent: 124 58 237; --hero-from: 79 70 229; --hero-via: 124 58 237; --hero-to: 192 38 211; }
+[data-role="Admin"] { --accent: 225 29 72; --hero-from: 190 18 60; --hero-via: 79 70 229; --hero-to: 124 58 237; }
 [data-role="Teacher"] { --accent: 79 70 229;  --hero-from: 67 56 202; --hero-via: 37 99 235;  --hero-to: 8 145 178; }
 
 .dark {

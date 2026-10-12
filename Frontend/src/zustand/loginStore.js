@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 // Validation function for user roles
-const isValidRole = (role) => ['Student', 'Teacher', null].includes(role);
+const isValidRole = (role) => ['Admin', 'Student', 'Teacher', null].includes(role);
 
 const initialLoginState = {
     _id: null,

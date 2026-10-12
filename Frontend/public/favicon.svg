@@ -1,25 +1,41 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="240 225 775 790" fill="none">
   <defs>
-    <linearGradient id="bg" x1="6" y1="4" x2="58" y2="60" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#4F46E5"/>
-      <stop offset="1" stop-color="#7C3AED"/>
+    <linearGradient id="aeBlue" x1="300" y1="250" x2="960" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0A72FF"/>
+      <stop offset=".55" stop-color="#1E3FE0"/>
+      <stop offset="1" stop-color="#3A1EC8"/>
     </linearGradient>
-    <linearGradient id="shine" x1="32" y1="0" x2="32" y2="34" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#fff" stop-opacity=".22"/>
-      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    <linearGradient id="aeGreen" x1="680" y1="670" x2="850" y2="840" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#16C24A"/>
+      <stop offset="1" stop-color="#0FAE6E"/>
     </linearGradient>
+    <linearGradient id="aeScan" x1="385" y1="0" x2="870" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5CD6FF" stop-opacity="0"/>
+      <stop offset=".2" stop-color="#5CD6FF"/>
+      <stop offset=".8" stop-color="#5CD6FF"/>
+      <stop offset="1" stop-color="#5CD6FF" stop-opacity="0"/>
+    </linearGradient>
+    <!-- transparent ring around the badge, so it works on light and dark backgrounds -->
+    <mask id="aeCut" maskUnits="userSpaceOnUse" x="240" y="225" width="775" height="790">
+      <rect x="240" y="225" width="775" height="790" fill="#fff"/>
+      <circle cx="762" cy="751" r="104"/>
+    </mask>
   </defs>
-  <rect width="64" height="64" rx="15" fill="url(#bg)"/>
-  <rect width="64" height="64" rx="15" fill="url(#shine)"/>
-  <g stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
-    <!-- scan frame corners -->
-    <path d="M14 23v-4a5 5 0 0 1 5-5h4"/>
-    <path d="M41 14h4a5 5 0 0 1 5 5v4"/>
-    <path d="M50 41v4a5 5 0 0 1-5 5h-4"/>
-    <path d="M23 50h-4a5 5 0 0 1-5-5v-4"/>
-    <!-- face -->
-    <path d="M25 27.5v1.5"/>
-    <path d="M39 27.5v1.5"/>
-    <path d="M25.5 37.5c3.6 3.4 9.4 3.4 13 0"/>
+  <!-- scan frame -->
+  <g stroke="url(#aeBlue)" stroke-width="44" stroke-linecap="round" mask="url(#aeCut)">
+    <path d="M353 390V306q0-43 43-43h90"/>
+    <path d="M769 263h88q43 0 43 43v84"/>
+    <path d="M353 512v80q0 43 43 43h46"/>
+    <path d="M900 512v80q0 43-43 43h-46"/>
   </g>
+  <!-- person -->
+  <circle cx="627" cy="454" r="132" fill="url(#aeBlue)"/>
+  <path d="M427 770c16-95 100-164 200-164s184 69 200 164c-58 42-128 65-200 65s-142-23-200-65z" fill="url(#aeBlue)" mask="url(#aeCut)"/>
+  <!-- scan line -->
+  <rect x="385" y="449" width="485" height="13" rx="6.5" fill="url(#aeScan)"/>
+  <!-- cradling hand -->
+  <path d="M302 752c26-12 58 8 88 43l205 94c20 11 44 11 64 0l238-129c30-16 64-12 68 13 4 22-24 44-70 86L790 951c-90 76-232 76-322 0L312 820c-34-29-38-58-10-68z" fill="url(#aeBlue)" mask="url(#aeCut)"/>
+  <!-- verified badge -->
+  <circle cx="762" cy="751" r="88" fill="url(#aeGreen)"/>
+  <path d="M716 750l34 34 62-64" stroke="#fff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

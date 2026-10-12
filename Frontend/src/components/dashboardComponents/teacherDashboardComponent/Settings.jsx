@@ -273,13 +273,15 @@ const Settings = () => {
               >
                 <Input size="large" disabled prefix={<Mail className="h-4 w-4 text-ink-3" aria-hidden="true" />} />
               </Form.Item>
-              <Form.Item name="semester" label={label("Semester")} rules={[{ required: true, message: "Please select your semester" }]}>
-                <Select
-                  size="large"
-                  placeholder="Select semester"
-                  options={Array.from({ length: 8 }, (_, i) => ({ value: (i + 1).toString(), label: `Semester ${i + 1}` }))}
-                />
-              </Form.Item>
+              {loginUserData.role !== "Admin" && (
+                <Form.Item name="semester" label={label("Semester")} rules={[{ required: true, message: "Please select your semester" }]}>
+                  <Select
+                    size="large"
+                    placeholder="Select semester"
+                    options={Array.from({ length: 8 }, (_, i) => ({ value: (i + 1).toString(), label: `Semester ${i + 1}` }))}
+                  />
+                </Form.Item>
+              )}
               <Form.Item name="role" label={label("Account type")}>
                 <Select
                   size="large"
@@ -287,6 +289,7 @@ const Settings = () => {
                   options={[
                     { value: "Student", label: "Student" },
                     { value: "Teacher", label: "Teacher" },
+                    { value: "Admin", label: "Admin" },
                   ]}
                 />
               </Form.Item>

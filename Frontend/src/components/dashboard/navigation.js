@@ -1,4 +1,4 @@
-import { BarChart3, CalendarDays, CalendarRange, ClipboardList, LayoutGrid, ScanFace, Settings, UserCheck } from "lucide-react";
+import { BarChart3, CalendarDays, CalendarRange, ClipboardList, LayoutGrid, ScanFace, Settings, UserCheck, Users } from "lucide-react";
 
 // Paths match the routes in Webroutes.jsx. `mobile: true` items appear in the
 // bottom tab bar; the rest live under "More".
@@ -29,7 +29,16 @@ export const navigation = {
     settingsPath: "/teacherdashboard/settings",
     holidaysPath: "/teacherdashboard/holiday-annoucement",
   },
+  Admin: {
+    base: "/admindashboard",
+    workspace: "Admin",
+    items: [{ name: "Accounts", path: "/admindashboard", icon: Users, color: "rose", mobile: true }],
+    settingsPath: "/admindashboard/settings",
+  },
 };
+
+// Where each role lands after signing in.
+export const homePath = (role) => navigation[role]?.base || "/login";
 
 export const settingsItem = { name: "Settings", icon: Settings, color: "violet" };
 

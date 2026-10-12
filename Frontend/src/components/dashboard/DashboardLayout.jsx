@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { message } from "antd";
 import store from "../../zustand/loginStore";
 import api from "../../lib/api";
-import { ThemeProvider } from "../../theme/ThemeProvider";
 import Sidebar from "./Sidebar";
 import TopHeader from "./TopHeader";
 import MobileNavigation from "./MobileNavigation";
@@ -81,7 +80,10 @@ const Shell = ({ role }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <Outlet context={{ changeTab: (_name, path) => navigate(path) }} />
+            {/* Pages load on demand; the shell stays put meanwhile. */}
+            <Suspense fallback={null}>
+              <Outlet context={{ changeTab: (_name, path) => navigate(path) }} />
+            </Suspense>
           </motion.div>
         </main>
       </div>
@@ -91,10 +93,6 @@ const Shell = ({ role }) => {
   );
 };
 
-const DashboardLayout = ({ role }) => (
-  <ThemeProvider>
-    <Shell role={role} />
-  </ThemeProvider>
-);
+const DashboardLayout = ({ role }) => <Shell role={role} />;
 
 export default DashboardLayout;

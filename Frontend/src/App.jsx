@@ -1,7 +1,12 @@
 import Webroutes from "./components/homeComponent/Webroutes";
+import { ThemeProvider } from "./theme/ThemeProvider";
 
 function App() {
-  return <Webroutes />;
+  return (
+    <ThemeProvider>
+      <Webroutes />
+    </ThemeProvider>
+  );
 }
 
 export default App;

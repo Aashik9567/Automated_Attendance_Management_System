@@ -114,7 +114,7 @@ const TopHeader = ({ config, page, user, onLogout, collapsed, onToggleCollapsed 
 
             {/* Grouped utilities capsule */}
             <div className="flex items-center gap-0.5 rounded-full border border-line bg-surface-2/70 p-1">
-              <NotificationsMenu holidaysPath={config.holidaysPath} />
+              {config.holidaysPath && <NotificationsMenu holidaysPath={config.holidaysPath} />}
               <span className="h-5 w-px bg-line" aria-hidden="true" />
               <ThemeToggle />
             </div>

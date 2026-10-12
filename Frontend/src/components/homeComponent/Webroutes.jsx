@@ -1,38 +1,44 @@
-import LandingPage from "./LandingPage";
-import AboutUs from "./AboutUs";
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import TeacherDashboard from "../dashboardComponents/teacherDashboardComponent/TeacherDashboard.jsx";
+import LandingPage from "./LandingPage";
 import Login from "../../loginSignup/Login.jsx";
 import SignUp from "../../loginSignup/SignUp.jsx";
 import ProtectedRouter from "../../zustand/ProtectedRouter";
-import StudentDashboard from "../dashboardComponents/studentDashboardComponent/StudentDashboard";
-import HomePage from "../dashboardComponents/teacherDashboardComponent/HomePage";
-import AttendanceSheet from "../dashboardComponents/teacherDashboardComponent/AttendanceSheet";
-import Settings from "../dashboardComponents/teacherDashboardComponent/Settings";
-import AssignmentManagement from "../dashboardComponents/teacherDashboardComponent/AssignmentManagement";
-import AttendanceReport from "../dashboardComponents/teacherDashboardComponent/AttendanceReport.jsx";
-import StudentHomePage from "../dashboardComponents/studentDashboardComponent/StudentHomePage.jsx";
-import StudentCalendar from "../dashboardComponents/studentDashboardComponent/StudentCalendar.jsx";
-import StudentAssignmentViewer from "../dashboardComponents/studentDashboardComponent/StudentAssignmentViewer.jsx";
-import Holiday from "../dashboardComponents/studentDashboardComponent/Holiday.jsx";
-import StudentAttendance from "../dashboardComponents/studentDashboardComponent/StudentAttendance.jsx";
-import TeacherHolidayAnnouncement from "../dashboardComponents/teacherDashboardComponent/TeacherHolidayAnnoucement.jsx";
-const Webroutes = () => {
-  
-  return (
-    <BrowserRouter future={{ v7_relativeSplatPath: true }}>
+
+// Dashboards load on demand, so the public pages don't download them.
+const page = (load) => lazy(load);
+const StudentDashboard = page(() => import("../dashboardComponents/studentDashboardComponent/StudentDashboard"));
+const StudentHomePage = page(() => import("../dashboardComponents/studentDashboardComponent/StudentHomePage.jsx"));
+const StudentCalendar = page(() => import("../dashboardComponents/studentDashboardComponent/StudentCalendar.jsx"));
+const StudentAssignmentViewer = page(() => import("../dashboardComponents/studentDashboardComponent/StudentAssignmentViewer.jsx"));
+const StudentAttendance = page(() => import("../dashboardComponents/studentDashboardComponent/StudentAttendance.jsx"));
+const Holiday = page(() => import("../dashboardComponents/studentDashboardComponent/Holiday.jsx"));
+const TeacherDashboard = page(() => import("../dashboardComponents/teacherDashboardComponent/TeacherDashboard.jsx"));
+const HomePage = page(() => import("../dashboardComponents/teacherDashboardComponent/HomePage"));
+const AttendanceSheet = page(() => import("../dashboardComponents/teacherDashboardComponent/AttendanceSheet"));
+const AssignmentManagement = page(() => import("../dashboardComponents/teacherDashboardComponent/AssignmentManagement"));
+const AttendanceReport = page(() => import("../dashboardComponents/teacherDashboardComponent/AttendanceReport.jsx"));
+const TeacherHolidayAnnouncement = page(() => import("../dashboardComponents/teacherDashboardComponent/TeacherHolidayAnnoucement.jsx"));
+const Settings = page(() => import("../dashboardComponents/teacherDashboardComponent/Settings"));
+const AdminDashboard = page(() => import("../dashboardComponents/adminDashboardComponent/AdminDashboard.jsx"));
+const AdminAccounts = page(() => import("../dashboardComponents/adminDashboardComponent/AdminAccounts.jsx"));
+
+const Webroutes = () => (
+  <BrowserRouter future={{ v7_relativeSplatPath: true }}>
+    {/* Blank canvas while a dashboard shell loads; pages inside load under the shell. */}
+    <Suspense fallback={<div className="min-h-screen bg-canvas" />}>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/aboutus" element={<AboutUs />} />
+
         <Route
           path="/studentdashboard"
           element={
-            <ProtectedRouter allowedRoles={['Student']}>
-            <StudentDashboard />
+            <ProtectedRouter allowedRoles={["Student"]}>
+              <StudentDashboard />
             </ProtectedRouter>
-            }
+          }
         >
           <Route index element={<StudentHomePage />} />
           <Route path="calendar" element={<StudentCalendar />} />
@@ -45,24 +51,33 @@ const Webroutes = () => {
         <Route
           path="/teacherdashboard"
           element={
-           <ProtectedRouter  allowedRoles={['Teacher']}>
+            <ProtectedRouter allowedRoles={["Teacher"]}>
               <TeacherDashboard />
-             </ProtectedRouter>
+            </ProtectedRouter>
           }
         >
           <Route index element={<HomePage />} />
           <Route path="attendance" element={<AttendanceSheet />} />
           <Route path="assignment" element={<AssignmentManagement />} />
-          <Route
-            path="reports"
-            element={<AttendanceReport />}
-          />
+          <Route path="reports" element={<AttendanceReport />} />
           <Route path="settings" element={<Settings />} />
           <Route path="holiday-annoucement" element={<TeacherHolidayAnnouncement />} />
         </Route>
+
+        <Route
+          path="/admindashboard"
+          element={
+            <ProtectedRouter allowedRoles={["Admin"]}>
+              <AdminDashboard />
+            </ProtectedRouter>
+          }
+        >
+          <Route index element={<AdminAccounts />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
       </Routes>
-    </BrowserRouter>
-  );
-};
+    </Suspense>
+  </BrowserRouter>
+);
 
 export default Webroutes;
